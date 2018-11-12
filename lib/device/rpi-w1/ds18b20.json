@@ -1,0 +1,62 @@
+{
+    "name": "DS18B20",
+    "category": "Raspberry Pi",
+    "group": "1-Wire",
+    "description": "Configuration for a 1-Wire temperature sensor for the Raspberry Pi, type DS18B20",
+    
+    "scan": true,
+    "driver": "rpi-w1",
+    "devices": [
+        {
+            "description": "DS18B20 temperature sensor",
+            "settings": "type:SENSOR_TEMPERATURE"
+        }
+    ],
+    
+    "options": [
+        {
+            "id": "id",
+            "name": "Device ID",
+            "description": "The device ID, retrievable through scanning.",
+            "type": "text",
+            "scan": true,
+            "mandatory": true,
+            "syntax": "deviceAddress"
+        }
+    ],
+    
+    "channels": [
+        {
+            "name": "temperature",
+            "description": "DS18B20 temperature",
+            "settings": "unit:CELSIUS",
+            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 900000, "loggingTolerance": 0.25, "average": true},
+            "configs": {"samplingInterval": 60000, "unit": "°C", "valueType":"DOUBLE"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "temperature"}
+                }
+            ]
+        }
+    ],
+    
+    "feeds": [
+        {
+            "name": "temperature",
+            "tag": "Temperature",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+			"unit": "°C"
+        }
+    ],
+    
+    "prefix": "name",
+    "syntax": {
+        "deviceAddress": {
+            "keyValue": true,
+            "assignment": ":",
+            "separator": ","
+        }
+    }
+}

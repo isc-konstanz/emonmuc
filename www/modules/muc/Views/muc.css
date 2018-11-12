@@ -1,0 +1,187 @@
+.progress-default .bar,
+.progress .bar-default {
+  background-color: #dddddd;
+  background-image: -moz-linear-gradient(top, #eeeeee, #cccccc);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#eeeeee), to(#cccccc));
+  background-image: -webkit-linear-gradient(top, #eeeeee, #cccccc);
+  background-image: -o-linear-gradient(top, #eeeeee, #cccccc);
+  background-image: linear-gradient(to bottom, #eeeeee, #cccccc);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffeeeeee', endColorstr='#ffcccccc', GradientType=0);
+}
+
+.progress-default.progress-striped .bar,
+.progress-striped .bar-default {
+  background-color: #eeeeee;
+  background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(0.25, rgba(255, 255, 255, 0.15)), color-stop(0.25, transparent), color-stop(0.5, transparent), color-stop(0.5, rgba(255, 255, 255, 0.15)), color-stop(0.75, rgba(255, 255, 255, 0.15)), color-stop(0.75, transparent), to(transparent));
+  background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+  background-image: -moz-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+  background-image: -o-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+  background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+}
+
+.btn-round {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.btn-round.btn-large {
+    width: 48px;
+    height: 48px;
+}
+
+.btn-round.btn-small {
+    width: 34px;
+    height: 34px;
+}
+
+.btn-round.btn-mini {
+    width: 24px;
+    height: 24px;
+}
+
+.view-container {
+    padding-top: 8px;
+}
+
+.modal-container {
+    position: relative;
+    width:100%;
+}
+
+.modal-overlay {
+    position: absolute;
+    top: 0; bottom:0; left: 0; right:0;
+    margin: auto;
+    background: rgba(255, 255, 255, .8) center;
+}
+
+.modal-adjust {
+    width: 60%; left:20%; /* (100%-width)/2 */
+    margin-left: auto; margin-right: auto;
+    overflow-y: hidden;
+}
+
+.modal-adjust .modal-body {
+    max-height: none;
+    overflow-y: auto;
+}
+
+.modal-adjust .divider {
+    *width: 100%;
+    height: 1px;
+    margin: 9px 1px;
+    *margin: -5px 0 5px;
+    overflow: hidden;
+    background-color: #e5e5e5;
+    border-bottom: 1px solid #ffffff;
+}
+
+.modal-adjust .alert-comment {
+    margin: 0px;
+    color: #737373;
+    background-color: #f9f9f9;
+    border-color: #e6e6e6;
+}
+
+.modal-adjust .alert-comment h4 {
+    color: #737373;
+}
+
+.scan-result li {
+    padding: 6px 6px 6px 0px;
+    vertical-align: middle;
+    cursor: pointer;
+}
+.scan-result li:hover,
+.scan-result li:focus {
+    color: #3a87ad;
+}
+
+.modal-option .option-header {
+    margin-top: 8px;
+}
+
+.modal-option .option-header {
+    cursor: pointer;
+    padding-top: 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.modal-option .option-header .icon-collapse {
+    vertical-align: middle;
+    margin-left: 2px;
+    margin-right: 2px;
+    margin-bottom: 4px;
+    opacity: 0.3;
+}
+
+.modal-option .option-header h5 {
+    vertical-align: middle;
+    margin: 0px;
+    color: #555555;
+}
+
+.modal-option .option-header:hover {
+    background-color: #f5f5f5;
+}
+
+.modal-option .input-large {
+    margin-bottom: 0px;
+}
+
+.table-option tbody + tbody {
+    border-top: 1px solid #dddddd;
+}
+.table-option tbody:hover {
+    background-color: #f5f5f5;
+}
+.table-option td {
+    border-top-width: 0px;
+    vertical-align: middle;
+}
+.table-option td:nth-of-type(1) { width: 210px; }
+.table-option td:nth-of-type(3) { text-align: right; }
+.table-option td:nth-of-type(4) { width:14px; text-align: center; }
+
+.table-option input[type="text"] {
+    width: 195px;
+}
+
+.table-option input[type="checkbox"] {
+    margin: 0px;
+}
+.table-option input[type=checkbox]:focus+:before {
+    outline: none !important;
+}
+
+/* Chrome */
+@supports (-webkit-appearance:none ) {
+    .checkbox-slider--b-flat {
+        padding: 0px;
+        height: 20px;
+    }
+}
+
+/* IE */
+@media screen and (-ms-high-contrast: active) , ( -ms-high-contrast : none) {
+    .checkbox-slider--b-flat {
+        padding: 0px;
+        height: 20px;
+    }
+}
+
+/* Firefox */
+_:-moz-tree-row(hover), .checkbox-slider--b-flat {
+    padding: 0px;
+    height: 20px;
+    width: 20px;
+    border-radius: 25px;
+    background-color: gainsboro;
+}
+
+*::before, *::after {
+    box-sizing: border-box;
+}

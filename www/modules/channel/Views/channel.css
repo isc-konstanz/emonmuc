@@ -1,0 +1,66 @@
+.channel-name {
+    width: 20%;
+    min-width: 90px;
+    max-width: 210px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 12px;
+}
+.channel-description > * {
+    color: #999;
+}
+@media(max-width: 900px) {
+    .channel-description { display: none !important; }
+}
+.channel-time > * {
+    padding-right: 8px;
+    text-align: right;
+}
+@media(max-width: 700px) {
+    .channel-time { display: none !important; }
+}
+.channel-flag > * {
+    padding-right: 12px;
+}
+.channel-sample {
+    width: 5%;
+    min-width: 40px;
+    text-align: right;
+}
+.channel-unit > * {
+    padding-left: 6px;
+    padding-right: 12px;
+    color: #999;
+}
+@media(max-width: 600px) {
+    .channel-sample { display: none !important; }
+    .channel-unit { display: none !important; }
+}
+
+.channels input {
+    margin: 0px;
+    text-align: right;
+}
+
+/* For Firefox */
+.channels input[type='number'] {
+    -moz-appearance: textfield;
+}
+
+/* Webkit browsers like Safari and Chrome */
+.channels input[type=number]::-webkit-inner-spin-button,
+.channels input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0px;
+}
+
+.channels input[type="checkbox"] {
+    margin: 0px;
+}
+.channels input[type=checkbox]:focus+:before {
+    outline: none !important;
+}
+.channels .channel-checkbox {
+    width: 40px;
+    float: right;
+}

@@ -1,0 +1,234 @@
+#!/bin/bash
+#Scriptname: emonmuc
+#Description: Script to start, stop, restart and reload EmonMUC
+
+# Add JVM options here.
+JVM_OPTS="-Djava.library.path=/usr/lib/jni -cp /usr/share/java/RXTXcomm.jar"
+
+# Set location for PID and Error output file. Default is "$EMONMUC_DIR/log/emonmuc.pid" or ".log"
+PID_FILE=/var/run/emonmuc/emonmuc.pid
+#ERR_FILE=/var/log/emonmuc/emonmuc.out
+ERR_FILE=/dev/null
+
+# Optionally set the location of the emonmuc framework. If the
+# variable is not set, it is assumed that this script is located
+# within the "bin" folder of the emonmuc framework folder.
+#EMONMUC_DIR="/path/to/emonmuc/"
+
+
+find_home_dir() {
+  # Attempt to set EMONMUC_DIR
+  # Resolve links: $0 may be a link
+  PRG="$0"
+  # Need this for relative symlinks.
+  while [ -h "$PRG" ] ; do
+    ls=`ls -ld "$PRG"`
+    link=`expr "$ls" : '.*-> \(.*\)$'`
+    if expr "$link" : '/.*' > /dev/null; then
+      PRG="$link"
+    else
+      PRG=`dirname "$PRG"`"/$link"
+    fi
+  done
+  SAVED="`pwd`"
+  cd "`dirname \"$PRG\"`/.." >/dev/null
+  EMONMUC_DIR="`pwd -P`"
+  cd "$SAVED" >/dev/null
+}
+
+if [ -z ${EMONMUC_DIR+x} ]; then
+  find_home_dir
+fi
+cd "$EMONMUC_DIR"
+
+EMONMUC_USER=`stat -c "%U" bin/emonmuc`
+
+# If root change user to owner of this script
+if [ $UID -eq 0 ] ; then
+  if [ "$EMONMUC_USER" != "root" ]; then
+    echo "Executed as root, will run as owner of this script: $EMONMUC_USER"
+    exec sudo -u $EMONMUC_USER bin/emonmuc "$@"
+  fi
+fi
+
+# Determine the Java command to use to start the JVM.
+if [ -n "$JAVA_HOME" ] ; then
+  if [ -x "$JAVA_HOME/jre/sh/java" ]; then
+    # IBM's JDK on AIX uses strange locations for the executables
+    JAVA_CMD="$JAVA_HOME/jre/sh/java"
+  else
+    JAVA_CMD="$JAVA_HOME/bin/java"
+  fi
+  if [ ! -x "$JAVA_CMD" ] ; then
+    echo "ERROR: JAVA_HOME is set to an invalid directory: $JAVA_HOME
+
+Please set the JAVA_HOME variable in your environment to match the
+location of your Java installation."
+    exit 1
+  fi
+else
+  JAVA_CMD="java"
+  type java >/dev/null 2>&1 || { echo "ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH.
+
+Please set the JAVA_HOME variable in your environment to match the
+location of your Java installation."; exit 1; }
+fi
+
+start() {
+  if [ -f $PID_FILE ]; then
+    if ps -p `cat $PID_FILE` > /dev/null
+    then
+      echo "EmonMUC is already running. Stop it first before running EmonMUC again."
+      exit 2
+    else
+      rm -f $PID_FILE
+    fi
+  fi
+
+  echo -e "\e[96m\e[1m$(cat $EMONMUC_DIR/lib/framework/welcome.txt)\e[0m"
+
+  if [ "$2" != "-fg" ]
+  then
+    echo "Starting in background. To start EmonMUC in foreground run this script with the -fg flag."
+    # Option: -Dgosh.args=--nointeractive is necessary for running emonmuc in background
+    exec "$JAVA_CMD" $JVM_OPTS -Dgosh.args=--nointeractive -jar "$EMONMUC_DIR"/bin/felix.jar >"$ERR_FILE" 2>&1 &
+  else
+    exec "$JAVA_CMD" $JVM_OPTS -jar "$EMONMUC_DIR"/bin/felix.jar
+  fi
+
+  if [ $? = 0 ]; then
+    # save PID of the emonmuc background process
+    echo $! > $PID_FILE
+    exit 0;
+  else
+    exit 1;
+  fi
+  echo "done"
+}
+
+stop() {
+  echo -n "Stopping EmonMUC"
+  terminate
+  RET_STATUS=$?
+  case "$RET_STATUS" in
+    0)
+      echo "done"
+      exit 0
+      ;;
+    1)
+    echo "No EmonMUC process is running"
+      exit 1
+      ;;
+    2)
+      echo "Unable to stop EmonMUC, try -f flag to kill by brute force"
+      exit 2
+      ;;
+    3)
+      echo "Unable to stop EmonMUC, user has no permission to stop process."
+      exit 3
+      ;;
+  esac
+}
+
+terminate() {
+    # Return
+    #   0 if daemon has been stopped
+    #   1 if daemon was not running
+    #   2 if daemon could not be stopped (likely because kill level was too low)
+    #   3 if user has no right to stop the daemon
+
+  if [ ! -e $PID_FILE ]; then
+    return 1
+  fi
+
+  #TODO check if PID from file matches a java felix process
+
+  TMP_PID=`cat $PID_FILE`
+
+  if ! ps -p "${TMP_PID}" >/dev/null 2>&1;
+  then
+    rm -f $PID_FILE
+    return 1
+  fi
+  
+  if ! kill -0 "${TMP_PID}" >/dev/null 2>&1;
+  then
+    return 3
+  fi
+  
+  if [ "$2" = "-f" ]
+  then
+    kill -9 $TMP_PID >/dev/null 2>&1
+    RET_STATUS=$?
+  else
+    kill $TMP_PID >/dev/null 2>&1
+    RET_STATUS=$?
+  fi
+
+  if [ $RET_STATUS -ne 0 ]; then
+    return 2
+  fi
+
+  local i=0    
+    while kill -0 "${TMP_PID}" 2> /dev/null;  do
+      if [ $i = '5' ]; then
+        return 2
+      fi
+      echo -n "."
+      sleep 1
+      i=$(($i+1))
+    done
+
+  rm -f $PID_FILE
+  return 0
+}
+
+bundles() {
+  source "$EMONMUC_DIR"/lib/framework/bundles.sh
+  if [ "$1" == "update" ]; then
+    update
+
+  elif [ $# -gt 1 ]; then
+    for bundle in "${@:2}"; do
+      bundle "$1" "$bundle"
+    done
+  else
+    echo "Specify one or more bundles to be installed"
+    exit 1
+  fi
+
+  echo "For the changes to take effect, please restart the framework:
+  systemctl restart emonmuc"
+}
+
+case "$1" in
+  start)
+    start $@
+    ;;
+  stop)
+    stop
+    ;;
+  restart)
+    stop
+    sleep 10
+    start $@
+    ;;
+  reload)
+    echo "Reaload configuration"
+    { echo "emonmuc:reload"; sleep 1; } | nc 127.0.0.1 6666
+    ;;
+  update | install | remove)
+    bundles $@
+    ;;
+  shell)
+    echo "Using nc to connect to remote shell at 127.0.0.1:6666"
+    echo "Press ctrl+d to close connection"
+    exec nc 127.0.0.1 6666
+    ;;
+  *)
+    echo "Synopsis: emonmuc {start|stop|restart|reload|update|install|remove|shell}"
+    exit 1
+    ;;
+esac
+
+exit 0

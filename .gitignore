@@ -1,0 +1,18 @@
+# Eclipse project files
+*.buildpath
+*.project
+*.settings/
+*.md.html
+
+# Framework
+log/
+cache/
+bundles/
+conf/
+!conf/logback.xml
+!conf/system.properties
+!conf/config.properties
+!conf/emoncms.apache2.conf
+!conf/emoncms.default.conf
+!conf/emoncms.settings.php
+!conf/https-certificate.jks

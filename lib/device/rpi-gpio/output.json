@@ -1,0 +1,78 @@
+{
+    "name": "Output",
+    "category": "Raspberry Pi",
+    "group": "GPIO",
+    "description": "Configuration for a Raspberry Pi pin as an output.",
+    
+    "driver": "rpi-gpio",
+    "devices": [
+        {
+            "description": "Raspberry Pi Output",
+            "settings": "mode:DIGITAL_OUTPUT"
+        }
+    ],
+    
+    "scan": {
+        "settings": "mode:DIGITAL_OUTPUT"
+    },
+    
+    "options": [
+        {
+            "id": "pin",
+            "name": "Pin",
+            "description": "The Pin number, according to the <a href='http://pi4j.com/pin-numbering-scheme.html'>WiringPi Pin Numbering Scheme</a>",
+            "type": "text",
+            "scan": true,
+            "mandatory": true,
+            "syntax": "deviceAddress"
+        }
+    ],
+    
+    "items": [
+        {
+            "id": "state",
+            "type": "Switch",
+            "label": "Pin state",
+            "left": "Low",
+            "right": "High",
+            "mapping": {
+                "ON": { "channel": "state", "value": true },
+                "OFF": { "channel": "state", "value": false }
+            },
+            "input": "state"
+        }
+    ],
+    
+    "channels": [
+        {
+            "name": "state",
+            "description": "Pin state",
+            "logging": {"loggingInterval": 5000, "loggingMaxInterval": 60000},
+            "configs": {"samplingInterval": 5000, "valueType":"BOOLEAN"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "state"}
+                }
+            ]
+        }
+    ],
+    
+    "feeds": [
+        {
+            "name": "state",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPFINA",
+            "interval": "60"
+        }
+    ],
+    
+    "prefix": "name",
+    "syntax": {
+        "deviceAddress": {
+            "keyValue": true,
+            "assignment": ":",
+            "separator": ","
+        }
+    }
+}

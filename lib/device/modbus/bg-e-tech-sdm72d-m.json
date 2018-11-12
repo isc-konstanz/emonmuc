@@ -1,0 +1,147 @@
+{
+    "name": "SDM72D-M",
+    "category": "Energy meters",
+    "group": "B+G E-TECH",
+    "description": "<b>Energy Meter SDM72D-M</b>:<br>Current: 10(100)A<br>Voltage : 3*230V<br>50(60)Hz",
+    
+    "devices": [
+        {
+            "driver": "modbus",
+            "description": "Energy Meter",
+            "settings": "RTU:SERIAL_ENCODING_RTU:9600:DATABITS_8:PARITY_NONE:STOPBITS_2:ECHO_FALSE:FLOWCONTROL_NONE:FLOWCONTROL_NONE"
+        }
+    ],
+    
+    "options": [
+        {
+            "id": "address",
+            "name": "Address",
+            "description": "The physical device address to uniquely identify a physical smart meter.<br><br><b>Example:</b><ol><li><b>Linux</b>: /dev/ttyS0 or /dev/ttyUSB0</li><li><b>Windows</b>: COM1</li></ol>",
+            "type": "text",
+            "mandatory": true,
+            "syntax": "deviceAddress"
+        },
+        {
+            "id": "unitId",
+            "name": "Unid ID",
+            "description": "The device address of the Modbus slave.<br>The slave device address is assigned form 1 to 247.<br>Address 0 is used as broadcast address.</li></ul>",
+            "type": "text",
+            "mandatory": true,
+            "syntax": "channelAddress"
+        }
+    ],
+    
+    "channels": [
+        {
+            "name": "power",
+            "description": "Total power",
+            "address": "<unitId>:INPUT_REGISTERS:52:FLOAT",
+            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 180000},
+            "configs": {"samplingInterval": 60000, "valueType":"FLOAT", "unit": "W"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "power"}
+                }
+            ]
+        },
+        {
+            "name": "import_energy",
+            "description": "Import energy",
+            "address": "<unitId>:INPUT_REGISTERS:72:FLOAT",
+            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 180000},
+            "configs": {"samplingInterval": 60000, "valueType":"FLOAT", "unit": "kWh"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "import_energy"}
+                }
+            ]
+        },
+        {
+            "name": "export_energy",
+            "description": "Export energy",
+            "address": "<unitId>:INPUT_REGISTERS:74:FLOAT",
+            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 180000},
+            "configs": {"samplingInterval": 60000, "valueType":"FLOAT", "unit": "kWh"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "export_energy"}
+                }
+            ]
+        },
+        {
+            "name": "import_power",
+            "description": "Import power",
+            "address": "<unitId>:INPUT_REGISTERS:1280:FLOAT",
+            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 180000},
+            "configs": {"samplingInterval": 60000, "valueType":"FLOAT", "unit": "W"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "import_power"}
+                }
+            ]
+        },
+        {
+            "name": "export_power",
+            "description": "Export energy",
+            "address": "<unitId>:INPUT_REGISTERS:1282:FLOAT",
+            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 180000},
+            "configs": {"samplingInterval": 60000, "valueType":"FLOAT", "unit": "W"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "export_power"}
+                }
+            ]
+        }
+    ],
+    
+    "feeds": [
+        {
+            "name": "power",
+            "tag": "Power",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "W"
+        },
+        {
+            "name": "import_energy",
+            "tag": "Energy",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "kWh"
+        },
+        {
+            "name": "export_energy",
+            "tag": "Energy",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "kWh"
+        },
+        {
+            "name": "import_power",
+            "tag": "Power",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "W"
+        },
+        {
+            "name": "export_power",
+            "tag": "Power",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "W"
+        }
+    ],
+    
+    "prefix": "name",
+    "syntax": {
+        "deviceAddress": {
+            "keyValue": false,
+            "separator": ":"
+        }
+    }
+}

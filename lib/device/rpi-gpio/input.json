@@ -1,0 +1,63 @@
+{
+    "name": "Input",
+    "category": "Raspberry Pi",
+    "group": "GPIO",
+    "description": "Configuration for a Raspberry Pi pin as an input.",
+    
+    "driver": "rpi-gpio",
+    "devices": [
+        {
+            "description": "Raspberry Pi Input",
+            "settings": "mode:DIGITAL_INPUT"
+        }
+    ],
+    
+    "scan": {
+        "settings": "mode:DIGITAL_INPUT"
+    },
+    
+    "options": [
+        {
+            "id": "pin",
+            "name": "Pin",
+            "description": "The Pin number, according to the <a href='http://pi4j.com/pin-numbering-scheme.html'>WiringPi Pin Numbering Scheme</a>",
+            "type": "text",
+            "scan": true,
+            "mandatory": true,
+            "syntax": "deviceAddress"
+        }
+    ],
+    
+    "channels": [
+        {
+            "name": "state",
+            "description": "Pin state",
+            "logging": {"loggingInterval": 5000, "loggingMaxInterval": 60000},
+            "configs": {"samplingInterval": 5000, "valueType":"BOOLEAN"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "state"}
+                }
+            ]
+        }
+    ],
+    
+    "feeds": [
+        {
+            "name": "state",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPFINA",
+            "interval": "60"
+        }
+    ],
+    
+    "prefix": "name",
+    "syntax": {
+        "deviceAddress": {
+            "keyValue": true,
+            "assignment": ":",
+            "separator": ","
+        }
+    }
+}
