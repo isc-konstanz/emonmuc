@@ -9,25 +9,25 @@ LIB_DIR="$EMONMUC_DIR/lib"
 TMP_DIR="/var/tmp/emonmuc/bundle"
 
 update() {
-  core github "OpenMUC"            "openmuc-core-api"                  $OPENMUC_VERSION
-  core github "OpenMUC"            "openmuc-core-spi"                  $OPENMUC_VERSION
-  core github "OpenMUC"            "openmuc-core-datamanager"          $OPENMUC_VERSION
-  core github "OpenMUC"            "openmuc-server-restws"             $OPENMUC_VERSION
+  core github "OpenMUC"             "openmuc-core-api"                  $OPENMUC_VERSION
+  core github "OpenMUC"             "openmuc-core-spi"                  $OPENMUC_VERSION
+  core github "OpenMUC"             "openmuc-core-datamanager"          $OPENMUC_VERSION
+  core github "OpenMUC"             "openmuc-server-restws"             $OPENMUC_VERSION
 
-  core github "emonjava"           "openmuc-datalogger-emoncms"        "1.1.5"
+  core github "emonjava"            "openmuc-datalogger-emoncms"        "1.1.5"
 
   #--------------------------------------------------------------------------------------------------
   # RXTX is a native interface to serial ports in java.
   #--------------------------------------------------------------------------------------------------
-  core maven  "org.openmuc"        "jrxtx"                             "1.0.1"
+  core maven  "org.openmuc"         "jrxtx"                             "1.0.1"
 
   #--------------------------------------------------------------------------------------------------
   # The Apache Felix Gogo standard shell for OSGi (http://felix.apache.org/site/apache-felix-gogo.html)
   #--------------------------------------------------------------------------------------------------
-  core maven  "org.apache.felix"   "org.apache.felix.gogo.runtime"     "1.1.0"
-  core maven  "org.apache.felix"   "org.apache.felix.gogo.command"     "1.0.2"
-  core maven  "org.apache.felix"   "org.apache.felix.gogo.jline"       "1.1.0"
-  core maven  "org.jline"          "jline"                             "3.8.0"
+  core maven  "org.apache.felix"    "org.apache.felix.gogo.runtime"     "1.1.0"
+  core maven  "org.apache.felix"    "org.apache.felix.gogo.command"     "1.0.2"
+  core maven  "org.apache.felix"    "org.apache.felix.gogo.jline"       "1.1.0"
+  core maven  "org.jline"           "jline"                             "3.8.0"
 
   #--------------------------------------------------------------------------------------------------
   # Adds a telnet server so that the Felix Gogo Shell can be accessed
@@ -35,53 +35,51 @@ update() {
   # localhost port 6666. Therefor you can on only access it from the
   # same host on which felix is running.
   #--------------------------------------------------------------------------------------------------
-  core maven  "org.apache.felix"   "org.apache.felix.shell.remote"     "1.2.0"
+  core maven  "org.apache.felix"    "org.apache.felix.shell.remote"     "1.2.0"
 
   #--------------------------------------------------------------------------------------------------
   # Apache Felix Service Component Runtime that implements the OSGi Declarative Services Specification
   # the OpenMUC core bundles use declarative services and thus depend on them
   #--------------------------------------------------------------------------------------------------
-  core maven  "org.apache.felix"   "org.apache.felix.scr"              "2.1.0"
+  core maven  "org.apache.felix"    "org.apache.felix.scr"              "2.1.0"
 
   #--------------------------------------------------------------------------------------------------
   # An implementation of the OSGi HTTP Service Specification, needed by the WebUI bundles
   #--------------------------------------------------------------------------------------------------
-  core maven  "org.apache.felix"   "org.apache.felix.http.servlet-api" "1.1.2"
-  core maven  "org.apache.felix"   "org.apache.felix.http.api"         "3.0.0"
-  core maven  "org.apache.felix"   "org.apache.felix.http.jetty"       "4.0.0"
+  core maven  "org.apache.felix"    "org.apache.felix.http.servlet-api" "1.1.2"
+  core maven  "org.apache.felix"    "org.apache.felix.http.api"         "3.0.0"
+  core maven  "org.apache.felix"    "org.apache.felix.http.jetty"       "4.0.0"
 
   #--------------------------------------------------------------------------------------------------
   # Implementations of the OSGi Event Admin, Configuration Admin and MetaType services, needed by jetty
   #--------------------------------------------------------------------------------------------------
-  core maven  "org.apache.felix"   "org.apache.felix.eventadmin"       "1.5.0"
-  core maven  "org.apache.felix"   "org.apache.felix.configadmin"      "1.9.2"
-  core maven  "org.apache.felix"   "org.apache.felix.metatype"         "1.2.0"
+  core maven  "org.apache.felix"    "org.apache.felix.eventadmin"       "1.5.0"
+  core maven  "org.apache.felix"    "org.apache.felix.configadmin"      "1.9.2"
+  core maven  "org.apache.felix"    "org.apache.felix.metatype"         "1.2.0"
 
   #--------------------------------------------------------------------------------------------------
   # Adds a web console for felix bundle management
   # http://localhost:8080/system/console/httpservice
   # https://localhost:8443/system/console/httpservice
   #--------------------------------------------------------------------------------------------------
-  core maven  "org.apache.felix"   "org.apache.felix.webconsole"       "4.3.4"
-  core maven  "org.apache.felix"   "org.apache.felix.log"              "1.0.1"
-  core maven  "commons-io"         "commons-io"                        "2.6"
-  core maven  "commons-fileupload" "commons-fileupload"                "1.3.3"
+  core maven  "org.apache.felix"    "org.apache.felix.webconsole"       "4.3.4"
+  core maven  "org.apache.felix"    "org.apache.felix.log"              "1.0.1"
+  core maven  "commons-io"          "commons-io"                        "2.6"
+  core maven  "commons-fileupload"  "commons-fileupload"                "1.3.3"
 
   #--------------------------------------------------------------------------------------------------
   # Message logging libraries, SLF4J is a light-weight logging API,
   # Logback is a message logger implementation that implements SLF4J
   # natively
   #--------------------------------------------------------------------------------------------------
-  core maven  "org.slf4j"          "slf4j-api"                         "1.7.25"
-  core maven  "ch.qos.logback"     "logback-classic"                   "1.2.3"
-  core maven  "ch.qos.logback"     "logback-core"                      "1.2.3"
+  core maven  "org.slf4j"           "slf4j-api"                         "1.7.25"
+  core maven  "ch.qos.logback"      "logback-classic"                   "1.2.3"
+  core maven  "ch.qos.logback"      "logback-core"                      "1.2.3"
 
   #--------------------------------------------------------------------------------------------------
   # The Apache Felix main executable
   #--------------------------------------------------------------------------------------------------
-  core maven  "org.apache.felix"   "org.apache.felix.main"             "6.0.0"
-
-  mv -f "$EMONMUC_DIR/bundle/org.apache.felix.main-"* "$EMONMUC_DIR/bin/felix.jar" >/dev/null 2>&1
+  core framework "org.apache.felix" "org.apache.felix.main"             "6.0.0"
 
   if [ -f "$EMONMUC_DIR/conf/bundles.conf" ]; then
     read -a bundles < "$EMONMUC_DIR/conf/bundles.conf"
@@ -203,6 +201,12 @@ core() {
       maven)
         maven  ${@:2}
         ;;
+	  framework)
+        wget --quiet \
+             --directory-prefix="$TMP_DIR" \
+             "http://central.maven.org/maven2/${2//./\/}/$3/$4/$3-$4.jar"
+        mv -f "$TMP_DIR/org.apache.felix.main-"* "$EMONMUC_DIR/bin/felix.jar"
+		;;
     esac
   fi
 }
