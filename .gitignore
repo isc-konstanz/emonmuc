@@ -7,7 +7,7 @@
 # Framework
 log/
 cache/
-bundles/
+bundle/
 conf/
 !conf/logback.xml
 !conf/system.properties

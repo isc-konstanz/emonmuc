@@ -77,11 +77,18 @@ install_emonmuc() {
   echo "d /var/run/emonmuc 0755 $EMONMUC_USER root -" | sudo tee /usr/lib/tmpfiles.d/emonmuc.conf >/dev/null 2>&1
 
   systemctl enable emonmuc.service
-  systemctl start emonmuc.service
-  while ! nc -z localhost $EMONMUC_PORT; do
+  systemctl restart emonmuc.service
+  wait=0
+  while ! nc -z localhost $EMONMUC_PORT && [ $wait -lt 100 ]; do
+    wait=$((wait + 1))
     sleep 0.1
   done
 
+  if [ "$CLEAN" ] && [ -e "/var/tmp/emonmuc/setup/conf" ]; then
+    rm -rf "$EMONMUC_DIR"/conf
+    mv /var/tmp/emonmuc/setup/conf "$EMONMUC_DIR"/conf
+	rm -rf /var/tmp/emonmuc/setup
+  fi
   if [ -n "$EMONCMS_DIR" ]; then
     sudo -u $EMONCMS_USER ln -sf $EMONMUC_DIR/www/modules/channel $EMONCMS_DIR/Modules/
     sudo -u $EMONCMS_USER ln -sf $EMONMUC_DIR/www/modules/muc $EMONCMS_DIR/Modules/
@@ -90,9 +97,8 @@ install_emonmuc() {
     php $EMONMUC_DIR/setup.php --dir $EMONCMS_DIR --apikey $API_KEY
     chown $EMONMUC_USER -R $EMONMUC_DIR/conf
   fi
-
   systemctl stop emonmuc.service
-  sleep 10
+  sleep 5
   rm /var/log/emoncms/emonmuc*
   systemctl start emonmuc.service
 }
@@ -120,16 +126,49 @@ install_emoncms() {
   if [ "$EMONCMS_DIR" != "/var/www/html/emoncms" ]; then
     sudo -u $EMONCMS_USER ln -sf $EMONCMS_DIR /var/www/html/emoncms
   fi
+
   cp $EMONMUC_DIR/conf/emoncms.apache2.conf /etc/apache2/sites-available/emoncms.conf
   a2ensite emoncms
   systemctl reload apache2
 
-  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq mariadb-server mariadb-client redis-server
+  if [ "$CLEAN" ] && [ -e "/var/tmp/emonmuc/setup/settings.php" ]; then
+    mv -f /var/tmp/emonmuc/setup/settings.php "$EMONCMS_DIR"/settings.php >/dev/null 2>&1
 
-  mysql -uroot --execute="\
+  else
+    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq mariadb-server mariadb-client redis-server
+
+    mysql -uroot --execute="\
 CREATE DATABASE emoncms DEFAULT CHARACTER SET utf8;\
 CREATE EMONMUC_USER 'emoncms'@'localhost' IDENTIFIED BY 'emoncms';\
 GRANT ALL ON emoncms.* TO 'emoncms'@'localhost';"
+
+    install_passwords
+  fi
+  php $EMONMUC_DIR/lib/www/upgrade.php
+}
+
+install_passwords() {
+  sudo apt-get install -y -qq pwgen
+
+  SQL_ROOT=$(pwgen -s1 32)
+  #SQL_ROOT=$(echo "$SQL_ROOT" | tr \\\´\`\'\"\$\@\( $(pwgen -1 1))
+
+  SQL_EMONMUC_USER=$(pwgen -s1 32)
+  #SQL_EMONMUC_USER=$(echo "$SQL_EMONMUC_USER" | tr \\\´\`\'\"\$\@\( $(pwgen -1 1))
+
+  mysql -uroot --execute="\
+SET PASSWORD FOR 'root'@'localhost' = PASSWORD('$SQL_ROOT');\
+SET PASSWORD FOR 'emoncms'@'localhost' = PASSWORD('$SQL_EMONMUC_USER');\
+FLUSH PRIVILEGES;"
+
+  if [ -f "$EMONCMS_DIR/settings.php" ]; then
+    cp -f $EMONMUC_DIR/conf/emoncms.settings.php $EMONCMS_DIR/settings.php
+  fi
+  sed -i "7s/.*password = .*$/    \$password = \"$SQL_EMONMUC_USER\";/" $EMONCMS_DIR/settings.php
+
+  echo "[Database]" > $EMONMUC_DIR/setup_pwd.conf
+  echo "root:$SQL_ROOT" >> $EMONMUC_DIR/setup_pwd.conf
+  echo "emoncms:$SQL_EMONMUC_USER" >> $EMONMUC_DIR/setup_pwd.conf
 }
 
 API_KEY=""
@@ -145,8 +184,16 @@ while [[ $# -gt 0 ]]; do
       shift
       shift
       ;;
+    -c | --clean)
+      CLEAN=true
+      shift
+      ;;
+    -r | --reset)
+      RESET=true
+      shift
+      ;;
     *)
-      echo "Synopsis: setup.sh [-e|--emoncms location] [-a|--apikey authentication]"
+      echo "Synopsis: setup.sh [-e|--emoncms location] [-a|--apikey authentication] [-c|--clean] [-r|--reset]"
       exit 1
       ;;
   esac
@@ -154,8 +201,19 @@ done
 
 if [ -z ${EMONMUC_DIR+x} ]; then
   find_emonmuc_dir
+fi
+if [ "$CLEAN" ]; then
+  mkdir -p /var/tmp/emonmuc/setup
+  mv -f "$EMONMUC_DIR/conf" /var/tmp/emonmuc/setup/ >/dev/null 2>&1
+  mv -f "$EMONCMS_DIR/settings.php" /var/tmp/emonmuc/setup/ >/dev/null 2>&1
+  rm -rf "$EMONMUC_DIR" >/dev/null 2>&1
+  rm -rf "$EMONCMS_DIR" >/dev/null 2>&1
+  rm -rf /srv/www/emoncms* >/dev/null 2>&1
+  rm -rf /var/www/emoncms* >/dev/null 2>&1
+  rm -rf /var/www/html/emoncms* >/dev/null 2>&1
+fi
 
-elif [ ! -d "$EMONMUC_DIR" ]; then
+if [ ! -d "$EMONMUC_DIR" ]; then
   download_emonmuc
 fi
 #echo -e "\e[96m\e[1m$(cat $EMONMUC_DIR/lib/framework/welcome.txt)\e[0m"
@@ -164,26 +222,10 @@ if [ -n "$EMONCMS_DIR" ]; then
   if [ ! -d "$EMONCMS_DIR" ]; then
     install_emoncms
   fi
-  sudo apt-get install -y -qq pwgen
-
-  SQL_ROOT=$(pwgen -s1 32)
-  #SQL_ROOT=$(echo "$SQL_ROOT" | tr \\\´\`\'\"\$\@\( $(pwgen -1 1))
-
-  SQL_EMONMUC_USER=$(pwgen -s1 32)
-  #SQL_EMONMUC_USER=$(echo "$SQL_EMONMUC_USER" | tr \\\´\`\'\"\$\@\( $(pwgen -1 1))
-
-  mysql -uroot --execute="\
-SET PASSWORD FOR 'root'@'localhost' = PASSWORD('$SQL_ROOT');\
-SET PASSWORD FOR 'emoncms'@'localhost' = PASSWORD('$SQL_EMONMUC_USER');\
-FLUSH PRIVILEGES;"
-
-  cp -f $EMONMUC_DIR/conf/emoncms.settings.php $EMONCMS_DIR/settings.php
-  sed -i "7s/<password>/$SQL_EMONMUC_USER/" $EMONCMS_DIR/settings.php
-  php -f $EMONMUC_DIR/lib/www/upgrade.php
-
-  echo "[Database]" > $EMONMUC_DIR/setup_pwd.conf
-  echo "root:$SQL_ROOT" >> $EMONMUC_DIR/setup_pwd.conf
-  echo "emoncms:$SQL_EMONMUC_USER" >> $EMONMUC_DIR/setup_pwd.conf
+  if [ "$RESET" ]; then
+    # TODO: reset all configurations and passwords
+    install_passwords
+  fi
 fi
 install_emonmuc
 
