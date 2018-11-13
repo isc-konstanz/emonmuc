@@ -8,7 +8,7 @@
 log/
 cache/
 bundle/
-conf/
+conf/*
 !conf/logback.xml
 !conf/system.properties
 !conf/config.properties
