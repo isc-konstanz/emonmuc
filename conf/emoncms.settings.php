@@ -81,9 +81,9 @@
     $default_language = 'en_GB';
 
     // Theme location (folder located under Theme/, and must have the same structure as the basic one)
-    $theme = "basic";
+    $theme = "seal";
     // Theme colour options: "standard", "blue", "sun"
-    $themecolor = "blue";
+    $themecolor = "sun";
 
     // Favicon filenme in Theme/$theme
     $favicon = "favicon.png";
@@ -185,4 +185,22 @@
     // Emonmuc module
     $muc_settings = array(
         'rootdir' => "/opt/emonmuc"
+    );
+
+    // App module settings
+    $app_settings = array(
+        // Blacklisted Apps. Uncommented apps will not be available for users to create.
+        'hidden' => array(
+            //'myelectric',
+            //'mysolarpv',
+            'mysolarpvdivert',
+            'myenergy',
+            //'myelectric2',
+            'timeofuse',
+            'timeofuse2',
+            'timeofusecl',
+            'costcomparison',
+            //'myheatpump',
+            //'openevse'
+        )
     );

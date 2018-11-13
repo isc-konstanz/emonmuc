@@ -1,15 +1,15 @@
 #!/bin/bash
 #Description: Setup script to install the EmonMUC framework
-GIT_SERVER="https://github.com/emoncms"
-GIT_BRANCH="stable"
+GIT_SERVER="https://github.com/isc-konstanz"
+GIT_BRANCH="seal"
 
 # Set the targeted location of the emonmuc framework and the emoncms webserver.
 # If a specified directory is empty, the component will be installed.
-#EMONCMS_DIR="/var/www/html/emoncms"
+EMONCMS_DIR="/srv/www/emoncms"
 EMONCMS_USER="www-data"
 
 EMONMUC_DIR="/opt/emonmuc"
-EMONMUC_USER="pi"
+EMONMUC_USER="ctrl"
 EMONMUC_PORT=8080
 
 
@@ -120,9 +120,9 @@ install_emoncms() {
   chown $EMONCMS_USER:root /var/log/emoncms/emoncms.log
   chown $EMONCMS_USER:root -R $EMONCMS_DIR /var/lib/emoncms
 
-  sudo -u $EMONCMS_USER git clone -b master $GIT_SERVER/device.git $EMONCMS_DIR/Modules/device
+  sudo -u $EMONCMS_USER git clone -b $GIT_BRANCH $GIT_SERVER/device.git $EMONCMS_DIR/Modules/device
   sudo -u $EMONCMS_USER git clone -b $GIT_BRANCH $GIT_SERVER/graph.git $EMONCMS_DIR/Modules/graph
-  #sudo -u $EMONCMS_USER git clone -b $GIT_BRANCH $GIT_SERVER/app.git $EMONCMS_DIR/Modules/app
+  sudo -u $EMONCMS_USER git clone -b $GIT_BRANCH $GIT_SERVER/app.git $EMONCMS_DIR/Modules/app
   if [ "$EMONCMS_DIR" != "/var/www/html/emoncms" ]; then
     sudo -u $EMONCMS_USER ln -sf $EMONCMS_DIR /var/www/html/emoncms
   fi
