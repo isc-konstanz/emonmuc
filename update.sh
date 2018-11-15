@@ -36,7 +36,6 @@ find_emonmuc_dir() {
 
 update_emonmuc() {
   echo "Updating emonmuc framework"
-
   sudo git -C "$EMONMUC_DIR" pull
   source "$EMONMUC_DIR"/lib/framework/bundles.sh
   update
@@ -49,7 +48,6 @@ update_emonmuc() {
 
 update_emoncms() {
   echo "Updating emoncms webserver"
-
   pear update-channels
   pear upgrade
   pecl update-channels
@@ -57,12 +55,15 @@ update_emoncms() {
 
   sudo -u $EMONCMS_USER git -C "$EMONCMS_DIR" pull
 
+  echo "Updating emoncms modules"
   for dir in "$EMONCMS_DIR"/Modules/*/; do
       if [ -d "$dir"/.git ]; then
         sudo -u $EMONCMS_USER git -C "$dir" pull
       fi
   done
+
   php "$EMONMUC_DIR"/lib/www/upgrade.php
+  php "$EMONMUC_DIR"/lib/www/reload.php
 }
 
 while [[ $# -gt 0 ]]; do
