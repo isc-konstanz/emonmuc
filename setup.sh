@@ -6,10 +6,9 @@ GIT_BRANCH="seal"
 # Set the targeted location of the emonmuc framework and the emoncms webserver.
 # If a specified directory is empty, the component will be installed.
 EMONCMS_DIR="/srv/www/emoncms"
-EMONCMS_USER="www-data"
-
 EMONMUC_DIR="/opt/emonmuc"
-EMONMUC_USER="ctrl"
+EMONCMS_USER="www-data"
+EMONMUC_USER="pi"
 EMONMUC_PORT=8080
 
 
@@ -58,22 +57,22 @@ download_emonmuc() {
   echo "Downloading emonmuc framework"
   apt-get install -y -qq git-core
 
-  git clone -b $GIT_BRANCH "https://github.com/isc-konstanz/emonmuc.git" $EMONMUC_DIR
+  git clone -b $GIT_BRANCH "https://github.com/isc-konstanz/emonmuc.git" "$EMONMUC_DIR"
 }
 
 install_emonmuc() {
   echo "Installing emonmuc framework"
 
-  source $EMONMUC_DIR/lib/framework/bundles.sh
+  source "$EMONMUC_DIR"/lib/framework/bundles.sh
   update
 
   mkdir -p /var/{lib,run}/emonmuc /var/log/emoncms
   chown $EMONMUC_USER:root /var/{lib,run}/emonmuc /var/log/emoncms
-  chown $EMONMUC_USER:root -R $EMONMUC_DIR
-  chown $EMONCMS_USER:root -R $EMONMUC_DIR/www
+  chown $EMONMUC_USER:root -R "$EMONMUC_DIR"
+  chown $EMONCMS_USER:root -R "$EMONMUC_DIR"/www
 
-  ln -sf $EMONMUC_DIR/bin/emonmuc /usr/local/bin/emonmuc
-  ln -sf $EMONMUC_DIR/lib/systemd/emonmuc.service /lib/systemd/system/emonmuc.service
+  ln -sf "$EMONMUC_DIR"/bin/emonmuc /usr/local/bin/emonmuc
+  ln -sf "$EMONMUC_DIR"/lib/systemd/emonmuc.service /lib/systemd/system/emonmuc.service
   echo "d /var/run/emonmuc 0755 $EMONMUC_USER root -" | sudo tee /usr/lib/tmpfiles.d/emonmuc.conf >/dev/null 2>&1
 
   systemctl enable emonmuc.service
@@ -87,15 +86,19 @@ install_emonmuc() {
   if [ "$CLEAN" ] && [ -e "/var/tmp/emonmuc/setup/conf" ]; then
     rm -rf "$EMONMUC_DIR"/conf
     mv /var/tmp/emonmuc/setup/conf "$EMONMUC_DIR"/conf
-	rm -rf /var/tmp/emonmuc/setup
+    rm -rf /var/tmp/emonmuc/setup
   fi
   if [ -n "$EMONCMS_DIR" ]; then
-    sudo -u $EMONCMS_USER ln -sf $EMONMUC_DIR/www/modules/channel $EMONCMS_DIR/Modules/
-    sudo -u $EMONCMS_USER ln -sf $EMONMUC_DIR/www/modules/muc $EMONCMS_DIR/Modules/
-    sudo -u $EMONCMS_USER ln -sf $EMONMUC_DIR/www/themes/seal $EMONCMS_DIR/Theme/
+    sudo -u $EMONCMS_USER ln -sf "$EMONMUC_DIR"/www/modules/channel "$EMONCMS_DIR"/Modules/
+    sudo -u $EMONCMS_USER ln -sf "$EMONMUC_DIR"/www/modules/muc "$EMONCMS_DIR"/Modules/
+    sudo -u $EMONCMS_USER ln -sf "$EMONMUC_DIR"/www/themes/seal "$EMONCMS_DIR"/Theme/
 
-    php $EMONMUC_DIR/setup.php --dir $EMONCMS_DIR --apikey $API_KEY
-    chown $EMONMUC_USER -R $EMONMUC_DIR/conf
+    # Wait a while for the server to be available.
+    # TODO: Explore necessity
+    sleep 1
+
+    php "$EMONMUC_DIR"/setup.php --dir "$EMONCMS_DIR" --apikey $API_KEY
+    chown $EMONMUC_USER -R "$EMONMUC_DIR"/conf
   fi
   systemctl stop emonmuc.service
   sleep 5
@@ -109,25 +112,24 @@ install_emoncms() {
 
   a2enmod rewrite
   pear channel-discover pear.swiftmailer.org
-  pecl channel-update pecl.php.net
   pecl install swift/swift
 
   mkdir -p /var/log/emoncms /var/lib/emoncms/{phpfiwa,phpfina,phptimeseries}
   touch /var/log/emoncms/emoncms.log
   chmod 666 /var/log/emoncms/emoncms.log
 
-  sudo git clone -b $GIT_BRANCH $GIT_SERVER/emoncms.git $EMONCMS_DIR
+  sudo git clone -b $GIT_BRANCH $GIT_SERVER/emoncms.git "$EMONCMS_DIR"
   chown $EMONCMS_USER:root /var/log/emoncms/emoncms.log
-  chown $EMONCMS_USER:root -R $EMONCMS_DIR /var/lib/emoncms
+  chown $EMONCMS_USER:root -R "$EMONCMS_DIR" /var/lib/emoncms
 
   sudo -u $EMONCMS_USER git clone -b $GIT_BRANCH $GIT_SERVER/device.git $EMONCMS_DIR/Modules/device
   sudo -u $EMONCMS_USER git clone -b $GIT_BRANCH $GIT_SERVER/graph.git $EMONCMS_DIR/Modules/graph
   sudo -u $EMONCMS_USER git clone -b $GIT_BRANCH $GIT_SERVER/app.git $EMONCMS_DIR/Modules/app
   if [ "$EMONCMS_DIR" != "/var/www/html/emoncms" ]; then
-    sudo -u $EMONCMS_USER ln -sf $EMONCMS_DIR /var/www/html/emoncms
+    sudo -u $EMONCMS_USER ln -sf "$EMONCMS_DIR" /var/www/html/emoncms
   fi
 
-  cp $EMONMUC_DIR/conf/emoncms.apache2.conf /etc/apache2/sites-available/emoncms.conf
+  cp -f "$EMONMUC_DIR"/conf/emoncms.apache2.conf /etc/apache2/sites-available/emoncms.conf
   a2ensite emoncms
   systemctl reload apache2
 
@@ -140,11 +142,12 @@ install_emoncms() {
     mysql -uroot --execute="\
 CREATE DATABASE emoncms DEFAULT CHARACTER SET utf8;\
 CREATE EMONMUC_USER 'emoncms'@'localhost' IDENTIFIED BY 'emoncms';\
-GRANT ALL ON emoncms.* TO 'emoncms'@'localhost';"
+GRANT ALL ON emoncms.* TO 'emoncms'@'localhost';" >/dev/null 2>&1
 
+    cp -f "$EMONMUC_DIR"/conf/emoncms.settings.php "$EMONCMS_DIR"/settings.php
     install_passwords
   fi
-  php $EMONMUC_DIR/lib/www/upgrade.php
+  php "$EMONMUC_DIR"/lib/www/upgrade.php
 }
 
 install_passwords() {
@@ -161,14 +164,11 @@ SET PASSWORD FOR 'root'@'localhost' = PASSWORD('$SQL_ROOT');\
 SET PASSWORD FOR 'emoncms'@'localhost' = PASSWORD('$SQL_EMONMUC_USER');\
 FLUSH PRIVILEGES;"
 
-  if [ -f "$EMONCMS_DIR/settings.php" ]; then
-    cp -f $EMONMUC_DIR/conf/emoncms.settings.php $EMONCMS_DIR/settings.php
-  fi
-  sed -i "7s/.*password = .*$/    \$password = \"$SQL_EMONMUC_USER\";/" $EMONCMS_DIR/settings.php
+  sed -i "7s/.*password = .*$/    \$password = \"$SQL_EMONMUC_USER\";/" "$EMONCMS_DIR"/settings.php
 
-  echo "[Database]" > $EMONMUC_DIR/setup_pwd.conf
-  echo "root:$SQL_ROOT" >> $EMONMUC_DIR/setup_pwd.conf
-  echo "emoncms:$SQL_EMONMUC_USER" >> $EMONMUC_DIR/setup_pwd.conf
+  echo "[Database]" > "$EMONMUC_DIR"/setup_pwd.conf
+  echo "root:$SQL_ROOT" >> "$EMONMUC_DIR"/setup_pwd.conf
+  echo "emoncms:$SQL_EMONMUC_USER" >> "$EMONMUC_DIR"/setup_pwd.conf
 }
 
 API_KEY=""
@@ -204,8 +204,8 @@ if [ -z ${EMONMUC_DIR+x} ]; then
 fi
 if [ "$CLEAN" ]; then
   mkdir -p /var/tmp/emonmuc/setup
-  mv -f "$EMONMUC_DIR/conf" /var/tmp/emonmuc/setup/ >/dev/null 2>&1
-  mv -f "$EMONCMS_DIR/settings.php" /var/tmp/emonmuc/setup/ >/dev/null 2>&1
+  mv -f "$EMONMUC_DIR"/conf /var/tmp/emonmuc/setup/ >/dev/null 2>&1
+  mv -f "$EMONCMS_DIR"/settings.php /var/tmp/emonmuc/setup/ >/dev/null 2>&1
   rm -rf "$EMONMUC_DIR" >/dev/null 2>&1
   rm -rf "$EMONCMS_DIR" >/dev/null 2>&1
   rm -rf /srv/www/emoncms* >/dev/null 2>&1

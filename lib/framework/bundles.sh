@@ -92,6 +92,15 @@ update() {
   rm -rf "$TMP_DIR"
 }
 
+bundles() {
+  for bundle in "${@:2}"; do
+    bundle "$1" "$bundle"
+  done
+  rm -rf "$TMP_DIR"
+
+  php "$EMONMUC_DIR"/lib/www/reload.php
+}
+
 bundle() {
   if ! bundle_exists "$2"; then
     echo "Unable to $1 unknown bundle: $2"

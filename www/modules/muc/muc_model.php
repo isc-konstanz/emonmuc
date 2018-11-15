@@ -175,13 +175,13 @@ class Controller
         }
         return $ctrls;
     }
-    
+
     private function get_driver_list($id) {
         $id = intval($id);
         
         $response = $this->request($id, 'drivers', 'GET', null);
         if (isset($response['success']) && $response['success'] == false) {
-            return $response;
+            return array();
         }
         return $response['drivers'];
     }
