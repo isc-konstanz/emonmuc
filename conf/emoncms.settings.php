@@ -7,7 +7,7 @@
     $password = "<password>";
     $port     = "3306";
     // Skip database setup test - set to false once database has been setup.
-    $dbtest = true;
+    $dbtest = false;
 
 
 //2 #### Redis
