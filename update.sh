@@ -6,7 +6,7 @@
 EMONCMS_DIR="/srv/www/emoncms"
 EMONMUC_DIR="/opt/emonmuc"
 EMONCMS_USER="www-data"
-EMONMUC_USER="pi"
+EMONMUC_USER="ctrl"
 
 
 if [[ $EUID -ne 0 ]]; then

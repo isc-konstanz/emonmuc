@@ -8,7 +8,7 @@ GIT_BRANCH="seal"
 EMONCMS_DIR="/srv/www/emoncms"
 EMONMUC_DIR="/opt/emonmuc"
 EMONCMS_USER="www-data"
-EMONMUC_USER="pi"
+EMONMUC_USER="ctrl"
 EMONMUC_PORT=8080
 
 
