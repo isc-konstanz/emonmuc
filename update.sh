@@ -37,8 +37,7 @@ find_emonmuc_dir() {
 update_emonmuc() {
   echo "Updating emonmuc framework"
   sudo git -C "$EMONMUC_DIR" pull
-  source "$EMONMUC_DIR"/lib/framework/bundles.sh
-  update
+  bash "$EMONMUC_DIR"/bin/emonmuc update >/dev/null 2>&1
 
   sudo chown $EMONMUC_USER:root -R "$EMONMUC_DIR"
   sudo chown $EMONCMS_USER:root -R "$EMONMUC_DIR"/www

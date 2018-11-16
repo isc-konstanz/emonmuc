@@ -63,9 +63,6 @@ download_emonmuc() {
 install_emonmuc() {
   echo "Installing emonmuc framework"
 
-  source "$EMONMUC_DIR"/lib/framework/bundles.sh
-  update
-
   mkdir -p /var/{lib,run}/emonmuc /var/log/emoncms
   chown $EMONMUC_USER:root /var/{lib,run}/emonmuc /var/log/emoncms
   chown $EMONMUC_USER:root -R "$EMONMUC_DIR"
@@ -75,10 +72,12 @@ install_emonmuc() {
   ln -sf "$EMONMUC_DIR"/lib/systemd/emonmuc.service /lib/systemd/system/emonmuc.service
   echo "d /var/run/emonmuc 0755 $EMONMUC_USER root -" | sudo tee /usr/lib/tmpfiles.d/emonmuc.conf >/dev/null 2>&1
 
+  bash "$EMONMUC_DIR"/bin/emonmuc update >/dev/null 2>&1
+
   systemctl enable emonmuc.service
   systemctl restart emonmuc.service
   wait=0
-  while ! nc -z localhost $EMONMUC_PORT && [ $wait -lt 100 ]; do
+  while ! nc -z localhost $EMONMUC_PORT && [ $wait -lt 200 ]; do
     wait=$((wait + 1))
     sleep 0.1
   done
@@ -94,15 +93,15 @@ install_emonmuc() {
     sudo -u $EMONCMS_USER ln -sf "$EMONMUC_DIR"/www/themes/seal "$EMONCMS_DIR"/Theme/
 
     # Wait a while for the server to be available.
-    # TODO: Explore necessity
-    sleep 1
+    # TODO: Explore necessity. May be necessary for Raspberry Pi V1
+    sleep 10
 
     php "$EMONMUC_DIR"/setup.php --dir "$EMONCMS_DIR" --apikey $API_KEY
     chown $EMONMUC_USER -R "$EMONMUC_DIR"/conf
   fi
   systemctl stop emonmuc.service
-  sleep 5
-  rm /var/log/emoncms/emonmuc*
+  sleep 10
+  rm /var/log/emoncms/emonmuc* >/dev/null 2>&1
   systemctl start emonmuc.service
 }
 
