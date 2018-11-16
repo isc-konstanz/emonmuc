@@ -210,7 +210,8 @@ case "$1" in
       echo "Specify one or more bundles to be installed"
       exit 1
     fi
-    echo "For the changes to take effect, please restart the framework:\n  systemctl restart emonmuc"
+    echo "For the changes to take effect, please restart the framework:
+  systemctl restart emonmuc"
     ;;
   shell)
     echo "Using nc to connect to remote shell at 127.0.0.1:6666"

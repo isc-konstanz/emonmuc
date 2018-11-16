@@ -177,7 +177,7 @@ install_conf() {
 install_lib() {
   if [ ! -e "$LIB_DIR/$2" ]; then
     mkdir -p "$(dirname "$LIB_DIR/$2")"
-    mv -f "$TMP_DIR/$1/lib/$2" "$LIB_DIR/$2"
+    mv -f "$TMP_DIR/$1/libs/$2" "$LIB_DIR/$2"
   fi
 }
 
