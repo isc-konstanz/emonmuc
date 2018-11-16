@@ -9,7 +9,7 @@ $user = new User($mysqli,$redis);
 
 $type = 'HTTP';
 $address = 'localhost';
-$path = '/emoncms/';
+$path = '/';
 
 if (isset($options['a']) || isset($options['apikey'])) {
     $apikey = isset($options['a']) ? $options['a'] : $options['apikey'];
