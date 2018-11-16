@@ -186,6 +186,16 @@ class Controller
         return $response['drivers'];
     }
 
+    public function get_all() {
+        $ctrls = array();
+        
+        $result = $this->mysqli->query("SELECT id, userid, type, address, description, password FROM muc");
+        while ($ctrl = (array) $result->fetch_object()) {
+            $ctrls[] = $ctrl;
+        }
+        return $ctrls;
+    }
+
     public function get($id) {
         $id = intval($id);
 

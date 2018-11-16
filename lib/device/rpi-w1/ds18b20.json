@@ -1,7 +1,7 @@
 {
     "name": "DS18B20",
-    "category": "Raspberry Pi",
-    "group": "1-Wire",
+    "category": "Sensor",
+    "group": "Raspberry Pi (1-Wire)",
     "description": "Configuration for a 1-Wire temperature sensor for the Raspberry Pi, type DS18B20",
     
     "scan": true,
