@@ -38,30 +38,34 @@ class MucTemplate extends DeviceTemplate
             new DeviceConnection($this->ctrl), $this->channel, $this->redis);
     }
 
-    protected function load_template_list($userid) {
+    protected function load_template_list() {
         $list = array();
         
         require_once "Modules/muc/Models/driver_model.php";
         $driver = new Driver($this->ctrl);
         $drivers = array();
-        $registered = $driver->get_registered($userid, null);
-        if (is_array($registered) && count($registered)>0 && !isset($registered['success'])) {
-            foreach ($registered as $drv) {
-                $drivers[] = $drv['id'];
-            }
-            
-            $dir = $this->get_template_dir();
-            $it = new RecursiveDirectoryIterator($dir);
-            foreach (new RecursiveIteratorIterator($it) as $file) {
-                if ($file->getExtension() == "json") {
-                    $type = substr(pathinfo($file, PATHINFO_DIRNAME), strlen($dir)).'/'.pathinfo($file, PATHINFO_FILENAME);
-                    
-                    $result = $this->get_template($userid, $type);
-                    if (is_array($result) && isset($result['success']) && $result['success'] == false) {
-                        return $result;
-                    }
-                    if (empty($result->driver) || in_array($result->driver, $drivers)) {
-                        $list[$type] = $result;
+        
+        $ctrls = $this->ctrl->get_all();
+        foreach ($ctrls as $ctrl) {
+            $registered = $driver->get_registered($ctrl['userid'], $ctrl['id']);
+            if (is_array($registered) && count($registered)>0 && !isset($registered['success'])) {
+                foreach ($registered as $drv) {
+                    $drivers[] = $drv['id'];
+                }
+                
+                $dir = $this->get_template_dir();
+                $it = new RecursiveDirectoryIterator($dir);
+                foreach (new RecursiveIteratorIterator($it) as $file) {
+                    if ($file->getExtension() == "json") {
+                        $type = substr(pathinfo($file, PATHINFO_DIRNAME), strlen($dir)).'/'.pathinfo($file, PATHINFO_FILENAME);
+                        
+                        $result = $this->get_template($type);
+                        if (is_array($result) && isset($result['success']) && $result['success'] == false) {
+                            return $result;
+                        }
+                        if (empty($result->driver) || in_array($result->driver, $drivers)) {
+                            $list[$type] = $result;
+                        }
                     }
                 }
             }
@@ -69,7 +73,7 @@ class MucTemplate extends DeviceTemplate
         return $list;
     }
 
-    public function get_template($userid, $type) {
+    public function get_template($type) {
         $file = $this->get_template_dir().$type.".json";
         if (file_exists($file)) {
             $template = json_decode(file_get_contents($file));
@@ -98,14 +102,14 @@ class MucTemplate extends DeviceTemplate
         return $muc_template_dir."lib/device/";
     }
 
-    public function get_template_options($userid, $type) {
-        $result = $this->get_template($userid, $type);
+    public function get_template_options($type) {
+        $result = $this->get_template($type);
         if (!is_object($result)) {
             return $result;
         }
         $options = array();
         
-        $ctrls = $this->ctrl->get_list($userid);
+        $ctrls = $this->ctrl->get_all();
         if (count($ctrls) > 0) {
             $select = array();
             foreach ($ctrls as $ctrl) {
