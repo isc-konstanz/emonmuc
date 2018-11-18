@@ -4,7 +4,7 @@ OPENMUC_VERSION="0.17.1"
 
 BUNDLES_DIR="$EMONMUC_DIR/bundle"
 CONF_DIR="$EMONMUC_DIR/conf"
-LIB_DIR="$EMONMUC_DIR/lib"
+LIB_DIR="/var/lib/emonmuc"
 
 TMP_DIR="/var/tmp/emonmuc/bundle"
 
@@ -177,7 +177,14 @@ install_conf() {
 install_lib() {
   if [ ! -e "$LIB_DIR/$2" ]; then
     mkdir -p "$(dirname "$LIB_DIR/$2")"
-    mv -f "$TMP_DIR/$1/libs/$2" "$LIB_DIR/$2"
+    case "$1" in
+      core)
+        cp -rf "$EMONMUC_DIR/lib/$2" "$LIB_DIR/$2"
+	    ;;
+	  *)
+        mv -f "$TMP_DIR/$1/libs/$2" "$LIB_DIR/$2"
+	    ;;
+	esac
   fi
 }
 
@@ -186,13 +193,13 @@ remove_bundle() {
 }
 
 remove_conf() {
-  if [ $# -gt 0 ] && [ -z "$1" ]; then
+  if [ $# -gt 0 ] && [ -n "$1" ]; then
     rm -rf "$CONF_DIR/$1"
   fi
 }
 
 remove_lib() {
-  if [ $# -gt 0 ] && [ -z "$1" ]; then
+  if [ $# -gt 0 ] && [ -n "$1" ]; then
     rm -rf "$LIB_DIR/$1"
   fi
 }
@@ -210,12 +217,12 @@ core() {
       maven)
         maven  ${@:2}
         ;;
-	  framework)
+      framework)
         wget --quiet \
              --directory-prefix="$TMP_DIR" \
              "http://central.maven.org/maven2/${2//./\/}/$3/$4/$3-$4.jar"
         mv -f "$TMP_DIR/org.apache.felix.main-"* "$EMONMUC_DIR/bin/felix.jar"
-		;;
+        ;;
     esac
   fi
 }
