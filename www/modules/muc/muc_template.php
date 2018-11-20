@@ -15,8 +15,8 @@ require_once "Modules/device/device_template.php";
 
 class MucTemplate extends DeviceTemplate
 {
-    const DEFAULT_DIR = "/opt/emonmuc/";
-    
+    const DEFAULT_DIR = "/var/lib/emonmuc/";
+
     private $ctrl;
     private $device;
     private $channel;
@@ -41,32 +41,18 @@ class MucTemplate extends DeviceTemplate
     protected function load_template_list() {
         $list = array();
         
-        require_once "Modules/muc/Models/driver_model.php";
-        $driver = new Driver($this->ctrl);
-        $drivers = array();
-        
-        $ctrls = $this->ctrl->get_all();
-        foreach ($ctrls as $ctrl) {
-            $registered = $driver->get_registered($ctrl['userid'], $ctrl['id']);
-            if (is_array($registered) && count($registered)>0 && !isset($registered['success'])) {
-                foreach ($registered as $drv) {
-                    $drivers[] = $drv['id'];
-                }
-                
-                $dir = $this->get_template_dir();
-                $it = new RecursiveDirectoryIterator($dir);
-                foreach (new RecursiveIteratorIterator($it) as $file) {
-                    if ($file->getExtension() == "json") {
-                        $type = substr(pathinfo($file, PATHINFO_DIRNAME), strlen($dir)).'/'.pathinfo($file, PATHINFO_FILENAME);
-                        
-                        $result = $this->get_template($type);
-                        if (is_array($result) && isset($result['success']) && $result['success'] == false) {
-                            return $result;
-                        }
-                        if (empty($result->driver) || in_array($result->driver, $drivers)) {
-                            $list[$type] = $result;
-                        }
+        $dir = $this->get_template_dir();
+        if (is_dir($dir)) {
+            $it = new RecursiveDirectoryIterator($dir);
+            foreach (new RecursiveIteratorIterator($it) as $file) {
+                if ($file->getExtension() == "json") {
+                    $type = substr(pathinfo($file, PATHINFO_DIRNAME), strlen($dir)).'/'.pathinfo($file, PATHINFO_FILENAME);
+                    
+                    $result = $this->get_template($type);
+                    if (is_array($result) && isset($result['success']) && $result['success'] == false) {
+                        return $result;
                     }
+                    $list[$type] = $result;
                 }
             }
         }
@@ -90,8 +76,8 @@ class MucTemplate extends DeviceTemplate
 
     protected function get_template_dir() {
         global $muc_settings;
-        if (isset($muc_settings) && isset($muc_settings['rootdir']) && $muc_settings['rootdir'] !== "") {
-            $muc_template_dir = $muc_settings['rootdir'];
+        if (isset($muc_settings) && isset($muc_settings['libdir']) && $muc_settings['libdir'] !== "") {
+            $muc_template_dir = $muc_settings['libdir'];
         }
         else {
             $muc_template_dir = self::DEFAULT_DIR;
@@ -99,7 +85,7 @@ class MucTemplate extends DeviceTemplate
         if (substr($muc_template_dir, -1) !== "/") {
             $muc_template_dir .= "/";
         }
-        return $muc_template_dir."lib/device/";
+        return $muc_template_dir."device/";
     }
 
     public function get_template_options($type) {
@@ -134,7 +120,7 @@ class MucTemplate extends DeviceTemplate
     public function prepare_template($device) {
         $userid = intval($device['userid']);
         
-        $result = $this->get_template($userid, $device['type']);
+        $result = $this->get_template($device['type']);
         if (!is_object($result)) {
             return $result;
         }
@@ -178,7 +164,7 @@ class MucTemplate extends DeviceTemplate
         }
         if (!is_object($template)) $template = (object) $template;
         
-        $result = $this->get_template($userid, $device['type']);
+        $result = $this->get_template($device['type']);
         if (!is_object($result)) {
             return $result;
         }
