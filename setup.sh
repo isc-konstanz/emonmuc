@@ -121,10 +121,12 @@ install_emoncms() {
   chown $EMONCMS_USER:root /var/log/emoncms/emoncms.log
   chown $EMONCMS_USER:root -R "$EMONCMS_DIR" /var/lib/emoncms
 
-  sudo -u $EMONCMS_USER git clone -b master $GIT_SERVER/device.git $EMONCMS_DIR/Modules/device
+  sudo -u $EMONCMS_USER git clone -b seal "https://github.com/isc-konstanz/device.git" $EMONCMS_DIR/Modules/device
+  #sudo -u $EMONCMS_USER git clone -b master $GIT_SERVER/device.git $EMONCMS_DIR/Modules/device
   sudo -u $EMONCMS_USER git clone -b $GIT_BRANCH $GIT_SERVER/graph.git $EMONCMS_DIR/Modules/graph
   #sudo -u $EMONCMS_USER git clone -b $GIT_BRANCH $GIT_SERVER/app.git $EMONCMS_DIR/Modules/app
   if [ "$EMONCMS_DIR" != "/var/www/html/emoncms" ]; then
+    sudo chown $EMONCMS_USER:root -R /var/www/html
     sudo -u $EMONCMS_USER ln -sf "$EMONCMS_DIR" /var/www/html/emoncms
   fi
 
