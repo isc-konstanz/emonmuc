@@ -115,15 +115,6 @@ class DeviceCache {
 
     public function get_list($userid) {
         $devices = array();
-        $channels = array();
-        $result = $this->channel->get_list($userid);
-        if (isset($result['success']) && $result['success'] == false) {
-            return $result;
-        }
-        foreach ($result as $channel) {
-            $channels[$channel['id']] = $channel;
-        }
-        
         foreach($this->ctrl->get_list($userid) as $ctrl) {
             $ctrlid = intval($ctrl['id']);
             
@@ -137,16 +128,29 @@ class DeviceCache {
                 }
             }
             else {
-                $devices = $this->device->get_list($userid, $ctrlid);
-            }
-            foreach($devices as &$device) {
-                $channelids = $device['channels'];
-                sort($channelids);
-                
-                $device['channels'] = array();
-                foreach($channelids as $id) {
-                    $device['channels'][] = $channels[$id];
+                $result = $this->device->get_list($userid, $ctrlid);
+                if (isset($result['success']) && $result['success'] == false) {
+                    return $result;
                 }
+                $devices = array_merge($devices, $result);
+            }
+        }
+        
+        $channels = array();
+        $result = $this->channel->get_list($userid);
+        if (isset($result['success']) && $result['success'] == false) {
+            return $result;
+        }
+        foreach ($result as $channel) {
+            $channels[$channel['id']] = $channel;
+        }
+        foreach($devices as &$device) {
+            $channelids = $device['channels'];
+            sort($channelids);
+            
+            $device['channels'] = array();
+            foreach($channelids as $id) {
+                $device['channels'][] = $channels[$id];
             }
         }
         usort($devices, function($d1, $d2) {

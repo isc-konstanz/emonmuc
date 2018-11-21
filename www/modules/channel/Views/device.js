@@ -14,11 +14,11 @@ var device = {
     },
 
     'states':function(callback) {
-        return device.request(callback, "channel/connect/states.json");
+        return device.request(callback, "muc/device/states.json");
     },
 
     'info':function(ctrlid, driverid, callback) {
-        return device.request(callback, "channel/connect/info.json", "ctrlid="+ctrlid+"&driverid="+driverid);
+        return device.request(callback, "muc/device/info.json", "ctrlid="+ctrlid+"&driverid="+driverid);
     },
 
     'get':function(ctrlid, id, callback) {

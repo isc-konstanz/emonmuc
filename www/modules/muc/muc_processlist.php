@@ -36,7 +36,6 @@ class Muc_ProcessList
 
     public function process_list() {
         textdomain("process_messages");
-        return array();
         $list = array(
             array(
                 "name"=>_("Time derivative by seconds"),
