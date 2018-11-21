@@ -15,7 +15,7 @@ require_once "Modules/device/device_scan.php";
 
 class MucScan extends DeviceScan
 {
-    const DEFAULT_DIR = "/opt/emonmuc/";
+    const DEFAULT_DIR = "/var/lib/emonmuc/";
 
     const DEVICE_ADDRESS = "deviceAddress";
     const DEVICE_SETTINGS = "deviceSettings";
@@ -124,7 +124,7 @@ class MucScan extends DeviceScan
     protected function get_template($type) {
         $file = $this->get_template_dir().$type.".json";
         if (!file_exists($file)) {
-            return array('success'=>false, 'message'=>"Error reading template ".$type.": file does not exist");
+            return array('success'=>false, 'message'=>"Error reading template ".$type.": $file does not exist");
         }
         $template = json_decode(file_get_contents($file));
         if (json_last_error() != 0) {
@@ -135,8 +135,8 @@ class MucScan extends DeviceScan
 
     protected function get_template_dir() {
         global $muc_settings;
-        if (isset($muc_settings) && isset($muc_settings['rootdir']) && $muc_settings['rootdir'] !== "") {
-            $muc_template_dir = $muc_settings['rootdir'];
+        if (isset($muc_settings) && isset($muc_settings['libdir']) && $muc_settings['libdir'] !== "") {
+            $muc_template_dir = $muc_settings['libdir'];
         }
         else {
             $muc_template_dir = self::DEFAULT_DIR;
@@ -144,7 +144,7 @@ class MucScan extends DeviceScan
         if (substr($muc_template_dir, -1) !== "/") {
             $muc_template_dir .= "/";
         }
-        return $muc_template_dir."lib/device/";
+        return $muc_template_dir."device/";
     }
 
     private function parse_progress($userid, $ctrlid, $type, $template, $result) {
