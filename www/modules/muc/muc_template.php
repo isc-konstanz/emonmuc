@@ -71,7 +71,7 @@ class MucTemplate extends DeviceTemplate
             }
             return array('success'=>false, 'message'=>"Error reading template $type: ".json_last_error_msg());
         }
-        return array('success'=>false, 'message'=>"Error reading template $type: file does not exist");
+        return array('success'=>false, 'message'=>"Error reading template $type: $file does not exist");
     }
 
     protected function get_template_dir() {

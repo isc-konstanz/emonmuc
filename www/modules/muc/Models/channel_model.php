@@ -166,6 +166,7 @@ class Channel
             $response = $this->ctrl->request($ctrl['id'], 'channels', 'GET', null);
             if (isset($response["records"])) {
                 foreach($response['records'] as $channel) {
+                    $type = isset($channel['valueType']) ? $channel['valueType'] : 'DOUBLE';
                     $record = $channel['record'];
                     $records[] = array(
                         'userid'=>$ctrl['userid'],
@@ -174,7 +175,7 @@ class Channel
                         'time'=>isset($record['timestamp']) ? $record['timestamp'] : null,
                         'value'=>isset($record['value']) ? $record['value'] : null,
                         'flag'=>$record['flag'],
-                        'configs'=>array('valueType'=>$channel['valueType']),
+                        'configs'=>array('valueType'=>$type),
                     );
                 }
             }

@@ -52,7 +52,6 @@ var channel_dialog = {
             $('#channel-config-name').val(channel_dialog.channel.id);
             $('#channel-config-description').val(channel_dialog.channel.description);
             
-            
             if (typeof channel_dialog.channel.scanned !== 'undefined' && channel_dialog.channel.scanned) {
                 $('#channel-config-back').show();
                 $('#channel-config-scan').hide();

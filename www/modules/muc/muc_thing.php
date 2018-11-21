@@ -15,7 +15,7 @@ require_once "Modules/device/device_thing.php";
 
 class MucThing extends DeviceThing
 {
-    const DEFAULT_DIR = "/opt/emonmuc/";
+    const DEFAULT_DIR = "/var/lib/emonmuc/";
 
     protected $ctrl;
     protected $channel;
@@ -34,7 +34,7 @@ class MucThing extends DeviceThing
     public function get_item_list($device) {
         $file = $this->get_template_dir().$device['type'].".json";
         if (!file_exists($file)) {
-            return array('success'=>false, 'message'=>"Error reading template ".$device['type'].": file does not exist");
+            return array('success'=>false, 'message'=>"Error reading template ".$device['type'].": $file does not exist");
         }
         $template = json_decode(file_get_contents($file));
         if (json_last_error() != 0) {
@@ -120,8 +120,8 @@ class MucThing extends DeviceThing
     
     protected function get_template_dir() {
         global $muc_settings;
-        if (isset($muc_settings) && isset($muc_settings['rootdir']) && $muc_settings['rootdir'] !== "") {
-            $muc_template_dir = $muc_settings['rootdir'];
+        if (isset($muc_settings) && isset($muc_settings['libdir']) && $muc_settings['libdir'] !== "") {
+            $muc_template_dir = $muc_settings['libdir'];
         }
         else {
             $muc_template_dir = self::DEFAULT_DIR;
@@ -129,7 +129,7 @@ class MucThing extends DeviceThing
         if (substr($muc_template_dir, -1) !== "/") {
             $muc_template_dir .= "/";
         }
-        return $muc_template_dir."lib/device/";
+        return $muc_template_dir."device/";
     }
 
     protected function get_ctrl_id($userid, $name, $driver) {
