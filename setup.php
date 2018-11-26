@@ -40,7 +40,7 @@ if (count($ctrl->get_list($userid)) == 0) {
         echo "Unable to create MUC for user $userid: ".$result['message']."\n"; die;
     }
     
-    if (!is_file($root.'/conf/emoncms.settings.conf')) {
+    if (!is_file($root.'/conf/emoncms.default.conf')) {
         echo "Unable to find default emoncms configuration ".$root."/conf/emoncms.default.conf\n"; die;
     }
     if (!is_writable($root.'/conf') || (is_file($root.'/conf/emoncms.conf') && !is_writable($root.'/conf/emoncms.conf'))) {

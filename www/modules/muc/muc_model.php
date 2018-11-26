@@ -175,15 +175,25 @@ class Controller
         }
         return $ctrls;
     }
-    
+
     private function get_driver_list($id) {
         $id = intval($id);
         
         $response = $this->request($id, 'drivers', 'GET', null);
         if (isset($response['success']) && $response['success'] == false) {
-            return $response;
+            return array();
         }
         return $response['drivers'];
+    }
+
+    public function get_all() {
+        $ctrls = array();
+        
+        $result = $this->mysqli->query("SELECT id, userid, type, address, description, password FROM muc");
+        while ($ctrl = (array) $result->fetch_object()) {
+            $ctrls[] = $ctrl;
+        }
+        return $ctrls;
     }
 
     public function get($id) {

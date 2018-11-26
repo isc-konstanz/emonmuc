@@ -183,24 +183,6 @@ terminate() {
   return 0
 }
 
-bundles() {
-  source "$EMONMUC_DIR"/lib/framework/bundles.sh
-  if [ "$1" == "update" ]; then
-    update
-
-  elif [ $# -gt 1 ]; then
-    for bundle in "${@:2}"; do
-      bundle "$1" "$bundle"
-    done
-  else
-    echo "Specify one or more bundles to be installed"
-    exit 1
-  fi
-
-  echo "For the changes to take effect, please restart the framework:
-  systemctl restart emonmuc"
-}
-
 case "$1" in
   start)
     start $@
@@ -218,7 +200,18 @@ case "$1" in
     { echo "emonmuc:reload"; sleep 1; } | nc 127.0.0.1 6666
     ;;
   update | install | remove)
-    bundles $@
+    source "$EMONMUC_DIR"/lib/framework/bundles.sh
+    if [ "$1" == "update" ]; then
+      update
+
+    elif [ $# -gt 1 ]; then
+      bundles $@
+    else
+      echo "Specify one or more bundles to be installed"
+      exit 1
+    fi
+    echo "For the changes to take effect, please restart the framework:
+  systemctl restart emonmuc"
     ;;
   shell)
     echo "Using nc to connect to remote shell at 127.0.0.1:6666"

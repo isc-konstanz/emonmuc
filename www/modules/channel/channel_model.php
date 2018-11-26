@@ -147,11 +147,14 @@ class ChannelCache {
         if (!$this->redis) {
             return $this->channel->get($ctrlid, $id);
         }
-        $channel = (array) $this->redis->hGetAll("muc#$ctrlid:channel:$id");
-        $channel['logging'] = json_decode($channel['logging'], true);
-        $channel['configs'] = json_decode($channel['configs'], true);
-        
-        return $channel;
+        if ($this->redis->exists("muc#$ctrlid:channel:$id")) {
+            $channel = (array) $this->redis->hGetAll("muc#$ctrlid:channel:$id");
+            $channel['logging'] = json_decode($channel['logging'], true);
+            $channel['configs'] = json_decode($channel['configs'], true);
+            
+            return $channel;
+        }
+        return array('success'=>false, 'message'=>'Channel does not exist');
     }
 
     public function update($userid, $ctrlid, $nodeid, $id, $configs) {

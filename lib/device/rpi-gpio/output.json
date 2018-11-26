@@ -1,7 +1,7 @@
 {
-    "name": "Output",
-    "category": "Raspberry Pi",
-    "group": "GPIO",
+    "name": "Pin",
+    "category": "Control",
+    "group": "Raspberry Pi (GPIO)",
     "description": "Configuration for a Raspberry Pi pin as an output.",
     
     "driver": "rpi-gpio",
@@ -67,7 +67,7 @@
         }
     ],
     
-    "prefix": "name",
+    "prefix": "node",
     "syntax": {
         "deviceAddress": {
             "keyValue": true,

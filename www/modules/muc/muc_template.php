@@ -15,8 +15,8 @@ require_once "Modules/device/device_template.php";
 
 class MucTemplate extends DeviceTemplate
 {
-    const DEFAULT_DIR = "/opt/emonmuc/";
-    
+    const DEFAULT_DIR = "/var/lib/emonmuc/";
+
     private $ctrl;
     private $device;
     private $channel;
@@ -38,38 +38,28 @@ class MucTemplate extends DeviceTemplate
             new DeviceConnection($this->ctrl), $this->channel, $this->redis);
     }
 
-    protected function load_template_list($userid) {
+    protected function load_template_list() {
         $list = array();
         
-        require_once "Modules/muc/Models/driver_model.php";
-        $driver = new Driver($this->ctrl);
-        $drivers = array();
-        $registered = $driver->get_registered($userid, null);
-        if (is_array($registered) && count($registered)>0 && !isset($registered['success'])) {
-            foreach ($registered as $drv) {
-                $drivers[] = $drv['id'];
-            }
-            
-            $dir = $this->get_template_dir();
+        $dir = $this->get_template_dir();
+        if (is_dir($dir)) {
             $it = new RecursiveDirectoryIterator($dir);
             foreach (new RecursiveIteratorIterator($it) as $file) {
                 if ($file->getExtension() == "json") {
                     $type = substr(pathinfo($file, PATHINFO_DIRNAME), strlen($dir)).'/'.pathinfo($file, PATHINFO_FILENAME);
                     
-                    $result = $this->get_template($userid, $type);
+                    $result = $this->get_template($type);
                     if (is_array($result) && isset($result['success']) && $result['success'] == false) {
                         return $result;
                     }
-                    if (empty($result->driver) || in_array($result->driver, $drivers)) {
-                        $list[$type] = $result;
-                    }
+                    $list[$type] = $result;
                 }
             }
         }
         return $list;
     }
 
-    public function get_template($userid, $type) {
+    public function get_template($type) {
         $file = $this->get_template_dir().$type.".json";
         if (file_exists($file)) {
             $template = json_decode(file_get_contents($file));
@@ -81,13 +71,13 @@ class MucTemplate extends DeviceTemplate
             }
             return array('success'=>false, 'message'=>"Error reading template $type: ".json_last_error_msg());
         }
-        return array('success'=>false, 'message'=>"Error reading template $type: file does not exist");
+        return array('success'=>false, 'message'=>"Error reading template $type: $file does not exist");
     }
 
     protected function get_template_dir() {
         global $muc_settings;
-        if (isset($muc_settings) && isset($muc_settings['rootdir']) && $muc_settings['rootdir'] !== "") {
-            $muc_template_dir = $muc_settings['rootdir'];
+        if (isset($muc_settings) && isset($muc_settings['libdir']) && $muc_settings['libdir'] !== "") {
+            $muc_template_dir = $muc_settings['libdir'];
         }
         else {
             $muc_template_dir = self::DEFAULT_DIR;
@@ -95,17 +85,17 @@ class MucTemplate extends DeviceTemplate
         if (substr($muc_template_dir, -1) !== "/") {
             $muc_template_dir .= "/";
         }
-        return $muc_template_dir."lib/device/";
+        return $muc_template_dir."device/";
     }
 
-    public function get_template_options($userid, $type) {
-        $result = $this->get_template($userid, $type);
+    public function get_template_options($type) {
+        $result = $this->get_template($type);
         if (!is_object($result)) {
             return $result;
         }
         $options = array();
         
-        $ctrls = $this->ctrl->get_list($userid);
+        $ctrls = $this->ctrl->get_all();
         if (count($ctrls) > 0) {
             $select = array();
             foreach ($ctrls as $ctrl) {
@@ -130,7 +120,7 @@ class MucTemplate extends DeviceTemplate
     public function prepare_template($device) {
         $userid = intval($device['userid']);
         
-        $result = $this->get_template($userid, $device['type']);
+        $result = $this->get_template($device['type']);
         if (!is_object($result)) {
             return $result;
         }
@@ -174,7 +164,7 @@ class MucTemplate extends DeviceTemplate
         }
         if (!is_object($template)) $template = (object) $template;
         
-        $result = $this->get_template($userid, $device['type']);
+        $result = $this->get_template($device['type']);
         if (!is_object($result)) {
             return $result;
         }

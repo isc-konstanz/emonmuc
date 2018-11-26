@@ -1,7 +1,7 @@
 <?php
 define('EMONCMS_EXEC', 1);
 
-$root = dirname(dirname(__FILE__));
+$root = dirname(dirname(dirname(__FILE__)));
 
 $options_short = "d:a:";
 $options_long  = array(

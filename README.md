@@ -37,14 +37,19 @@ sudo chown pi -R /opt/emonmuc
 If the webserver already got installed, the setup may be finished by passing the servers **directory** and a registered users **apikey**.
 
 ~~~
-sudo bash /opt/emonmuc/setup.sh --emoncms /var/www/html/emoncms --apikey <apikey>
+sudo /opt/emonmuc/setup.sh --emoncms /var/www/emoncms --apikey <apikey>
 ~~~
 
-Both parameters are optional and the webserver will be installed to the specified directory, if it does not exist.  
-If no API key was specified, the first existing user will be used to register a controller. Empty installations will be initialized with a default user "*admin*", authenticated with a temporary password: *admin*, that should be replaced with a secure password immediately in the Account configurations.  
-*If the database was created automatically, a `setup_pwd.conf` file can be found at the emonmuc root directory, containing database user passwords. This file needs to be removed from the system, to avoid compromising security.*
+Both parameters are optional and the webserver may be installed to a specified directory. This will be done automatically, if the directory does not exist already.
 
-A more detailed installation guide, containing separate steps executed in the setup script, can be found here:
+~~~
+sudo /opt/emonmuc/setup.sh -e /var/www/html/emoncms
+~~~
+
+If no API key was specified, the first existing user will be used to register a controller. Empty installations will be initialized with a default user "*admin*", authenticated with a temporary password: *admin*, that should be replaced with a secure password immediately in the Account configurations.  
+*If the database was created automatically, a `setup.conf` file can be found at the emonmuc root directory, containing database user passwords. This file needs to be removed from the system, to avoid compromising security.*
+
+A more detailed installation guide, containing the separate steps that will be executed in the setup script, can be found here:
 
 - [Ubuntu / Debian Linux via git](docs/LinuxInstall.md)
 

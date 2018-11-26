@@ -1,7 +1,7 @@
 {
-    "name": "Input",
-    "category": "Raspberry Pi",
-    "group": "GPIO",
+    "name": "Pin",
+    "category": "Sensor",
+    "group": "Raspberry Pi (GPIO)",
     "description": "Configuration for a Raspberry Pi pin as an input.",
     
     "driver": "rpi-gpio",
@@ -52,7 +52,7 @@
         }
     ],
     
-    "prefix": "name",
+    "prefix": "node",
     "syntax": {
         "deviceAddress": {
             "keyValue": true,

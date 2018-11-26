@@ -11,9 +11,11 @@ install() {
     remove
     github "$OWNER" "$PROJECT" "$OPENMUC_VERSION"
     install_bundle "$PROJECT" "openmuc-$SERVICE-$ID" "$OPENMUC_VERSION"
+    install_lib core "device/$ID"
   fi
 }
 
 remove() {
   remove_bundle "openmuc-$SERVICE-$ID"
+  remove_lib "device/$ID"
 }
