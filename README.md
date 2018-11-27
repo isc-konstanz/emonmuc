@@ -91,6 +91,12 @@ Several drivers can be enabled at once, while each needs to be selected individu
 Details about drivers and specific information about their usage and configuration may be found by clicking corresponding links or for most of them in the [OpenMUC User Guide](https://www.openmuc.org/openmuc/user-guide/).
 
 
+## Serial Port
+
+To use any serial port with the emonmuc framework, e.g. to communicate via Modbus RTU, the open-source project **[jRxTx](https://github.com/openmuc/jrxtx)** is used. This, as well as some additional steps if the UART Pins of the Raspberry Pi Platform should be used, need to be prepared.  
+The [Serial Port preparation guide](docs/LinuxSerialPort.md) may be followed to do so.
+
+
 ----------
 
 # Guides
