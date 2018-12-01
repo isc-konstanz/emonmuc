@@ -68,7 +68,7 @@
     table.fields = {
         'disabled':{'title':'', 'type':"disable"},
         'name':{'title':'<?php echo _("Name"); ?>','type':"fixed"},
-        'controller':{'title':'<?php echo _("Controller"); ?>','type':"fixed"},
+        'ctrl':{'title':'<?php echo _("Controller"); ?>','type':"fixed"},
         'devices':{'title':'<?php echo _("Devices"); ?>','type':"devicelist"},
         // Actions
         'add-action':{'title':'', 'type':"icon-enabled", 'icon':'icon-plus-sign'},
@@ -76,8 +76,6 @@
         'delete-action':{'title':'', 'type':"delete"},
         'config-action':{'title':'', 'type':"iconconfig", 'icon':'icon-wrench'}
     }
-
-    device.states = null;
 
     muc.list(function(data, textStatus, xhr) {
         if (data.length == 0) {
@@ -104,14 +102,6 @@
                 $("#api-help-header").hide();
             }
             $('#driver-loader').hide();
-        });
-        
-        device.listStates(function(data, textStatus, xhr) {
-            if (device.states == null) {
-                device.states = data;
-                table.draw();
-            }
-            else device.states = data;
         });
     }
 
@@ -183,8 +173,9 @@
 
     $("#table").on('click', '.device-label', function() {
         // Get the ids of the clicked lable
-        var ctrlid = $(this).attr('ctrlid');
-        var deviceid = $(this).attr('deviceid');
+        var driver = table.data[$(this).closest('td').attr('row')];
+        var ctrlid = driver['ctrlid'];
+        var deviceid = $(this).data('id');
 
         $('#driver-loader').show();
         device.get(ctrlid, deviceid, function(result) {

@@ -1,5 +1,4 @@
 var device = {
-    states: null,
 
     'create':function(ctrlid, driverid, configs, callback) {
         return $.ajax({

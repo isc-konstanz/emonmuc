@@ -48,10 +48,10 @@ class Driver
         $drivers = array();
         foreach($ctrls as $ctrl) {
             // Get drivers of all registered MUCs and add identifying location description and parse their configuration
-            $response = $this->ctrl->request($ctrl['id'], 'drivers/details', 'GET', null);
-            if (isset($response["details"])) {
-                foreach($response['details'] as $details) {
-                    $drivers[] = $this->get_driver($ctrl, $details);
+            $response = $this->ctrl->request($ctrl['id'], 'drivers', 'GET', array('details' => 'true'));
+            if (isset($response['drivers'])) {
+                foreach($response['drivers'] as $driver) {
+                    $drivers[] = $this->get_driver($ctrl, $driver);
                 }
             }
         }
@@ -71,7 +71,7 @@ class Driver
         
         $drivers = array();
         foreach($ctrls as $ctrl) {
-            $result = $this->ctrl->request($ctrl['id'], 'drivers/registered', 'GET', null);
+            $result = $this->ctrl->request($ctrl['id'], 'drivers/running', 'GET', null);
             if (isset($result['success']) && $result['success'] == false) {
                 return $result;
             }
@@ -95,20 +95,12 @@ class Driver
         
         $drivers = array();
         foreach($ctrls as $ctrl) {
-            $result = $this->ctrl->request($ctrl['id'], 'drivers', 'GET', null);
+            $result = $this->ctrl->request($ctrl['id'], 'drivers', 'GET', array('details' => 'true'));
             if (isset($result['success']) && $result['success'] == false) {
                 return $result;
             }
-            $configured = $result['drivers'];
-            
-            $result = $this->get_registered($userid, $ctrl['id']);
-            if (isset($result['success']) && $result['success'] == false) {
-                return $result;
-            }
-            foreach($result as $driver) {
-                if (in_array($driver['id'], $configured)) {
-                    $drivers[] = $this->get_description($ctrl, $driver);
-                }
+            foreach($result['drivers'] as $driver) {
+                $drivers[] = $this->get_description($ctrl, $driver);
             }
         }
         return $drivers;
@@ -170,7 +162,7 @@ class Driver
     public function info($ctrlid, $id) {
         $ctrlid = intval($ctrlid);
 
-        $response = $this->ctrl->request($ctrlid, 'drivers/'.$id.'/infos/details/driver', 'GET', null);
+        $response = $this->ctrl->request($ctrlid, 'drivers/'.$id.'/infos/options', 'GET', array('filter' => 'driver'));
         if (isset($response['success']) && $response['success'] == false) {
             return $response;
         }
@@ -181,12 +173,11 @@ class Driver
         $ctrlid = intval($ctrlid);
         
         $ctrl = $this->ctrl->get($ctrlid);
-        $response = $this->ctrl->request($ctrlid, 'drivers/'.$id.'/details', 'GET', null);
+        $response = $this->ctrl->request($ctrlid, 'drivers/'.$id, 'GET', array('details' => 'true'));
         if (isset($response['success']) && $response['success'] == false) {
             return $response;
         }
-        $details = (array) $response['details'];
-        return $this->get_driver($ctrl, $details);
+        return $this->get_driver($ctrl, $response);
     }
 
     private function get_driver($ctrl, $details) {
@@ -196,24 +187,21 @@ class Driver
             'ctrl'=>$ctrl['description'],
             'id'=>$details['id']
         );
+        $driver['name'] = isset($details['name']) ? $details['name'] : '';
         
-        if (isset($details['name'])) {
-            $driver['name'] = $details['name'];
+        $disabled = false;
+        $configs = $details['configs'];
+        if (count($configs) > 0) {
+            if (isset($configs['disabled'])) {
+                $disabled = $configs['disabled'];
+                unset($configs['disabled']);
+            }
+            $driver['configs'] = $configs;
         }
-        else $driver['name'] = '';
+        $driver['devices'] = isset($details['devices']) ? $details['devices'] : array();
         
-        if (isset($details['devices'])) {
-            $driver['devices'] = $details['devices'];
-        }
-        else $driver['devices'] = array();
-        
-        $configs = $this->get_configs($details);
-        if (count($configs) > 0) $driver['configs'] = $configs;
-        
-        if (isset($details['disabled'])) {
-            $driver['disabled'] = $details['disabled'];
-        }
-        else $driver['disabled'] = false;
+        $driver['disabled'] = $disabled;
+        $driver['running'] = $details['running'];
         
         return $driver;
     }
@@ -233,25 +221,11 @@ class Driver
         return $driver;
     }
 
-    private function get_configs($device) {
-        $configs = array();
-        foreach($device as $key => $value) {
-            if (strcmp($key, 'id') !== 0 &&
-                    strcmp($key, 'name') !== 0 &&
-                    strcmp($key, 'devices') !== 0 && 
-                    strcmp($key, 'disabled') !== 0) {
-                        
-                $configs[$key] = $value;
-            }
-        }
-        return $configs;
-    }
-
     public function update($ctrlid, $id, $details) {
         $ctrlid = intval($ctrlid);
         
         $details = (array) json_decode($details);
-        $configs = $this->parse_driver($details['id'], $details);
+        $configs = $this->parse_driver($id, $details);
         
         $response = $this->ctrl->request($ctrlid, 'drivers/'.$id.'/configs', 'PUT', array('configs' => $configs));
         if (isset($response['success']) && $response['success'] == false) {

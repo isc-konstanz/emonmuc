@@ -51,7 +51,7 @@ var device_dialog =
         if (device_dialog.device != null) {
             $('#device-config-label').html('Configure Device: <b>'+device_dialog.device.id+'</b>');
             $('#device-config-driver').html('<b>'+device_dialog.device.driver+'</b>').show();
-            $('#device-config-name').val(device_dialog.device.id);
+            $('#device-config-key').val(device_dialog.device.id);
             $('#device-config-description').val(device_dialog.device.description);
             
             if (typeof device_dialog.device.scanned !== 'undefined' && device_dialog.device.scanned) {
@@ -68,7 +68,7 @@ var device_dialog =
         }
         else {
             $('#device-config-label').html('New Device');
-            $('#device-config-name').val('');
+            $('#device-config-key').val('');
             $('#device-config-description').val('');
             
             $('#device-config-back').hide();
@@ -192,7 +192,7 @@ var device_dialog =
         });
 
         $("#device-config-save").off('click').on('click', function () {
-            var id = $('#device-config-name').val();
+            var id = $('#device-config-key').val();
             
             if (id == '' || (device_dialog.device == null && device_dialog.driverid == null)) {
                 alert('Device needs to be configured first.');
@@ -220,13 +220,11 @@ var device_dialog =
                 }
                 configs['channels'] = $.extend([], device_dialog.device.channels);
                 
-                var foo = JSON.stringify(configs);
-                
-                result = device.update(device_dialog.device.ctrlid, device_dialog.device.id, configs, 
+                device.update(device_dialog.device.ctrlid, device_dialog.device.id, configs, 
                         device_dialog.closeConfig);
             }
             else {
-                result = device.create(device_dialog.ctrlid, device_dialog.driverid, configs, 
+                device.create(device_dialog.ctrlid, device_dialog.driverid, configs, 
                         device_dialog.closeConfig);
             }
         });
