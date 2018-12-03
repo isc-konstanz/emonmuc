@@ -99,7 +99,6 @@
 
     update();
 
-    channel.states = null;
     function update() {
         device.list(function(data, textStatus, xhr) {
             table.data = data;
@@ -115,11 +114,6 @@
                 $("#api-help-header").hide();
             }
             $('#device-loader').hide();
-        });
-
-        channel.listStates(function(data, textStatus, xhr) {
-            // Set the channel states for the labels to be colored correctly
-            channel.states = data;
         });
     }
 
@@ -191,8 +185,9 @@
 
     $("#table").on('click', '.channel-label', function() {
         // Get the ids of the clicked lable
-        var ctrlid = $(this).attr('ctrlid');
-        var channelid = $(this).attr('channelid');
+        var device = table.data[$(this).closest('td').attr('row')];
+        var ctrlid = device['ctrlid'];
+        var channelid = $(this).data('id');
 
         $('#device-loader').show();
         channel.get(ctrlid, channelid, function(result) {

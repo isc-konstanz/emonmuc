@@ -16,3 +16,4 @@ conf/*
 !conf/emoncms.default.conf
 !conf/emoncms.settings.php
 !conf/https-certificate.jks
+bin/felix.jar

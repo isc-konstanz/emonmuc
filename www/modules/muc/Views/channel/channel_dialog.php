@@ -24,14 +24,14 @@
             <tr>
                 <th><?php echo _('Device'); ?></th>
                 <th><?php echo _('Key'); ?></th>
-                <th><?php echo _('Name'); ?></th>
+                <th><?php echo _('Description'); ?></th>
             </tr>
             <tr>
                 <td>
                     <label id="channel-config-device" style="padding: 4px 6px; margin-bottom: 10px;"><span style="color:#888"><em><?php echo _('loading...'); ?></em></span></label>
                     <select id="channel-config-device-select" class="input-large" style="display:none;"></select>
                 </td>
-                <td><input id="channel-config-name" class="input-medium" type="text" required></td>
+                <td><input id="channel-config-key" class="input-medium" type="text" pattern="[a-zA-Z0-9-_.:/]+" required></td>
                 <td><input id="channel-config-description" class="input-large" type="text"></td>
             </tr>
         </table>

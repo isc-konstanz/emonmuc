@@ -117,7 +117,8 @@ install_emoncms() {
   touch /var/log/emoncms/emoncms.log
   chmod 666 /var/log/emoncms/emoncms.log
 
-  sudo git clone -b $GIT_BRANCH $GIT_SERVER/emoncms.git "$EMONCMS_DIR"
+  sudo git clone -b seal "https://github.com/isc-konstanz/emoncms.git" "$EMONCMS_DIR"
+  #sudo git clone -b $GIT_BRANCH $GIT_SERVER/emoncms.git "$EMONCMS_DIR"
   chown $EMONCMS_USER:root /var/log/emoncms/emoncms.log
   chown $EMONCMS_USER:root -R "$EMONCMS_DIR" /var/lib/emoncms
 

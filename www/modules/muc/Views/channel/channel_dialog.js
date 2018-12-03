@@ -49,7 +49,7 @@ var channel_dialog = {
         if (channel_dialog.channel != null) {
             $('#channel-config-label').html('Configure Channel: <b>'+channel_dialog.channel.id+'</b>');
             $('#channel-config-device').html('<b>'+channel_dialog.channel.deviceid+'</b>').show();
-            $('#channel-config-name').val(channel_dialog.channel.id);
+            $('#channel-config-key').val(channel_dialog.channel.id);
             $('#channel-config-description').val(channel_dialog.channel.description);
             
             if (typeof channel_dialog.channel.scanned !== 'undefined' && channel_dialog.channel.scanned) {
@@ -66,7 +66,7 @@ var channel_dialog = {
         }
         else {
             $('#channel-config-label').html('New Channel');
-            $('#channel-config-name').val('');
+            $('#channel-config-key').val('');
             $('#channel-config-description').val('');
 
             $('#channel-config-back').hide();
@@ -177,7 +177,7 @@ var channel_dialog = {
         });
 
         $("#channel-config-save").off('click').on('click', function () {
-            var id = $('#channel-config-name').val();
+            var id = $('#channel-config-key').val();
             
             if (id == '' || (channel_dialog.channel == null && channel_dialog.deviceid == null)) {
                 alert('Channel needs to be configured first.');
@@ -194,10 +194,10 @@ var channel_dialog = {
             var description = $('#channel-config-description').val();
             
             var configs = {
-            		'id': id,
-            		'driverid': driverid,
-            		'deviceid': deviceid,
-            		'description': description,
+                    'id': id,
+                    'driverid': driverid,
+                    'deviceid': deviceid,
+                    'description': description,
             };
             
             configs['address'] = config.encode('address');
@@ -214,8 +214,7 @@ var channel_dialog = {
                     configs['disabled'] = channel_dialog.channel['disabled'];
                 }
                 
-                result = channel.update(channel_dialog.channel.ctrlid, channel_dialog.channel.nodeid, 
-                        channel_dialog.channel.id, configs, 
+                channel.update(channel_dialog.channel.ctrlid, channel_dialog.channel.nodeid, channel_dialog.channel.id, configs, 
                         channel_dialog.closeConfig);
             }
             else {
@@ -295,7 +294,7 @@ var channel_dialog = {
             
             var list = '';
             for (var i = 0; i < channel_dialog.scanChannels.length; i++) {
-            	list += '<li class="channel-scan-row" title="Add" data-row='+i+'>'+channel_dialog.scanChannels[i]['description']+'</li>';
+                list += '<li class="channel-scan-row" title="Add" data-row='+i+'>'+channel_dialog.scanChannels[i]['description']+'</li>';
             }
             $('#channel-scan-results').html(list);
         }
