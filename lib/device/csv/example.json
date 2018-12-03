@@ -3,7 +3,7 @@
     "category": "Demonstration",
     "group": "CSV",
     "description": "Configuration for a CSV driver demonstration, creating the device channels, inputs and feeds for a virtual household.",
-    
+
     "driver": "csv",
     "devices": [
         {
@@ -11,11 +11,11 @@
             "settings": "samplingmode=hhmmss;rewind=true"
         }
     ],
-    
+
     "scan": {
         "settings": "path=lib/driver/csv/"
     },
-    
+
     "options": [
         {
             "id": "file",
@@ -27,10 +27,10 @@
             "syntax": "deviceAddress"
         }
     ],
-    
+
     "channels": [
         {
-            "name": "pv_power",
+            "name": "<node>_pv",
             "description": "Photovoltaic generation power",
             "address": "pv_power_production",
             "logging": {"loggingInterval": 5000, "loggingMaxInterval": 60000},
@@ -42,16 +42,16 @@
                 },
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "solar_power"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>_solar", "tag": "Power"}
                 },
                 {
                     "process": "power_to_kwh",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "solar_energy"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>_solar", "tag": "Energy"}
                 }
             ]
         },
         {
-            "name": "grid_import_power",
+            "name": "<node>_grid_import",
             "description": "Grid import power",
             "address": "grid_power",
             "logging": {"loggingInterval": 5000, "loggingMaxInterval": 60000},
@@ -67,16 +67,16 @@
                 },
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "grid_import_power"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>_grid_import", "tag": "Power"}
                 },
                 {
                     "process": "power_to_kwh",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "grid_import_energy"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>_grid_import", "tag": "Energy"}
                 }
             ]
         },
         {
-            "name": "grid_export_power",
+            "name": "<node>_grid_export",
             "description": "Grid export power",
             "address": "grid_power",
             "logging": {"loggingInterval": 5000, "loggingMaxInterval": 60000},
@@ -92,16 +92,16 @@
                 },
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "grid_export_power"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>_grid_export", "tag": "Power"}
                 },
                 {
                     "process": "power_to_kwh",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "grid_export_energy"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>_grid_export", "tag": "Energy"}
                 }
             ]
         },
         {
-            "name": "consumption_power",
+            "name": "<node>_consumption",
             "description": "Consumption power",
             "address": "grid_power",
             "logging": {"loggingInterval": 5000, "loggingTimeOffset": 1000, "loggingMaxInterval": 60000},
@@ -113,7 +113,7 @@
                 },
                 {
                     "process": "add_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "solar_power"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>_solar", "tag": "Power"}
                 },
                 {
                     "process": "allowpositive",
@@ -121,16 +121,16 @@
                 },
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "consumption_power"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>_consumption", "tag": "Power"}
                 },
                 {
                     "process": "power_to_kwh",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "consumption_energy"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>_consumption", "tag": "Energy"}
                 }
             ]
         },
         {
-            "name": "hp_power",
+            "name": "<node>_hp",
             "description": "Heat pump consumption",
             "address": "hp_power_consumption",
             "logging": {"loggingInterval": 5000, "loggingMaxInterval": 60000},
@@ -142,16 +142,16 @@
                 },
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "heatpump_power"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>_heatpump", "tag": "Power"}
                 },
                 {
                     "process": "power_to_kwh",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "heatpump_energy"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>_heatpump", "tag": "Energy"}
                 }
             ]
         },
         {
-            "name": "ev_power",
+            "name": "<node>_ev",
             "description": "Electric vehicle consumption",
             "address": "ev_power_consumption",
             "logging": {"loggingInterval": 5000, "loggingMaxInterval": 60000},
@@ -163,11 +163,11 @@
                 },
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "ev_power"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>_ev", "tag": "Power"}
                 },
                 {
                     "process": "power_to_kwh",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "ev_energy"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>_ev", "tag": "Energy"}
                 }
             ]
         }
@@ -175,84 +175,96 @@
 
     "feeds": [
         {
-            "name": "solar_power",
+            "name": "<node>_solar",
+            "tag": "Power",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
 			"unit": "W"
         },
         {
-            "name": "solar_energy",
+            "name": "<node>_solar",
+            "tag": "Energy",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
 			"unit": "kWh"
         },
         {
-            "name": "grid_import_power",
+            "name": "<node>_grid_import",
+            "tag": "Power",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
 			"unit": "W"
         },
         {
-            "name": "grid_import_energy",
+            "name": "<node>_grid_import",
+            "tag": "Energy",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
 			"unit": "kWh"
         },
         {
-            "name": "grid_export_power",
+            "name": "<node>_grid_export",
+            "tag": "Power",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
 			"unit": "W"
         },
         {
-            "name": "grid_export_energy",
+            "name": "<node>_grid_export",
+            "tag": "Energy",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
 			"unit": "kWh"
         },
         {
-            "name": "consumption_power",
+            "name": "<node>_consumption",
+            "tag": "Power",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
 			"unit": "W"
         },
         {
-            "name": "consumption_energy",
+            "name": "<node>_consumption",
+            "tag": "Energy",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
 			"unit": "kWh"
         },
         {
-            "name": "heatpump_power",
+            "name": "<node>_heatpump",
+            "tag": "Power",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
 			"unit": "W"
         },
         {
-            "name": "heatpump_energy",
+            "name": "<node>_heatpump",
+            "tag": "Energy",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
 			"unit": "kWh"
         },
         {
-            "name": "ev_power",
+            "name": "<node>_ev",
+            "tag": "Power",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
 			"unit": "W"
         },
         {
-            "name": "ev_energy",
+            "name": "<node>_ev",
+            "tag": "Energy",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
@@ -260,7 +272,6 @@
         }
     ],
     
-    "prefix": "node",
     "syntax": {
         "deviceAddress": {
             "keyValue": false

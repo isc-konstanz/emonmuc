@@ -91,11 +91,11 @@ class ChannelCache {
             }
             
             // Get drivers of all registered MUCs and add identifying location description and parse their configuration
-            $result = $this->ctrl->request($ctrlid, 'channels/details', 'GET', null);
+            $result = $this->ctrl->request($ctrlid, 'channels', 'GET', array('details' => 'true'));
             if (isset($result['success']) && $result['success'] == false) {
                 return $result;
             }
-            foreach($result['details'] as $details) {
+            foreach($result['channels'] as $details) {
                 $channel = $this->channel->get_channel($ctrl, $details);
                 $id = $channel['id'];
                 

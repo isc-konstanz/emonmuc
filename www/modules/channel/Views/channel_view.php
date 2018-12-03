@@ -182,7 +182,7 @@ function draw(result) {
 }
 
 function drawDevice(device) {
-    var deviceid = 'device-muc'+device.ctrlid+'-'+device.id.toLowerCase().replace(/[._]/g, '-');
+    var deviceid = 'device-muc'+device.ctrlid+'-'+device.id.toLowerCase().replace(/[_.:/]/g, '-');
     
     if (typeof collapsed[deviceid] === 'undefined') {
         collapsed[deviceid] = true;
@@ -200,7 +200,7 @@ function drawDevice(device) {
     if (typeof device.channels !== 'undefined' && device.channels.length > 0) {
         for (var i in device.channels) {
             var channel = device.channels[i];
-            var channelid = 'channel-muc'+channel.ctrlid+'-'+channel.id.toLowerCase().replace(/[._]/g, '-');
+            var channelid = 'channel-muc'+channel.ctrlid+'-'+channel.id.toLowerCase().replace(/[_.:/]/g, '-');
             
             channels[channelid] = channel;
             
@@ -294,10 +294,14 @@ function drawChannel(id, channel) {
 }
 
 function drawRecords(result) {
+    if (typeof result.success !== 'undefined' && !result.success) {
+        return;
+    }
     records = {};
+    
     for (var i in result) {
         var record = result[i];
-        var id = 'channel-muc'+record.ctrlid+'-'+record.id.toLowerCase().replace(/[._]/g, '-');
+        var id = 'channel-muc'+record.ctrlid+'-'+record.id.toLowerCase().replace(/[_.:/]/g, '-');
         
         records[id] = record;
         if (typeof channels[id] !== 'undefined' && !redraw) {
@@ -487,7 +491,7 @@ function selectChannel(id, state) {
     var checked = true;
     var indeterminate = false;
     var channel = channels[id];
-    var deviceid = 'device-muc'+channel.ctrlid+'-'+channel.deviceid.toLowerCase().replace(/[._]/g, '-');
+    var deviceid = 'device-muc'+channel.ctrlid+'-'+channel.deviceid.toLowerCase().replace(/[_.:/]/g, '-');
     
     selected[id] = state;
     

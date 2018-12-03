@@ -1,5 +1,4 @@
 var channel = {
-    states: null,
 
     'create':function(ctrlid, driverid, deviceid, configs, callback) {
         return $.ajax({

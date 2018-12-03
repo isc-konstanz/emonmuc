@@ -46,8 +46,6 @@ class MucThing extends DeviceThing
         }
         $ctrlid = intval($device['options']['ctrlid']);
         
-        $prefix = $this->parse_prefix($device['nodeid'], $device['name'], $template);
-        
         $items = array();
         for ($i=0; $i<count($template->items); $i++) {
             $item = (array) $template->items[$i];
@@ -55,7 +53,7 @@ class MucThing extends DeviceThing
             if (isset($item['mapping'])) {
                 foreach($item['mapping'] as &$mapping) {
                     if (isset($mapping->channel)) {
-                        $channelid = $prefix.$mapping->channel;
+                        $channelid = $this->parse_name($device['nodeid'], $mapping->channel);
                         
                         $configs = [];
                         foreach($template->channels as $c) {
@@ -72,7 +70,7 @@ class MucThing extends DeviceThing
                 }
             }
             if (isset($item['input'])) {
-                $inputid = $this->get_input_id($device['userid'], $device['nodeid'], $prefix, $item['input'], $template->channels);
+                $inputid = $this->get_input_id($device['userid'], $device['nodeid'], $item['input'], $template->channels);
                 if ($inputid == false) {
                     $this->log->error("get_item_list() failed to find input of item '".$item['id']."' in template: ".$device['type']);
                     continue;
@@ -81,7 +79,7 @@ class MucThing extends DeviceThing
                 $item = array_merge($item, array('inputid'=>$inputid));
             }
             if (isset($item['feed'])) {
-                $feedid = $this->get_feed_id($device['userid'], $prefix, $item['feed']);
+                $feedid = $this->get_feed_id($device['userid'], $device['nodeid'], $item['feed']);
                 if ($feedid == false) {
                     $this->log->error("get_item_list() failed to find feed of item '".$item['id']."' in template: ".$device['type']);
                     continue;
@@ -117,7 +115,7 @@ class MucThing extends DeviceThing
         }
         return array('success'=>false, 'message'=>"Error while seting item value");
     }
-    
+
     protected function get_template_dir() {
         global $muc_settings;
         if (isset($muc_settings) && isset($muc_settings['libdir']) && $muc_settings['libdir'] !== "") {
@@ -143,5 +141,10 @@ class MucThing extends DeviceThing
             }
         }
         return null;
+    }
+
+    protected function parse_name($nodeid, $name) {
+        $name = parent::parse_name($nodeid, $name);
+        return strtolower($name);
     }
 }

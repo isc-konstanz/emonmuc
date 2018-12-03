@@ -34,6 +34,9 @@ else {
     $apikey = $user->get_apikey_write($userid);
 }
 
+// Enable deviceView by default
+$user->set_preferences($userid, array('deviceView' => true));
+
 if (count($ctrl->get_list($userid)) == 0) {
     $result = $ctrl->create($userid, $type, $address, 'Local');
     if (isset($result['success']) && $result['success'] == false) {

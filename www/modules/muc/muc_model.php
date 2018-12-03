@@ -146,7 +146,7 @@ class Controller
         foreach ($ctrlids as $id)
         {
             $row = $this->redis->hGetAll("muc:$id");
-            $row['drivers'] = $this->get_driver_list($id);
+            $row['drivers'] = $this->get_driver_list($userid, $id);
             
             $ctrls[] = $row;
         }
@@ -160,7 +160,7 @@ class Controller
         $result = $this->mysqli->query("SELECT id, userid, type, address, description, password FROM muc WHERE userid = '$userid'");
         while ($row = (array) $result->fetch_object())
         {
-            $drivers = $this->get_driver_list($row['id']);
+            $drivers = $this->get_driver_list($userid, $row['id']);
             $ctrl = array(
                 'id'=>$row['id'],
                 'userid'=>$row['userid'],
@@ -176,14 +176,17 @@ class Controller
         return $ctrls;
     }
 
-    private function get_driver_list($id) {
+    private function get_driver_list($userid, $id) {
         $id = intval($id);
         
-        $response = $this->request($id, 'drivers', 'GET', null);
-        if (isset($response['success']) && $response['success'] == false) {
+        require_once "Modules/muc/Models/driver_model.php";
+        $driver = new Driver($this);
+        
+        $result = $driver->get_list($userid, $id);
+        if (isset($result['success']) && $result['success'] == false) {
             return array();
         }
-        return $response['drivers'];
+        return $result;
     }
 
     public function get_all() {
@@ -343,7 +346,7 @@ class Controller
                 CURLOPT_CONNECTTIMEOUT => 5,
                 CURLOPT_TIMEOUT => 10,
                 //TODO: This prevents curl from detecting man in the middle attacks. Implement SSL cert verification instead of unsafely disabling it
-                 //CURLOPT_CAINFO => "PATH_TO/cacert.pem");
+                //CURLOPT_CAINFO => "PATH_TO/cacert.pem");
                 CURLOPT_SSL_VERIFYHOST => 0,
                 CURLOPT_SSL_VERIFYPEER => 0
         ));

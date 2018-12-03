@@ -48,7 +48,7 @@ find_emonmuc_dir() {
     fi
   done
   SAVED="`pwd`"
-  cd "`dirname \"$PRG\"`/.." >/dev/null
+  cd "`dirname \"$PRG\"`" >/dev/null
   EMONMUC_DIR="`pwd -P`"
   cd "$SAVED" >/dev/null
 }
@@ -117,7 +117,8 @@ install_emoncms() {
   touch /var/log/emoncms/emoncms.log
   chmod 666 /var/log/emoncms/emoncms.log
 
-  sudo git clone -b $GIT_BRANCH $GIT_SERVER/emoncms.git "$EMONCMS_DIR"
+  sudo git clone -b seal "https://github.com/isc-konstanz/emoncms.git" "$EMONCMS_DIR"
+  #sudo git clone -b $GIT_BRANCH $GIT_SERVER/emoncms.git "$EMONCMS_DIR"
   chown $EMONCMS_USER:root /var/log/emoncms/emoncms.log
   chown $EMONCMS_USER:root -R "$EMONCMS_DIR" /var/lib/emoncms
 
@@ -133,7 +134,7 @@ install_emoncms() {
   a2ensite emoncms
   systemctl reload apache2
 
-  if [ "$CLEAN" ] && [ -e "/var/tmp/emonmuc/setup/settings.php" ]; then
+  if [ "$CLEAN" ] && [ -f "/var/tmp/emonmuc/setup/settings.php" ]; then
     mv -f /var/tmp/emonmuc/setup/settings.php "$EMONCMS_DIR"/settings.php >/dev/null 2>&1
 
   else
@@ -141,8 +142,8 @@ install_emoncms() {
 
     mysql -uroot --execute="\
 CREATE DATABASE emoncms DEFAULT CHARACTER SET utf8;\
-CREATE EMONMUC_USER 'emoncms'@'localhost' IDENTIFIED BY 'emoncms';\
-GRANT ALL ON emoncms.* TO 'emoncms'@'localhost';" >/dev/null 2>&1
+CREATE USER 'emoncms'@'localhost' IDENTIFIED BY 'emoncms';\
+GRANT ALL ON emoncms.* TO 'emoncms'@'localhost';"
 
     cp -f "$EMONMUC_DIR"/conf/emoncms.settings.php "$EMONCMS_DIR"/settings.php
     install_passwords
@@ -166,9 +167,9 @@ FLUSH PRIVILEGES;"
 
   sed -i "7s/.*password = .*$/    \$password = \"$SQL_EMONMUC_USER\";/" "$EMONCMS_DIR"/settings.php
 
-  echo "[Database]" > "$EMONMUC_DIR"/setup_pwd.conf
-  echo "root:$SQL_ROOT" >> "$EMONMUC_DIR"/setup_pwd.conf
-  echo "emoncms:$SQL_EMONMUC_USER" >> "$EMONMUC_DIR"/setup_pwd.conf
+  echo "[Database]" > "$EMONMUC_DIR"/setup.conf
+  echo "root:$SQL_ROOT" >> "$EMONMUC_DIR"/setup.conf
+  echo "emoncms:$SQL_EMONMUC_USER" >> "$EMONMUC_DIR"/setup.conf
 }
 
 API_KEY=""

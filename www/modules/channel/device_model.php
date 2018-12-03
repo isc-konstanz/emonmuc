@@ -87,11 +87,11 @@ class DeviceCache {
             }
             
             // Get drivers of all registered MUCs and add identifying location description and parse their configuration
-            $result = $this->ctrl->request($ctrlid, 'devices/details', 'GET', null);
+            $result = $this->ctrl->request($ctrlid, 'devices', 'GET', array('details' => 'true'));
             if (isset($result['success']) && $result['success'] == false) {
                 return $result;
             }
-            foreach($result['details'] as $details) {
+            foreach($result['devices'] as $details) {
                 $device = $this->device->get_device($ctrl, $details);
                 $id = $device['id'];
                 
@@ -122,7 +122,7 @@ class DeviceCache {
                 foreach ($this->redis->sMembers("muc#$ctrlid:devices") as $id) {
                     $device = (array) $this->redis->hGetAll("muc#$ctrlid:device:$id");
                     $device['configs'] = json_decode($device['configs'], true);
-                    $device['channels'] = json_decode($device['channels']);
+                    $device['channels'] = json_decode($device['channels'], true);
                     
                     $devices[] = $device;
                 }
@@ -145,13 +145,17 @@ class DeviceCache {
             $channels[$channel['id']] = $channel;
         }
         foreach($devices as &$device) {
-            $channelids = $device['channels'];
-            sort($channelids);
+            $chs = array();
             
-            $device['channels'] = array();
-            foreach($channelids as $id) {
-                $device['channels'][] = $channels[$id];
+            if (is_array($device['channels'])) {
+                foreach($device['channels'] as $channel) {
+                    $chs[] = $channels[$channel['id']];
+                }
+                usort($chs, function($c1, $c2) {
+                    return strcmp($c1['id'], $c2['id']);
+                });
             }
+            $device['channels'] = $chs;
         }
         usort($devices, function($d1, $d2) {
             if($d1['id'] == $d2['id'])

@@ -3,7 +3,7 @@
     "category": "Control",
     "group": "Raspberry Pi (GPIO)",
     "description": "Configuration for a Raspberry Pi pin as an output.",
-    
+
     "driver": "rpi-gpio",
     "devices": [
         {
@@ -11,11 +11,11 @@
             "settings": "mode:DIGITAL_OUTPUT"
         }
     ],
-    
+
     "scan": {
         "settings": "mode:DIGITAL_OUTPUT"
     },
-    
+
     "options": [
         {
             "id": "pin",
@@ -27,7 +27,7 @@
             "syntax": "deviceAddress"
         }
     ],
-    
+
     "items": [
         {
             "id": "state",
@@ -36,43 +36,35 @@
             "left": "Low",
             "right": "High",
             "mapping": {
-                "ON": { "channel": "state", "value": true },
-                "OFF": { "channel": "state", "value": false }
+                "ON": { "channel": "<node>_state", "value": true },
+                "OFF": { "channel": "<node>_state", "value": false }
             },
-            "input": "state"
+            "input": "<node>_state"
         }
     ],
-    
+
     "channels": [
         {
-            "name": "state",
+            "name": "<node>_state",
             "description": "Pin state",
             "logging": {"loggingInterval": 5000, "loggingMaxInterval": 60000},
             "configs": {"samplingInterval": 5000, "valueType":"BOOLEAN"},
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "state"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "State"}
                 }
             ]
         }
     ],
-    
+
     "feeds": [
         {
-            "name": "state",
+            "name": "<node>",
+            "tag": "State",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60"
         }
-    ],
-    
-    "prefix": "node",
-    "syntax": {
-        "deviceAddress": {
-            "keyValue": true,
-            "assignment": ":",
-            "separator": ","
-        }
-    }
+    ]
 }

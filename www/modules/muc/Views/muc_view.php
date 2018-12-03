@@ -147,8 +147,9 @@
 
     $("#table").on('click', '.driver-label', function() {
         // Get the ids of the clicked lable
-        var ctrlid = $(this).attr('ctrlid');
-        var driverid = $(this).attr('driverid');
+        var ctrl = table.data[$(this).closest('td').attr('row')];
+        var ctrlid = ctrl['id'];
+        var driverid = $(this).data('id');
 
         $('#ctrl-loader').show();
         driver.get(ctrlid, driverid, function(result) {
