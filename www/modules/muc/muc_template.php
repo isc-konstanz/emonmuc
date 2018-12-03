@@ -119,16 +119,16 @@ class MucTemplate extends DeviceTemplate
 
     public function prepare_template($device) {
         $userid = intval($device['userid']);
+        $nodeid = $device['nodeid'];
         
         $result = $this->get_template($device['type']);
         if (!is_object($result)) {
             return $result;
         }
-        $prefix = $this->parse_prefix($device['nodeid'], $device['name'], $result);
         
         if (isset($result->feeds)) {
             $feeds = $result->feeds;
-            $this->prepare_feeds($userid, $device['nodeid'], $prefix, $feeds);
+            $this->prepare_feeds($userid, $nodeid, $feeds);
         }
         else {
             $feeds = [];
@@ -136,17 +136,17 @@ class MucTemplate extends DeviceTemplate
         
         if (isset($result->channels)) {
             $channels = $result->channels;
-            $this->prepare_inputs($userid, $device['nodeid'], $prefix, $channels);
+            $this->prepare_inputs($userid, $nodeid, $channels);
         }
         else {
             $channels = [];
         }
         
         if (!empty($feeds)) {
-            $this->prepare_feed_processes($userid, $prefix, $feeds, $channels);
+            $this->prepare_feed_processes($userid, $nodeid, $feeds, $channels);
         }
         if (!empty($channels)) {
-            $this->prepare_input_processes($userid, $prefix, $feeds, $channels);
+            $this->prepare_input_processes($userid, $nodeid, $feeds, $channels);
         }
         
         return array('success'=>true, 'feeds'=>$feeds, 'inputs'=>$channels);
@@ -177,7 +177,7 @@ class MucTemplate extends DeviceTemplate
         $driverid = isset($result->driver) ? $result->driver : null;
         
         $devices = $this->parse_devices($result, $options);
-        $response = $this->create_devices($userid, $ctrlid, $driverid, $device['name'], $devices);
+        $response = $this->create_devices($userid, $ctrlid, $driverid, $device['nodeid'], $devices);
         if (isset($response['success']) && $response['success'] == false) {
             return $response;
         }
@@ -346,5 +346,10 @@ class MucTemplate extends DeviceTemplate
             }
         }
         return $result;
+    }
+
+    protected function parse_name($nodeid, $name) {
+        $name = parent::parse_name($nodeid, $name);
+        return strtolower($name);
     }
 }

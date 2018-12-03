@@ -276,7 +276,12 @@ class Channel
         if (!empty($logging)) {
             $configs['loggingSettings'] = $this->encode_log_settings($logging);
         }
-        
+        if (isset($channel['logging'])) {
+            $logging = (array) $channel['logging'];
+            if (isset($logging['loggingInterval'])) $configs['loggingInterval'] = $logging['loggingInterval'];
+            if (isset($logging['loggingTimeOffset'])) $configs['loggingTimeOffset'] = $logging['loggingTimeOffset'];
+            
+        }
         if (isset($channel['configs'])) $configs = array_merge($configs, $channel['configs']);
         if (isset($channel['disabled'])) $configs['disabled'] = $channel['disabled'];
         
@@ -295,7 +300,11 @@ class Channel
         foreach($info['configs']['options'] as $option) {
             if ($option['key'] == 'loggingInterval' ||
                 $option['key'] == 'loggingTimeOffset') {
-                    
+                    $option['name'] = str_replace('Logging', 'Post', $option['name']);
+                    if (isset($option['description'])) {
+                        $option['description'] = str_replace('logging', 'posting', $option['description']);
+                        $option['description'] = str_replace('logged', 'posted', $option['description']);
+                    }
                     $logging['options'][] = $option;
                 }
                 else {
