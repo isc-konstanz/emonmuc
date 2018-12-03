@@ -9,5 +9,5 @@
             'icon'=>'icon-random',
             'path'=>"channel/view" ,
             'session'=>"write",
-            'order' => 5
+            'order' => 20
     );
