@@ -36,6 +36,9 @@ find_emonmuc_dir() {
 
 update_emonmuc() {
   echo "Updating emonmuc framework"
+  if [ "$RESET" ]; then
+    sudo git -C "$EMONMUC_DIR" reset --hard
+  fi
   sudo git -C "$EMONMUC_DIR" pull
   bash "$EMONMUC_DIR"/bin/emonmuc update >/dev/null 2>&1
 
@@ -52,11 +55,17 @@ update_emoncms() {
   pecl update-channels
   pecl upgrade
 
+  if [ "$RESET" ]; then
+    sudo -u $EMONCMS_USER git -C "$EMONCMS_DIR" reset --hard
+  fi
   sudo -u $EMONCMS_USER git -C "$EMONCMS_DIR" pull
 
   echo "Updating emoncms modules"
   for dir in "$EMONCMS_DIR"/Modules/*/; do
       if [ -d "$dir"/.git ]; then
+        if [ "$RESET" ]; then
+          sudo -u $EMONCMS_USER git -C "$dir" reset --hard
+        fi
         sudo -u $EMONCMS_USER git -C "$dir" pull
       fi
   done
@@ -72,8 +81,12 @@ while [[ $# -gt 0 ]]; do
       shift
       shift
       ;;
+    -r | --reset)
+      RESET=true
+      shift
+      ;;
     *)
-      echo "Synopsis: update.sh [-e|--emoncms location]"
+      echo "Synopsis: update.sh [-e|--emoncms location] [-r|--reset]"
       exit 1
       ;;
   esac
