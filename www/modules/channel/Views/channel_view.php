@@ -121,7 +121,7 @@ function updateView() {
         });
     }
     else if (!redraw) {
-        if ((time - redrawTime) % INTERVAL_RECORDS == 0) {
+        if ((time - redrawTime) % INTERVAL_RECORDS < 1000) {
             
             channel.records(drawRecords);
         }
@@ -166,6 +166,7 @@ function draw(result) {
     }
     devices = {};
     channels = {};
+    records = {};
     
     $("#channel-header").show();
     $("#channel-actions").show();
@@ -194,7 +195,7 @@ function drawDevice(device) {
     }
     else description = "";
     
-    var groups = "";
+    var group = "";
     var count = 0;
     var checked = '';
     if (typeof device.channels !== 'undefined' && device.channels.length > 0) {
@@ -203,6 +204,8 @@ function drawDevice(device) {
             var channelid = 'channel-muc'+channel.ctrlid+'-'+channel.id.toLowerCase().replace(/[_.:/]/g, '-');
             
             channels[channelid] = channel;
+            records[channelid] = { 'configs': { 'valueType': channel.configs.valueType },
+                    'flag': channel.flag, 'time': channel.time, 'value': channel.value };
             
             if (typeof selected[channelid] === 'undefined') {
                 selected[channelid] = false;
@@ -210,11 +213,11 @@ function drawDevice(device) {
             if (selected[channelid]) {
                 count++;
             }
-            groups += drawChannel(channelid, channel);
+            group += drawChannel(channelid, channel);
         }
     }
     else {
-        groups += "<div id='"+deviceid+"-none' class='alert'>" +
+        group += "<div id='"+deviceid+"-none' class='alert'>" +
                 "No channels configured yet. <a class='device-add'>Add</a> or <a class='device-scan'>scan</a> for channels with the buttons on this connection block." +
             "</div>";
     }
@@ -236,10 +239,10 @@ function drawDevice(device) {
                     "<div class='action device-scan'><span class='icon-search' title='Scan'></span></div>" +
                     "<div class='action device-add'><span class='icon-plus-sign' title='Add'></span></div>" +
                     "<div class='action device-config'><span class='icon-wrench' title='Configure'></span></div>" +
-                    "</div>" +
                 "</div>" +
+            "</div>" +
             "<div id='"+deviceid+"-body' class='group-body collapse "+(collapsed[deviceid] ? '' : 'in')+"'>" +
-                groups +
+                group +
             "</div>" +
         "</div>"
     );
@@ -297,16 +300,17 @@ function drawRecords(result) {
     if (typeof result.success !== 'undefined' && !result.success) {
         return;
     }
-    records = {};
-    
     for (var i in result) {
-        var record = result[i];
-        var id = 'channel-muc'+record.ctrlid+'-'+record.id.toLowerCase().replace(/[_.:/]/g, '-');
+        var id = 'channel-muc'+result[i].ctrlid+'-'+result[i].id.toLowerCase().replace(/[_.:/]/g, '-');
         
-        records[id] = record;
-        if (typeof channels[id] !== 'undefined' && !redraw) {
-            $('#'+id+'-flag').html(drawRecordFlag(id));
-            $('#'+id+'-sample').html(drawRecordValue(id));
+        if (typeof records[id] !== 'undefined' && typeof channels[id] !== 'undefined' && !redraw) {
+            var record = records[id];
+            
+            records[id] = result[i];
+            if (record.flag != result[i].flag || record.value != result[i].value) {
+                $('#'+id+'-flag').html(drawRecordFlag(id));
+                $('#'+id+'-sample').html(drawRecordValue(id));
+            }
         }
     }
 }
@@ -528,13 +532,13 @@ function registerEvents() {
         var id = $(this).data('id');
         $("#"+id+"-icon").hide();
         $("#"+id+"-select").show();
-    }),
+    });
 
     $(".group-header .group-item").off('mouseout').on("mouseout", function(e) {
         var id = $(this).data('id');
         $("#"+id+"-icon").show();
         $("#"+id+"-select").hide();
-    }),
+    });
 
     $(".collapse").off('show hide').on('show hide', function(e) {
         // Remember if the device block is collapsed, to redraw it correctly
@@ -555,7 +559,7 @@ function registerEvents() {
                 $("#"+id+"-select").show();
             }
         }
-    }),
+    });
 
     $(".group-body .group-item").off('click').on('click', function(e) {
         e.stopPropagation();
@@ -734,7 +738,7 @@ function registerEvents() {
                 $('#'+id+'-write').data('action', 'cancel');
                 $('#'+id+'-write span').removeClass('icon-share-alt').addClass('icon-remove');
             }
-        }, 200);
+        }, 250);
     });
 }
 

@@ -33,6 +33,7 @@
             "id": "state",
             "type": "Switch",
             "label": "Pin state",
+            "header": true,
             "left": "Low",
             "right": "High",
             "mapping": {

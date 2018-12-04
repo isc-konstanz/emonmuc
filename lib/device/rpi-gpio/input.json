@@ -28,6 +28,20 @@
         }
     ],
 
+    "items": [
+        {
+            "id": "state",
+            "type": "Text",
+            "label": "Pin state",
+            "header": true,
+            "select": {
+                "0":"Low",
+                "1":"High"
+            },
+            "input": "<node>_state"
+        }
+    ],
+
     "channels": [
         {
             "name": "<node>_state",
