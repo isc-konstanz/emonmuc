@@ -25,6 +25,17 @@
         }
     ],
 
+    "items": [
+        {
+            "id": "temperature",
+            "type": "Text",
+            "label": "Temperature",
+            "header": true,
+            "format": "%.1f °C",
+            "input": "<node>_temperature"
+        }
+    ],
+
     "channels": [
         {
             "name": "<node>_temperature",
