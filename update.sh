@@ -4,9 +4,7 @@
 # Set the targeted location of the emonmuc framework and the emoncms webserver.
 # If a specified directory is empty, the component will be installed.
 #EMONCMS_DIR="/var/www/html/emoncms"
-#EMONMUC_DIR="/opt/emonmuc"
 EMONCMS_USER="www-data"
-EMONMUC_USER="pi"
 
 
 if [[ $EUID -ne 0 ]]; then
@@ -32,6 +30,10 @@ find_emonmuc_dir() {
   cd "`dirname \"$PRG\"`/.." >/dev/null
   EMONMUC_DIR="`pwd -P`"
   cd "$SAVED" >/dev/null
+}
+
+find_emonmuc_user() {
+  EMONMUC_USER=`stat -c "%U" "$EMONMUC_DIR"/update.sh`
 }
 
 update_emonmuc() {
@@ -74,6 +76,8 @@ update_emoncms() {
   php "$EMONMUC_DIR"/lib/www/reload.php
 }
 
+echo "Starting emonmuc update"
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
     -e | --emoncms)
@@ -95,6 +99,8 @@ done
 if [ -z ${EMONMUC_DIR+x} ]; then
   find_emonmuc_dir
 fi
+find_emonmuc_user
+
 update_emonmuc
 
 if [ -n "$EMONCMS_DIR" ] && [ -d "$EMONCMS_DIR" ]; then

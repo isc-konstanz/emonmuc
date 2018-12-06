@@ -6,9 +6,7 @@ GIT_BRANCH="stable"
 # Set the targeted location of the emonmuc framework and the emoncms webserver.
 # If a specified directory is empty, the component will be installed.
 #EMONCMS_DIR="/var/www/html/emoncms"
-#EMONMUC_DIR="/opt/emonmuc"
 EMONCMS_USER="www-data"
-EMONMUC_USER="pi"
 EMONMUC_PORT=8080
 
 
@@ -51,6 +49,10 @@ find_emonmuc_dir() {
   cd "`dirname \"$PRG\"`" >/dev/null
   EMONMUC_DIR="`pwd -P`"
   cd "$SAVED" >/dev/null
+}
+
+find_emonmuc_user() {
+  EMONMUC_USER=`stat -c "%U" "$EMONMUC_DIR"/setup.sh`
 }
 
 download_emonmuc() {
@@ -173,6 +175,8 @@ FLUSH PRIVILEGES;"
   echo "emoncms:$SQL_EMONMUC_USER" >> "$EMONMUC_DIR"/setup.conf
 }
 
+echo "Starting emonmuc setup"
+
 API_KEY=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -204,6 +208,8 @@ done
 if [ -z ${EMONMUC_DIR+x} ]; then
   find_emonmuc_dir
 fi
+find_emonmuc_user
+
 if [ "$CLEAN" ]; then
   mkdir -p /var/tmp/emonmuc/setup
   mv -f "$EMONMUC_DIR"/conf /var/tmp/emonmuc/setup/ >/dev/null 2>&1

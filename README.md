@@ -24,10 +24,16 @@ This project is developed as an extension to [emoncms](https://emoncms.org/) and
 
 # Installation
 
-These setup instructions were documented for Debian Linux based platforms, specifically for a user *pi* on *Raspbian Stretch*, but may work for other Linux systems with slight adjustments to the setup script. Further guides may follow in the future.
+These setup instructions were documented for Debian Linux based platforms, specifically for a user *pi* on **Raspbian** stretch, but may work for other Linux systems with slight adjustments to the setup script. Further guides may follow in the future.
 
 First, the framework can be downloaded either via git or simply copied into a directory like `/opt/emonmuc`.  
-Git is a source code management and revision control system, but here it is used to download and update the emonmuc application. After downloading, the right permissions need to be set:
+Git is a source code management and revision control system, but here it is used to download and update the emonmuc application.
+
+~~~
+sudo apt-get install git-core
+~~~
+
+After downloading, permissions should changed:
 
 ~~~
 sudo git clone -b stable https://github.com/isc-konstanz/emonmuc.git /opt/emonmuc
