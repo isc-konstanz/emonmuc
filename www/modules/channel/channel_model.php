@@ -131,6 +131,8 @@ class ChannelCache {
                 $channel = (array) $this->redis->hGetAll("muc#$ctrlid:channel:$id");
                 $channel['logging'] = json_decode($channel['logging'], true);
                 $channel['configs'] = json_decode($channel['configs'], true);
+                $channel['state'] = 'LOADING';
+                $channel['flag'] = 'LOADING';
                 
                 $channels[] = $channel;
             }
@@ -151,6 +153,8 @@ class ChannelCache {
             $channel = (array) $this->redis->hGetAll("muc#$ctrlid:channel:$id");
             $channel['logging'] = json_decode($channel['logging'], true);
             $channel['configs'] = json_decode($channel['configs'], true);
+            $channel['state'] = 'LOADING';
+            $channel['flag'] = 'LOADING';
             
             return $channel;
         }

@@ -258,7 +258,7 @@ class Channel
             unset($configs['disabled']);
         }
         $channel['configs'] = $configs;
-        if (!empty($logging)) $channel['logging'] = $logging;
+        $channel['logging'] = $logging;
         
         $channel['disabled'] = $disabled;
         

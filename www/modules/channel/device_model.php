@@ -220,8 +220,9 @@ class DeviceCache {
 
     public function delete($ctrlid, $id) {
         if ($this->redis) {
-            $channelids = json_decode($this->redis->hget("muc#$ctrlid:device:$id",'channels'));
-            foreach ($channelids as $channelid) {
+            $channels = json_decode($this->redis->hget("muc#$ctrlid:device:$id",'channels'), true);
+            foreach ($channels as $channel) {
+                $channelid = $channel['id'];
                 $this->redis->srem("muc#$ctrlid:channels", $channelid);
                 $this->redis->del("muc#$ctrlid:channel:$channelid");
             }
