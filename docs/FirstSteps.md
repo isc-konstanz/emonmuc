@@ -58,7 +58,7 @@ The header navigation bar provides the access to all important emoncms pages. Ad
 
 ### Setup
 
-![emonmuc setup](img/emonmuc-setup-2.0.png)
+![emonmuc setup](img/emonmuc-setup.png)
 
 - **My Account**: Here you get information about your Profile. You can edit your username, password, E-mail and access your [API Keys](https://cloud.google.com/endpoints/docs/openapi/when-why-api-key) (for *read* and *write* access).
 

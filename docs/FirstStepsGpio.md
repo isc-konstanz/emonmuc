@@ -44,7 +44,7 @@ sudo chmod g+rw /dev/gpiomem
 To do so, simply change the ownership of the runscript and restart the framework:
 
 ~~~
-sudo chown root -R /opt/emonmuc/bin
+sudo chown root -R /opt/emonmuc
 sudo systemctl restart emonmuc
 ~~~
 
