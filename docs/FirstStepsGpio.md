@@ -75,7 +75,7 @@ If done, click **Save and Initialize**.
 
 Now, navigate to the thing view via **Extra > Things**, to get a very basic block with one switch button:
 
-![thing view](img/rpi-gpio/thing-view.jpg)
+![thing view](img/rpi-gpio/device_things.png)
 
 With it, simply turn the LED On and Off by toggling the button. Did you do everything correct? Congratulations!  
 The graph view shows you the history of the LED status: 1 equals high, 0 equals low.
