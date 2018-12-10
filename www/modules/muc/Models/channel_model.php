@@ -115,8 +115,8 @@ class Channel
             // Get drivers of all registered MUCs and add identifying location description and parse their configuration
             $response = $this->ctrl->request($ctrl['id'], 'channels', 'GET', array('details' => 'true'));
             if (isset($response['channels'])) {
-                foreach($response['channels'] as $details) {
-                    $channels[] = $this->get_channel($ctrl, $details);
+                foreach($response['channels'] as $channel) {
+                    $channels[] = $this->get_channel($ctrl, $channel);
                 }
             }
         }
@@ -258,7 +258,7 @@ class Channel
             unset($configs['disabled']);
         }
         $channel['configs'] = $configs;
-        if (!empty($logging)) $channel['logging'] = $logging;
+        $channel['logging'] = $logging;
         
         $channel['disabled'] = $disabled;
         

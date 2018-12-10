@@ -99,7 +99,7 @@ Details about drivers and specific information about their usage and configurati
 
 ## Serial Port
 
-To use any serial port with the emonmuc framework, e.g. to communicate via Modbus RTU, the open-source project **[jRxTx](https://github.com/openmuc/jrxtx)** is used. This, as well as some additional steps if the UART Pins of the Raspberry Pi Platform should be used, need to be prepared.  
+To use any serial port with the emonmuc framework, e.g. to communicate via Modbus RTU, the open-source project [jRxTx](https://github.com/openmuc/jrxtx) is used. This, as well as some additional steps if the UART Pins of the Raspberry Pi Platform should be used, need to be prepared.  
 The [Serial Port preparation guide](docs/LinuxSerialPort.md) may be followed to do so.
 
 
