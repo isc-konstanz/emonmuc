@@ -7,7 +7,7 @@ This document describes how to prepare the serial port for emonmuc (**e**nergy *
 
 # 1 Prepare the Serial Port
 
-To use any serial port with the emonmuc framework, e.g. to communicate via Modbus RTU, the open-source project **[jRxTx](https://github.com/openmuc/jrxtx)** is used. This, as well as some additional steps if the UART Pins of the Raspberry Pi Platform should be used, need to be prepared.
+To use any serial port with the emonmuc framework, e.g. to communicate via Modbus RTU, the open-source project [jRxTx](https://github.com/openmuc/jrxtx) is used. This, as well as some additional steps if the UART Pins of the Raspberry Pi Platform should be used, need to be prepared.
 
 
 ## 1.1 Install RXTX 

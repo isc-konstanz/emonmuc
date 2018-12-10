@@ -37,30 +37,23 @@
     .channel-unit { display: none !important; }
 }
 
-.channels input {
+.channel-sample input {
     margin: 0px;
     text-align: right;
 }
 
 /* For Firefox */
-.channels input[type='number'] {
+.channel-sample input[type=number] {
     -moz-appearance: textfield;
 }
 
 /* Webkit browsers like Safari and Chrome */
-.channels input[type=number]::-webkit-inner-spin-button,
-.channels input[type=number]::-webkit-outer-spin-button {
+.channel-sample input[type=number]::-webkit-inner-spin-button,
+.channel-sample input[type=number]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0px;
 }
 
-.channels input[type="checkbox"] {
-    margin: 0px;
-}
-.channels input[type=checkbox]:focus+:before {
+.channel-sample input[type=checkbox]:focus+:before {
     outline: none !important;
-}
-.channels .channel-checkbox {
-    width: 40px;
-    float: right;
 }

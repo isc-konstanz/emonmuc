@@ -53,12 +53,12 @@ The project and knowledge gained in its development served as groundwork and the
 
 ## 2.3 Navigation
 
-The header navigation bar provides the access to all important emoncms pages. Additionally to the **Channels**, **Inputs** and **Feeds**, the dropdown menues contain the following noteworthy entries:
+The header navigation bar provides the access to all important emoncms pages. Additionally to the **Channels**, **Devices** and **Feeds**, the dropdown menues contain the following noteworthy entries:
 
 
 ### Setup
 
-![emonmuc setup](img/emonmuc-setup.jpg)
+![emonmuc setup](img/emonmuc-setup.png)
 
 - **My Account**: Here you get information about your Profile. You can edit your username, password, E-mail and access your [API Keys](https://cloud.google.com/endpoints/docs/openapi/when-why-api-key) (for *read* and *write* access).
 
@@ -83,7 +83,7 @@ First, the driver needs to be installed. This can be done with the simple shell 
 emonmuc install csv
 ~~~
 
-After restarting the framework, add a new Device Connection (representing a specified CSV file in this case) by opening the input view **Setup > Inputs** and pressing the "New device" button.
+After restarting the framework, add a new Device Connection (representing a specified CSV file in this case) by opening the device view **Setup > Devices** and pressing the "New device" button.
 
 ![input-none](img/csv/input-none.jpg)
 
