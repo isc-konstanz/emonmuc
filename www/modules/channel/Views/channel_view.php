@@ -166,7 +166,6 @@ function draw(result) {
     }
     devices = {};
     channels = {};
-    records = {};
     
     $("#channel-header").show();
     $("#channel-actions").show();
@@ -202,11 +201,14 @@ function drawDevice(device) {
         for (var i in device.channels) {
             var channel = device.channels[i];
             var channelid = 'channel-muc'+channel.ctrlid+'-'+channel.id.toLowerCase().replace(/[_.:/]/g, '-');
-            
             channels[channelid] = channel;
-            records[channelid] = { 'configs': { 'valueType': channel.configs.valueType },
-                    'flag': channel.flag, 'time': channel.time, 'value': channel.value };
             
+            if (typeof channel.time !== 'undefined' || 
+                    typeof records[channelid] === 'undefined') {
+                
+                records[channelid] = { 'configs': { 'valueType': channel.configs.valueType },
+                        'flag': channel.flag, 'time': channel.time, 'value': channel.value };
+            }
             if (typeof selected[channelid] === 'undefined') {
                 selected[channelid] = false;
             }
