@@ -46,7 +46,7 @@ class DeviceCache {
                 'address'=>$device['address'],
                 'settings'=>$device['settings'],
                 'configs'=>json_encode($device['configs']),
-                'channels'=>json_encode($device['channels'])
+                'channels'=>json_encode(array())
             ));
         }
         return $result;
@@ -95,6 +95,10 @@ class DeviceCache {
                 $device = $this->device->get_device($ctrl, $details);
                 $id = $device['id'];
                 
+                $channels = array();
+                foreach ($device['channels'] as $channel) {
+                    $channels[] = $channel['id'];
+                }
                 $this->redis->sAdd("muc#$ctrlid:devices", $id);
                 $this->redis->hMSet("muc#$ctrlid:device:$id", array(
                     'id'=>$device['id'],
@@ -106,7 +110,7 @@ class DeviceCache {
                     'address'=>$device['address'],
                     'settings'=>$device['settings'],
                     'configs'=>json_encode($device['configs']),
-                    'channels'=>json_encode($device['channels'])
+                    'channels'=>json_encode($channels)
                 ));
             }
         }
@@ -148,8 +152,10 @@ class DeviceCache {
             $chs = array();
             
             if (is_array($device['channels'])) {
-                foreach($device['channels'] as $channel) {
-                    $chs[] = $channels[$channel['id']];
+                foreach($device['channels'] as $channelid) {
+                    if (isset($channels[$channelid])) {
+                        $chs[] = $channels[$channelid];
+                    }
                 }
                 usort($chs, function($c1, $c2) {
                     return strcmp($c1['id'], $c2['id']);
@@ -221,8 +227,7 @@ class DeviceCache {
     public function delete($ctrlid, $id) {
         if ($this->redis) {
             $channels = json_decode($this->redis->hget("muc#$ctrlid:device:$id",'channels'), true);
-            foreach ($channels as $channel) {
-                $channelid = $channel['id'];
+            foreach ($channels as $channelid) {
                 $this->redis->srem("muc#$ctrlid:channels", $channelid);
                 $this->redis->del("muc#$ctrlid:channel:$channelid");
             }

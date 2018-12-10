@@ -723,9 +723,9 @@ function registerEvents() {
             var id = $(self).closest('.group-item').data('id');
             
             var value = null;
-            if (typeof records[id] !== 'undefined') {
+            if (typeof records[id] !== 'undefined' && typeof records[id].value !== 'undefined') {
                 value = records[id].value;
-                if (!isNaN(value)) {
+                if (value != null && !isNaN(value)) {
                     value = value.toFixed(3);
                 }
             }
