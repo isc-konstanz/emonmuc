@@ -44,14 +44,14 @@ sudo chmod g+rw /dev/gpiomem
 To do so, simply change the ownership of the runscript and restart the framework:
 
 ~~~
-sudo chown root -R /opt/emonmuc/bin
+sudo chown root -R /opt/emonmuc
 sudo systemctl restart emonmuc
 ~~~
 
 
 ## 1.1 Assembling the hardware
 
-Now, connect a LED via a GPIO pin: next to the Raspberry Pi you need a breadboard or something similar, some wires (Female-Male), a LED and a resistor (e.g. 420 Ohm, depending on your LED), as shown in the first image. If you are not sure, how high your resistance is, go check it out [here](http://www.dieelektronikerseite.de/Tools/Widerstandsrechner.htm).
+Now, connect a LED via a GPIO pin: next to the Raspberry Pi you need a breadboard or something similar, some wires (Female-Male), a LED and a resistor (e.g. 420 Ohm, depending on your LED), as shown in the first image. If you are not sure, how high your resistance is, go check it out [here](https://www.digikey.com/en/resources/conversion-calculators/conversion-calculator-resistor-color-code-4-band).
 
 Next, connect one wire (black) from the ground-pin to the breadboard. Connect the resistor and the LED with the board in series. Last step is to link the second wire (orange) with any pin (here, it is pin 21, GPIO 13).
 
@@ -75,7 +75,7 @@ If done, click **Save and Initialize**.
 
 Now, navigate to the thing view via **Extra > Things**, to get a very basic block with one switch button:
 
-![thing view](img/rpi-gpio/thing-view.jpg)
+![thing view](img/rpi-gpio/device_things.png)
 
 With it, simply turn the LED On and Off by toggling the button. Did you do everything correct? Congratulations!  
 The graph view shows you the history of the LED status: 1 equals high, 0 equals low.
