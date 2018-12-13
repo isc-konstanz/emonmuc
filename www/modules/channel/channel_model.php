@@ -193,8 +193,15 @@ class ChannelCache {
             if ($id != $newid) {
                 $this->redis->del("muc#$ctrlid:channel:$id");
                 $this->redis->srem("muc#$ctrlid:channels", $id);
-                
                 $this->redis->sAdd("muc#$ctrlid:channels", $newid);
+                
+                $channels = json_decode($this->redis->hget("muc#$ctrlid:device:".$device,'channels'), true);
+                $index = array_search($id, $channels);
+                if($index !== false) {
+                    unset($channels[$index]);
+                }
+                $channels[] = $newid;
+                $this->redis->hset("muc#$ctrlid:device:".$device,'channels', json_encode($channels));
             }
             $this->redis->hMSet("muc#$ctrlid:channel:$newid", array(
                 'id'=>$newid,
