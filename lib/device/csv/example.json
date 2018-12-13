@@ -51,8 +51,8 @@
             ]
         },
         {
-            "name": "<node>_grid_import",
-            "description": "Grid import power",
+            "name": "<node>_grid",
+            "description": "Grid power",
             "address": "grid_power",
             "logging": {"loggingInterval": 5000, "loggingMaxInterval": 60000},
             "configs": {"samplingInterval": 5000, "valueType":"DOUBLE", "unit": "kW"},
@@ -72,16 +72,11 @@
                 {
                     "process": "power_to_kwh",
                     "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>_grid_import", "tag": "Energy"}
-                }
-            ]
-        },
-        {
-            "name": "<node>_grid_export",
-            "description": "Grid export power",
-            "address": "grid_power",
-            "logging": {"loggingInterval": 5000, "loggingMaxInterval": 60000},
-            "configs": {"samplingInterval": 5000, "valueType":"DOUBLE", "unit": "kW"},
-            "processList": [
+                },
+                {
+                    "process": "reset2original",
+                    "arguments": {"type": "ProcessArg::NONE"}
+                },
                 {
                     "process": "scale",
                     "arguments": {"type": "ProcessArg::VALUE", "value": "-1000"}

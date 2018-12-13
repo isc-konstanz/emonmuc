@@ -1,7 +1,7 @@
 {
     "name": "Pin",
     "category": "Sensor",
-    "group": "Raspberry Pi (GPIO)",
+    "group": "GPIO (Raspberry Pi)",
     "description": "Configuration for a Raspberry Pi pin as an input.",
 
     "driver": "rpi-gpio",
