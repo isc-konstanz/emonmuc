@@ -12,13 +12,13 @@ To setup this driver, [emonmuc](https://github.com/isc-konstanz/emonmuc/) needs 
 With emonmuc being installed, the driver may be enabled
 
 ~~~
-emonmuc install csv
+emonmuc install rpi-gpio
 ~~~
 
 To disable the driver, use
 
 ~~~
-emonmuc remove csv
+emonmuc remove rpi-gpio
 ~~~
 
 To allow drivers to have access to GPIO pins of the Raspberry Pi even when not root, non-privileged accessed can be enabled since the Raspberry Pi 3.  

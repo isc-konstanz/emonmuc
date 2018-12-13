@@ -152,7 +152,8 @@ class DeviceCache {
             $chs = array();
             
             if (is_array($device['channels'])) {
-                foreach($device['channels'] as $channelid) {
+                foreach($device['channels'] as $channel) {
+                    $channelid = is_string($channel) ? $channel : $channel['id'];
                     if (isset($channels[$channelid])) {
                         $chs[] = $channels[$channelid];
                     }
@@ -202,11 +203,21 @@ class DeviceCache {
             }
             $driver = $configs['driverid'];
             
+            $channels = array();
+            if (isset($configs['channels'])) {
+                foreach ($configs['channels'] as $channel) {
+                    $channels[] = is_string($channel) ? $channel : $channel['id'];
+                }
+            }
+            
             if ($id != $newid) {
                 $this->redis->del("muc#$ctrlid:device:$id");
                 $this->redis->srem("muc#$ctrlid:devices", $id);
-                
                 $this->redis->sAdd("muc#$ctrlid:devices", $newid);
+                
+                foreach ($channels as $channelid) {
+                    $this->redis->hset("muc#$ctrlid:channel:$channelid",'deviceid', $newid);
+                }
             }
             $this->redis->hMSet("muc#$ctrlid:device:$newid", array(
                 'id'=>$newid,
@@ -218,7 +229,7 @@ class DeviceCache {
                 'address'=>isset($configs['address']) ? $configs['address'] : '',
                 'settings'=>isset($configs['settings']) ? $configs['settings'] : '',
                 'configs'=>json_encode(isset($configs['configs']) ? $configs['configs'] : new stdClass()),
-                'channels'=>json_encode(isset($configs['channels']) ? $configs['channels'] : array()),
+                'channels'=>json_encode($channels),
             ));
         }
         return $result;

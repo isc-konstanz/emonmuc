@@ -30,6 +30,7 @@ First, the framework can be downloaded either via git or simply copied into a di
 Git is a source code management and revision control system, but here it is used to download and update the emonmuc application.
 
 ~~~
+sudo apt-get update
 sudo apt-get install git-core
 ~~~
 

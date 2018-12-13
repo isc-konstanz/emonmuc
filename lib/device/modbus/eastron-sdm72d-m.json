@@ -1,7 +1,7 @@
 {
     "name": "SDM72D-M",
     "category": "Meter",
-    "group": "B+G E-TECH",
+    "group": "EASTRON",
     "description": "<b>Energy Meter SDM72D-M</b>:<br>Current: 10(100)A<br>Voltage : 3*230V<br>50(60)Hz",
 
     "driver": "modbus",

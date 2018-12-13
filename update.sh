@@ -27,7 +27,7 @@ find_emonmuc_dir() {
     fi
   done
   SAVED="`pwd`"
-  cd "`dirname \"$PRG\"`/.." >/dev/null
+  cd "`dirname \"$PRG\"`" >/dev/null
   EMONMUC_DIR="`pwd -P`"
   cd "$SAVED" >/dev/null
 }
