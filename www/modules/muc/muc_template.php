@@ -79,7 +79,7 @@ class MucTemplate extends DeviceTemplate
                             array('name'=>'Dot', 'value'=>'.'),
                             array('name'=>'Hyphen', 'value'=>'-'),
                             array('name'=>'Underscore', 'value'=>'_'),
-                            array('name'=>'Space', 'value'=>' ')
+                            array('name'=>'Slash', 'value'=>'/')
                         ),
                         'default'=>self::SEPARATOR,
                         'mandatory'=>false,
