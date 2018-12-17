@@ -38,17 +38,17 @@ class MucTemplate extends DeviceTemplate
             new DeviceConnection($this->ctrl), $this->channel, $this->redis);
     }
 
-    protected function load_template_list() {
+    protected function load_list() {
         $list = array();
         
-        $dir = $this->get_template_dir();
+        $dir = $this->get_dir();
         if (is_dir($dir)) {
             $it = new RecursiveDirectoryIterator($dir);
             foreach (new RecursiveIteratorIterator($it) as $file) {
                 if ($file->getExtension() == "json") {
                     $type = substr(pathinfo($file, PATHINFO_DIRNAME), strlen($dir)).'/'.pathinfo($file, PATHINFO_FILENAME);
                     
-                    $result = $this->get_template($type);
+                    $result = $this->get($type);
                     if (is_array($result) && isset($result['success']) && $result['success'] == false) {
                         return $result;
                     }
@@ -59,14 +59,50 @@ class MucTemplate extends DeviceTemplate
         return $list;
     }
 
-    public function get_template($type) {
-        $file = $this->get_template_dir().$type.".json";
+    public function get($type) {
+        $file = $this->get_dir().$type.".json";
         if (file_exists($file)) {
-            $template = json_decode(file_get_contents($file));
+            $content = file_get_contents($file);
+            $template = json_decode($content);
             if (json_last_error() == 0) {
                 if (empty($template->options)) {
                     $template->options = array();
                 }
+                $options = array();
+                
+                if (strpos($content, '*') !== false) {
+                    $options[] = array('id'=>'sep',
+                        'name'=>'Separator',
+                        'description'=>'The separator to use in the names of automatically created elements.',
+                        'type'=>'selection',
+                        'select'=>array(
+                            array('name'=>'Dot', 'value'=>'.'),
+                            array('name'=>'Hyphen', 'value'=>'-'),
+                            array('name'=>'Underscore', 'value'=>'_'),
+                            array('name'=>'Space', 'value'=>' ')
+                        ),
+                        'default'=>self::SEPARATOR,
+                        'mandatory'=>false,
+                    );
+                }
+                
+                $ctrls = $this->ctrl->get_all();
+                if (count($ctrls) > 0) {
+                    $select = array();
+                    foreach ($ctrls as $ctrl) {
+                        $select[] = array('name'=>$ctrl['description'], 'value'=>$ctrl['id']);
+                    }
+                    $options[] = array('id'=>'ctrlid',
+                        'name'=>'Controller',
+                        'description'=>'The communication controller this device should be registered for.',
+                        'type'=>'selection',
+                        'select'=>$select,
+                        'default'=>$ctrls[0]['id'],
+                        'mandatory'=>true,
+                    );
+                }
+                $template->options = array_merge($options, $template->options);
+                
                 return $template;
             }
             return array('success'=>false, 'message'=>"Error reading template $type: ".json_last_error_msg());
@@ -74,7 +110,7 @@ class MucTemplate extends DeviceTemplate
         return array('success'=>false, 'message'=>"Error reading template $type: $file does not exist");
     }
 
-    protected function get_template_dir() {
+    protected function get_dir() {
         global $muc_settings;
         if (isset($muc_settings) && isset($muc_settings['libdir']) && $muc_settings['libdir'] !== "") {
             $muc_template_dir = $muc_settings['libdir'];
@@ -88,54 +124,86 @@ class MucTemplate extends DeviceTemplate
         return $muc_template_dir."device/";
     }
 
-    public function get_template_options($type) {
-        $result = $this->get_template($type);
-        if (!is_object($result)) {
-            return $result;
+    public function get_options($type) {
+        $template = $this->get($type);
+        if (!is_object($template)) {
+            return $template;
         }
-        $options = array();
-        
-        $ctrls = $this->ctrl->get_all();
-        if (count($ctrls) > 0) {
-            $select = array();
-            foreach ($ctrls as $ctrl) {
-                $select[] = array('name'=>$ctrl['description'], 'value'=>$ctrl['id']);
-            }
-            $options[] = array('id'=>'ctrlid',
-                'name'=>'Controller',
-                'description'=>'The communication controller this device should be registered for.',
-                'type'=>'selection',
-                'select'=>$select,
-                'default'=>$ctrls[0]['id'],
-                'mandatory'=>true,
-            );
-        }
-        
-        if (isset($result->options)) {
-            $options = array_merge($options, (array) $result->options);
-        }
-        return $options;
+        return $template->options;
     }
 
-    public function prepare_template($device) {
+    public function set_fields($device, $fields) {
         $userid = intval($device['userid']);
         $nodeid = $device['nodeid'];
         
-        $result = $this->get_template($device['type']);
-        if (!is_object($result)) {
-            return $result;
+        $template = $this->get($device['type']);
+        if (!is_object($template)) {
+            return $template;
         }
         
-        if (isset($result->feeds)) {
-            $feeds = $result->feeds;
+        if (isset($fields->nodeid)) {
+            $sep = isset($device['options']['sep']) ? $device['options']['sep'] : self::SEPARATOR;
+            
+            $options = $device['options'];
+            if (isset($options['ctrlid'])) {
+                $ctrlid = intval($options['ctrlid']);
+                $configs = $this->device->get($userid, $ctrlid, $nodeid);
+                $configs['id'] = $fields->nodeid;
+                
+                $result = $this->device->update($userid, $ctrlid, $nodeid, json_encode($configs));
+                if (isset($result['success']) && $result['success'] == false) {
+                    return $result;
+                }
+                if (isset($template->channels)) {
+                    $result = $this->channel->get_list($userid, $ctrlid);
+                    if (isset($result['success']) && $result['success'] == false) {
+                        return $result;
+                    }
+                    $channels = array();
+                    foreach($result as $channel) $channels[$channel['id']] = $channel;
+                    foreach($template->channels as $channel) {
+                        $id = $this->parse_name($sep, $nodeid, $channel->name);
+                        if (isset($channels[$id])) {
+                            $configs = $channels[$id];
+                            $configs['id'] = $this->parse_name($sep, $fields->nodeid, $channel->name);
+                            if (isset($configs['logging'])) {
+                                $configs['logging']['nodeid'] = $fields->nodeid;
+                            }
+                            else {
+                                $configs['logging'] = array('nodeid' => $fields->nodeid);
+                            }
+                            $this->channel->update($userid, $ctrlid, $nodeid, $id, json_encode($configs));
+                        }
+                    }
+                }
+            }
+        }
+        return array('success'=>true, 'message'=>"Device updated");
+    }
+
+    public function prepare($device) {
+        $userid = intval($device['userid']);
+        $nodeid = $device['nodeid'];
+        
+        $template = $this->get($device['type']);
+        if (!is_object($template)) {
+            return $template;
+        }
+        if (empty($device['options'])) {
+            $device['options'] = array();
+        }
+        $options = (array) $device['options'];
+        
+        if (isset($template->feeds)) {
+            $feeds = $this->prepare_names($nodeid, $options, $template->feeds);
             $this->prepare_feeds($userid, $nodeid, $feeds);
         }
         else {
             $feeds = [];
         }
         
-        if (isset($result->channels)) {
-            $channels = $result->channels;
+        if (isset($template->channels)) {
+            $channels = $this->prepare_names($nodeid, $options, $template->channels);
             $this->prepare_inputs($userid, $nodeid, $channels);
         }
         else {
@@ -143,20 +211,20 @@ class MucTemplate extends DeviceTemplate
         }
         
         if (!empty($feeds)) {
-            $this->prepare_feed_processes($userid, $nodeid, $feeds, $channels);
+            $this->prepare_feed_processes($userid, $feeds, $channels);
         }
         if (!empty($channels)) {
-            $this->prepare_input_processes($userid, $nodeid, $feeds, $channels);
+            $this->prepare_input_processes($userid, $feeds, $channels);
         }
         
         return array('success'=>true, 'feeds'=>$feeds, 'inputs'=>$channels);
     }
 
-    public function init_template($device, $template) {
+    public function init($device, $template) {
         $userid = intval($device['userid']);
         
         if (empty($template)) {
-            $result = $this->prepare_template($device);
+            $result = $this->prepare($device);
             if (isset($result['success']) && $result['success'] == false) {
                 return $result;
             }
@@ -164,7 +232,7 @@ class MucTemplate extends DeviceTemplate
         }
         if (!is_object($template)) $template = (object) $template;
         
-        $result = $this->get_template($device['type']);
+        $result = $this->get($device['type']);
         if (!is_object($result)) {
             return $result;
         }
@@ -348,8 +416,25 @@ class MucTemplate extends DeviceTemplate
         return $result;
     }
 
-    protected function parse_name($nodeid, $name) {
-        $name = parent::parse_name($nodeid, $name);
+    protected function parse_name($separator, $nodeid, $name) {
+        $name = parent::parse_name($separator, $nodeid, $name);
         return strtolower($name);
     }
+
+    public function delete($device) {
+        $nodeid = $device['nodeid'];
+        $options = $device['options'];
+        if (isset($options['ctrlid'])) {
+            $ctrlid = intval($options['ctrlid']);
+            
+            $result = $this->device->delete($ctrlid, $nodeid);
+            if (isset($result['success']) && $result['success'] == false) {
+                if (strpos($result['message'], 'does not exist') === false) {
+                    return $result;
+                }
+            }
+        }
+        return array('success'=>true, 'message'=>"No device to delete");
+    }
+
 }
