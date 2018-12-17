@@ -1,7 +1,7 @@
 {
     "name": "DS18B20",
     "category": "Sensor",
-    "group": "GPIO (Raspberry Pi)",
+    "group": "1-Wire (Raspberry Pi)",
     "description": "Configuration for a 1-Wire temperature sensor for the Raspberry Pi, type DS18B20",
 
     "scan": true,
@@ -32,13 +32,13 @@
             "label": "Temperature",
             "header": true,
             "format": "%.1f °C",
-            "input": "<node>_temperature"
+            "input": "<node>*temperature"
         }
     ],
 
     "channels": [
         {
-            "name": "<node>_temperature",
+            "name": "<node>*temperature",
             "description": "DS18B20 temperature",
             "settings": "unit:CELSIUS",
             "logging": {"loggingInterval": 60000, "loggingMaxInterval": 900000, "loggingTolerance": 0.25, "average": true},

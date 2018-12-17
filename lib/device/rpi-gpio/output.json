@@ -37,16 +37,16 @@
             "left": "Low",
             "right": "High",
             "mapping": {
-                "ON": { "channel": "<node>_state", "value": true },
-                "OFF": { "channel": "<node>_state", "value": false }
+                "ON": { "channel": "<node>*state", "value": true },
+                "OFF": { "channel": "<node>*state", "value": false }
             },
-            "input": "<node>_state"
+            "input": "<node>*state"
         }
     ],
 
     "channels": [
         {
-            "name": "<node>_state",
+            "name": "<node>*state",
             "description": "Pin state",
             "logging": {"loggingInterval": 5000, "loggingMaxInterval": 60000},
             "configs": {"samplingInterval": 5000, "valueType":"BOOLEAN"},

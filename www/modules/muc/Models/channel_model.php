@@ -269,7 +269,7 @@ class Channel
         $configs = array(
             'id' => $id
         );
-        if ($description !== '') $channel['description'] = $description;
+        if ($description != '') $configs['description'] = $description;
         
         if (isset($channel['address'])) $configs['channelAddress'] = $channel['address'];
         if (isset($channel['settings'])) $configs['channelSettings'] = $channel['settings'];
