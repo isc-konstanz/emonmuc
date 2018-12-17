@@ -38,13 +38,13 @@
                 "0":"Low",
                 "1":"High"
             },
-            "input": "<node>_state"
+            "input": "<node>*state"
         }
     ],
 
     "channels": [
         {
-            "name": "<node>_state",
+            "name": "<node>*state",
             "description": "Pin state",
             "logging": {"loggingInterval": 5000, "loggingMaxInterval": 60000},
             "configs": {"samplingInterval": 5000, "valueType":"BOOLEAN"},

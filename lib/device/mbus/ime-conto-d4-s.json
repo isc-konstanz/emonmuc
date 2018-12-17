@@ -33,7 +33,7 @@
 
     "channels": [
         {
-            "name": "<node>_energy",
+            "name": "<node>*energy",
             "description": "Energy",
             "address": "06:fd61",
             "logging": {"loggingInterval": 60000, "loggingMaxInterval": 180000},
