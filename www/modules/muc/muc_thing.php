@@ -32,16 +32,10 @@ class MucThing extends DeviceThing
     }
 
     public function get_item_list($device) {
-        $file = $this->get_template_dir().$device['type'].".json";
-        if (!file_exists($file)) {
-            return array('success'=>false, 'message'=>"Error reading template ".$device['type'].": $file does not exist");
+        $template = $this->get_template($device);
+        if (!is_object($template)) {
+            return $template;
         }
-        $template = json_decode(file_get_contents($file));
-        if (json_last_error() != 0) {
-            return array('success'=>false, 'message'=>"Error reading template ".$device['type'].":".json_last_error_msg());
-        }
-        $sep = (isset($device['options']) && isset($device['options']['sep'])) ? $device['options']['sep'] : self::SEPARATOR;
-        
         if (empty($device['options']['ctrlid'])) {
             return array('success'=>false, 'message'=>'Unspecified controller ID in device options.');
         }
@@ -54,8 +48,7 @@ class MucThing extends DeviceThing
             if (isset($item['mapping'])) {
                 foreach($item['mapping'] as &$mapping) {
                     if (isset($mapping->channel)) {
-                        $channelid = $this->parse_name($sep, $device['nodeid'], $mapping->channel);
-                        
+                        $channelid = $mapping->channel;
                         $configs = [];
                         foreach($template->channels as $c) {
                             if ($c->name == $mapping->channel) {
@@ -71,7 +64,7 @@ class MucThing extends DeviceThing
                 }
             }
             if (isset($item['input'])) {
-                $inputid = $this->get_input_id($sep, $device['userid'], $device['nodeid'], $item['input'], $template->channels);
+                $inputid = $this->get_input_id($device['userid'], $device['nodeid'], $item['input'], $template->channels);
                 if ($inputid == false) {
                     $this->log->error("get_item_list() failed to find input of item '".$item['id']."' in template: ".$device['type']);
                     continue;
@@ -80,7 +73,7 @@ class MucThing extends DeviceThing
                 $item = array_merge($item, array('inputid'=>$inputid));
             }
             if (isset($item['feed'])) {
-                $feedid = $this->get_feed_id($sep, $device['userid'], $device['nodeid'], $item['feed']);
+                $feedid = $this->get_feed_id($device['userid'], $item['feed']);
                 if ($feedid == false) {
                     $this->log->error("get_item_list() failed to find feed of item '".$item['id']."' in template: ".$device['type']);
                     continue;
@@ -117,6 +110,45 @@ class MucThing extends DeviceThing
         return array('success'=>false, 'message'=>"Error while seting item value");
     }
 
+    protected function get_template($device) {
+        $file = $this->get_template_dir().$device['type'].".json";
+        if (!file_exists($file)) {
+            return array('success'=>false, 'message'=>"Error reading template ".$device['type'].": $file does not exist");
+        }
+        $content = file_get_contents($file);
+        $template = json_decode($content);
+        if (json_last_error() != 0) {
+            return array('success'=>false, 'message'=>"Error reading template ".$device['type'].": ".json_last_error_msg());
+        }
+        $options = isset($device['options']) ? (array) $device['options'] : array();
+        
+        if (strpos($content, '*') !== false) {
+            $separator = isset($options['sep']) ? $options['sep'] : self::SEPARATOR;
+            $content = str_replace("*", $separator, $content);
+        }
+        if (strpos($content, '<node>') !== false) {
+            $content = str_replace("<node>", strtolower($device['nodeid']), $content);
+        }
+        if (isset($template->options)) {
+            foreach ($template->options as $option) {
+                if (strpos($content, "<$option->id>") !== false) {
+                    if (isset($options[$option->id])) {
+                        $content = str_replace("<$option->id>", $options[$option->id], $content);
+                    }
+                    else if (isset($option->default)) {
+                        $content = str_replace("<$option->id>", $option->default, $content);
+                    }
+                }
+            }
+        }
+        
+        $template = json_decode($content);
+        if (json_last_error() != 0) {
+            return array('success'=>false, 'message'=>"Error preparing type ".$device['type'].": ".json_last_error_msg());
+        }
+        return $template;
+    }
+
     protected function get_template_dir() {
         global $muc_settings;
         if (isset($muc_settings) && isset($muc_settings['libdir']) && $muc_settings['libdir'] !== "") {
@@ -142,10 +174,5 @@ class MucThing extends DeviceThing
             }
         }
         return null;
-    }
-
-    protected function parse_name($separator, $nodeid, $name) {
-        $name = parent::parse_name($separator, $nodeid, $name);
-        return strtolower($name);
     }
 }
