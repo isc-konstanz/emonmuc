@@ -276,7 +276,7 @@ class MucTemplate extends DeviceTemplate
         }
         if (!is_object($template)) $template = (object) $template;
         
-        $result = $this->get($device['type']);
+        $result = $this->prepare_template($device);
         if (!is_object($result)) {
             return $result;
         }
@@ -421,6 +421,9 @@ class MucTemplate extends DeviceTemplate
         // Iterate all options as configured in the template and parse them accordingly, 
         // if they exist in the passed key value options array
         foreach ($template->options as $option) {
+            if (empty($option->syntax)) {
+                continue;
+            }
             $value = $parameters[$option->id];
             
             $types = explode(',', $option->syntax);

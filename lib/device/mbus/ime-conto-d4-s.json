@@ -28,6 +28,14 @@
             "type": "text",
             "mandatory": true,
             "syntax": "deviceAddress"
+        },
+        {
+            "id": "timeOffset",
+            "name": "Time offset",
+            "description": "The time waited in milliseconds, until the serial connection will be used. Necessary for multiple meters on the same line.",
+            "type": "text",
+            "default": 0,
+            "mandatory": false
         }
     ],
 
@@ -37,7 +45,7 @@
             "description": "Energy",
             "address": "06:fd61",
             "logging": {"loggingInterval": 60000, "loggingMaxInterval": 180000},
-            "configs": {"samplingInterval": 60000, "valueType":"DOUBLE", "unit": "kWh"},
+            "configs": {"samplingInterval": 60000, "samplingTimeOffset": "<timeOffset>", "valueType":"DOUBLE", "unit": "kWh"},
             "processList": [
                 {
                     "process": "log_to_feed",
