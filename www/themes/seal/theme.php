@@ -61,7 +61,7 @@ $maxwidth2=intval(($nbshortcuts1+$nbshortcuts2+$nbshortcuts3+$nbshortcuts4+$nbsh
 if($maxwidth2>$maxwidth1){$maxwidth2=$maxwidth1-1;}
 if($maxwidth3>$maxwidth2){$maxwidth3=$maxwidth2-1;}
 
-if (is_dir("Theme/".$theme)) {
+if (!is_dir("Theme/".$theme)) {
     $theme = "basic";
 }
 if (!in_array($themecolor, ["blue", "sun", "standard"])) {
@@ -121,8 +121,11 @@ if (!in_array($themecolor, ["blue", "sun", "standard"])) {
     <script type="text/javascript" src="<?php echo $path; ?>Lib/jquery-1.11.3.min.js"></script>
     <script>
         window.onerror = function(msg, source, lineno, colno, error) {
-            if (msg.toLowerCase().indexOf("script error") < 0) {
-                var message = [
+            if (msg.toLowerCase().indexOf("script error") > -1) {
+                alert('Script Error: See Browser Console for Detail');
+            }
+            else {
+                var messages = [
                     'EmonCMS Error',
                     '-------------',
                     'Message: ' + msg,
@@ -131,9 +134,9 @@ if (!in_array($themecolor, ["blue", "sun", "standard"])) {
                     'Column: ' + colno
                 ];
                 if (Object.keys(error).length > 0) {
-                	message.push('Error: ' + JSON.stringify(error));
+                    messages.push('Error: ' + JSON.stringify(error));
                 }
-                console.error(message.join("\n"));
+                alert(messages.join("\n"));
             }
             return true; // true == prevents the firing of the default event handler.
         }

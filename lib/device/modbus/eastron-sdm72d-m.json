@@ -7,7 +7,8 @@
     "driver": "modbus",
     "devices": [
         {
-            "description": "Energy Meter",
+            "name": "modbus<address>",
+            "description": "Modbus RTU connection",
             "settings": "RTU:SERIAL_ENCODING_RTU:9600:DATABITS_8:PARITY_NONE:STOPBITS_2:ECHO_FALSE:FLOWCONTROL_NONE:FLOWCONTROL_NONE"
         }
     ],
@@ -26,8 +27,15 @@
             "name": "Unid ID",
             "description": "The device address of the Modbus slave.<br>The slave device address is assigned form 1 to 247.<br>Address 0 is used as broadcast address.</li></ul>",
             "type": "text",
-            "mandatory": true,
-            "syntax": "channelAddress"
+            "mandatory": true
+        },
+        {
+            "id": "timeOffset",
+            "name": "Time offset",
+            "description": "The time waited in milliseconds, until the serial connection will be used. Necessary for multiple meters on the same line.",
+            "type": "text",
+            "default": 0,
+            "mandatory": false
         }
     ],
 
@@ -37,7 +45,7 @@
             "description": "Total power",
             "address": "<unitId>:INPUT_REGISTERS:52:FLOAT",
             "logging": {"loggingInterval": 60000, "loggingMaxInterval": 180000},
-            "configs": {"samplingInterval": 60000, "valueType":"FLOAT", "unit": "W"},
+            "configs": {"samplingInterval": 60000, "samplingTimeOffset": "<timeOffset>", "valueType":"FLOAT", "unit": "W"},
             "processList": [
                 {
                     "process": "log_to_feed",
@@ -50,7 +58,7 @@
             "description": "Import energy",
             "address": "<unitId>:INPUT_REGISTERS:72:FLOAT",
             "logging": {"loggingInterval": 60000, "loggingMaxInterval": 180000},
-            "configs": {"samplingInterval": 60000, "valueType":"FLOAT", "unit": "kWh"},
+            "configs": {"samplingInterval": 60000, "samplingTimeOffset": "<timeOffset>", "valueType":"FLOAT", "unit": "kWh"},
             "processList": [
                 {
                     "process": "log_to_feed",
@@ -63,7 +71,7 @@
             "description": "Export energy",
             "address": "<unitId>:INPUT_REGISTERS:74:FLOAT",
             "logging": {"loggingInterval": 60000, "loggingMaxInterval": 180000},
-            "configs": {"samplingInterval": 60000, "valueType":"FLOAT", "unit": "kWh"},
+            "configs": {"samplingInterval": 60000, "samplingTimeOffset": "<timeOffset>", "valueType":"FLOAT", "unit": "kWh"},
             "processList": [
                 {
                     "process": "log_to_feed",
@@ -76,7 +84,7 @@
             "description": "Import power",
             "address": "<unitId>:INPUT_REGISTERS:1280:FLOAT",
             "logging": {"loggingInterval": 60000, "loggingMaxInterval": 180000},
-            "configs": {"samplingInterval": 60000, "valueType":"FLOAT", "unit": "W"},
+            "configs": {"samplingInterval": 60000, "samplingTimeOffset": "<timeOffset>", "valueType":"FLOAT", "unit": "W"},
             "processList": [
                 {
                     "process": "log_to_feed",
@@ -89,7 +97,7 @@
             "description": "Export energy",
             "address": "<unitId>:INPUT_REGISTERS:1282:FLOAT",
             "logging": {"loggingInterval": 60000, "loggingMaxInterval": 180000},
-            "configs": {"samplingInterval": 60000, "valueType":"FLOAT", "unit": "W"},
+            "configs": {"samplingInterval": 60000, "samplingTimeOffset": "<timeOffset>", "valueType":"FLOAT", "unit": "W"},
             "processList": [
                 {
                     "process": "log_to_feed",
