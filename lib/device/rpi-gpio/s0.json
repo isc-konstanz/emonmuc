@@ -1,0 +1,72 @@
+{
+    "name": "S0",
+    "category": "Meter",
+    "group": "Pulse counter (Raspberry Pi)",
+    "description": "Configuration for a Raspberry Pi pin as an S0 pulse counter.",
+
+    "driver": "rpi-gpio",
+    "devices": [
+        {
+            "description": "Raspberry Pi Input",
+            "settings": "mode:DIGITAL_INPUT,pullResistance:PULL_DOWN,counter:true"
+        }
+    ],
+
+    "scan": {
+        "settings": "mode:DIGITAL_INPUT"
+    },
+
+    "options": [
+        {
+            "id": "pin",
+            "name": "Pin",
+            "description": "The Pin number, according to the <a href='http://pi4j.com/pin-numbering-scheme.html'>WiringPi Pin Numbering Scheme</a>",
+            "type": "text",
+            "scan": true,
+            "mandatory": true,
+            "syntax": "deviceAddress"
+        },
+        {
+            "id": "impulses",
+            "name": "imp./kWh",
+            "description": "The amount of impulses corresponding to one kWh.</a>",
+            "type": "text",
+            "mandatory": true,
+            "syntax": "channelSettings"
+        }
+    ],
+
+    "channels": [
+        {
+            "name": "<node>*energy",
+            "description": "S0 pulse counter",
+            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 900000},
+            "configs": {"samplingInterval": 60000, "valueType":"DOUBLE"},
+            "processList": [
+                {
+                    "process": "counter_accumulator",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "Energy"}
+                },
+                {
+                    "process": "kwh_to_power",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "Power"}
+                }
+            ]
+        }
+    ],
+
+    "feeds": [
+        {
+            "name": "<node>",
+            "tag": "Energy",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES"
+        },
+        {
+            "name": "<node>",
+            "tag": "Power",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES"
+        }
+    ]
+}

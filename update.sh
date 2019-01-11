@@ -47,15 +47,16 @@ update_emonmuc() {
   sudo chown $EMONMUC_USER:root -R "$EMONMUC_DIR"
   sudo chown $EMONCMS_USER:root -R "$EMONMUC_DIR"/www
 
+  systemctl daemon-reload
   systemctl restart emonmuc
 }
 
 update_emoncms() {
   echo "Updating emoncms webserver"
-  pear update-channels
-  pear upgrade
-  pecl update-channels
-  pecl upgrade
+  #pear update-channels
+  #pear upgrade
+  #pecl update-channels
+  #pecl upgrade
 
   if [ "$RESET" ]; then
     sudo -u $EMONCMS_USER git -C "$EMONCMS_DIR" reset --hard

@@ -62,6 +62,18 @@ class Muc_ProcessList
                 "engines"=>array(Engine::PHPFINA,Engine::PHPFIWA,Engine::PHPTIMESERIES,Engine::MYSQL,Engine::MYSQLMEMORY,Engine::CASSANDRA),
                 "requireredis"=>true,
                 "description"=>_("<p>Get the derivative of the value with respect to the time in hours.</p>")
+            ),
+            array(
+                "name"=>_("Pulse count Accumulator"),
+                "short"=>"counter",
+                "argtype"=>ProcessArg::FEEDID,
+                "function"=>"counter_accumulator",
+                "datafields"=>1,
+                "datatype"=>DataType::REALTIME,
+                "group"=>_("Misc"),
+                "engines"=>array(Engine::PHPFINA,Engine::PHPTIMESERIES,Engine::MYSQL),
+                "requireredis"=>true,
+                "description"=>_("<b>Accumulates a pulse count that may reset, ensuring the global counter in emoncms does not.")
             )
         );
         return $list;
@@ -77,7 +89,7 @@ class Muc_ProcessList
 
     private function derivative($feedid, $time, $value, $scale) {
         global $redis;
-        if (!$redis|| $value === null) return $value; // return if redis is not available or null
+        if (!$redis || $value === null) return $value; // return if redis is not available or null
         
         $derivative = 0;
         if ($redis->exists("process:derivative:$feedid")) {
@@ -92,6 +104,32 @@ class Muc_ProcessList
         $redis->hMset("process:derivative:$feedid", array('time' => $time, 'value' => $value));
         
         return $derivative;
+    }
+
+    public function counter_accumulator($feedid, $time, $value) {
+        global $redis;
+        if (!$redis || $value === null) return $value; // return if redis is not available or null
+        
+        $counter = $value;
+		
+        if ($redis->exists("process:counter:$feedid")) {
+            $last_input = $redis->hmget("process:counter:$feedid",array('time','value'));
+            $last_feed  = $this->feed->get_timevalue($feedid);
+			
+            $counter = $last_feed['value'];
+            
+            $time_diff = $time - $last_feed['time'];
+            $val_diff = $value - $last_input['value'];
+			
+            if ($time_diff > 0 && $val_diff > 0) {
+				$counter += $val_diff;
+            }
+            $padding_mode = "join";
+            $this->feed->insert_data($feedid, $time, $time, $counter, $padding_mode);
+        }
+        $redis->hMset("process:counter:$feedid", array('time'=>$time, 'value'=>$value));
+        
+        return $counter;
     }
 
 //     public function write_channel($arg, $time, $value) {
