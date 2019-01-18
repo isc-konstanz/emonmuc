@@ -62,11 +62,11 @@ Next, connect one wire (black) from the ground-pin to the breadboard. Connect th
 
 # 2 Configure Device
 
-Create a *New device* in the input view and select its type **Raspberry Pi > GPIO > Output** (to allow the switching of the LED, it needs to be an output). Enter a *Node* and a *Name*, as well as the number of the priorly chosen pin.
+Create a *New device* in the device view and select its type **Control > GPIO (Raspberry Pi) > Pin**. Enter a *Key* and optional a *Description*, as well as the number of the priorly chosen pin.
 
 **Caution**: Pins are sorted according to the [WiringPi Pin Numbering Scheme](http://pi4j.com/pin-numbering-scheme.html). This might be different to the numbering you know from former projects!
 
-![device config](img/rpi-gpio/device-config.jpg)
+![device config](img/rpi-gpio/configure-device.png)
 
 If done, click **Save and Initialize**. 
 
