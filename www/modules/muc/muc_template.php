@@ -146,6 +146,9 @@ class MucTemplate extends DeviceTemplate
             if (isset($options['ctrlid'])) {
                 $ctrlid = intval($options['ctrlid']);
                 
+                if (!$this->device->exist($ctrlid, $nodeid)) {
+                    return array('success'=>false, 'message'=>"Unable to rename unexisting device: $nodeid");
+                }
                 if (isset($template->channels)) {
                     $separator = isset($options['sep']) ? $options['sep'] : self::SEPARATOR;
                     
