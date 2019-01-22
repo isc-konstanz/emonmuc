@@ -146,6 +146,9 @@ class MucTemplate extends DeviceTemplate
             if (isset($options['ctrlid'])) {
                 $ctrlid = intval($options['ctrlid']);
                 
+                if (!$this->device->exist($ctrlid, $nodeid)) {
+                    return array('success'=>false, 'message'=>"Unable to rename unexisting device: $nodeid");
+                }
                 if (isset($template->channels)) {
                     $separator = isset($options['sep']) ? $options['sep'] : self::SEPARATOR;
                     
@@ -154,12 +157,12 @@ class MucTemplate extends DeviceTemplate
                         return $channels;
                     }
                     foreach($template->channels as $channel) {
-                        $id = str_replace("<node>", strtolower($nodeid), $channel->name);
+                        $id = str_replace("<node>", $nodeid, $channel->name);
                         
                         foreach ($channels as $configs) {
                             if (fnmatch($id, $configs['id'])) {
                                 $id = $configs['id'];
-                                $newid = str_replace("<node>", strtolower($fields->nodeid), $channel->name);
+                                $newid = str_replace("<node>", $fields->nodeid, $channel->name);
                                 $newid = str_replace("*", $separator, $newid);
                                 $configs['id'] = $newid;
                                 
@@ -242,7 +245,7 @@ class MucTemplate extends DeviceTemplate
             $content = str_replace("*", $separator, $content);
         }
         if (strpos($content, '<node>') !== false) {
-            $content = str_replace("<node>", strtolower($device['nodeid']), $content);
+            $content = str_replace("<node>", $device['nodeid'], $content);
         }
         if (isset($template->options)) {
             foreach ($template->options as $option) {

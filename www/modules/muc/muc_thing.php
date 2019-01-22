@@ -127,7 +127,7 @@ class MucThing extends DeviceThing
             $content = str_replace("*", $separator, $content);
         }
         if (strpos($content, '<node>') !== false) {
-            $content = str_replace("<node>", strtolower($device['nodeid']), $content);
+            $content = str_replace("<node>", $device['nodeid'], $content);
         }
         if (isset($template->options)) {
             foreach ($template->options as $option) {
