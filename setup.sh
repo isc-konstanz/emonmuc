@@ -5,7 +5,7 @@ GIT_BRANCH="stable"
 
 # Set the targeted location of the emonmuc framework and the emoncms webserver.
 # If a specified directory is empty, the component will be installed.
-#EMONCMS_DIR="/var/www/html/emoncms"
+#EMONCMS_DIR="/var/www/emoncms"
 EMONCMS_USER="www-data"
 EMONMUC_PORT=8080
 
@@ -128,9 +128,9 @@ install_emoncms() {
   #sudo -u $EMONCMS_USER git clone -b master $GIT_SERVER/device.git $EMONCMS_DIR/Modules/device
   sudo -u $EMONCMS_USER git clone -b $GIT_BRANCH $GIT_SERVER/graph.git $EMONCMS_DIR/Modules/graph
   #sudo -u $EMONCMS_USER git clone -b $GIT_BRANCH $GIT_SERVER/app.git $EMONCMS_DIR/Modules/app
-  if [ "$EMONCMS_DIR" != "/var/www/html/emoncms" ]; then
-    sudo chown $EMONCMS_USER:root -R /var/www/html
-    sudo -u $EMONCMS_USER ln -sf "$EMONCMS_DIR" /var/www/html/emoncms
+  if [ "$EMONCMS_DIR" != "/var/www/emoncms" ]; then
+    sudo chown $EMONCMS_USER:root -R /var/www
+    sudo -u $EMONCMS_USER ln -sf "$EMONCMS_DIR" /var/www/emoncms
   fi
 
   cp -f "$EMONMUC_DIR"/conf/emoncms.apache2.conf /etc/apache2/sites-available/emoncms.conf

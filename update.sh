@@ -3,7 +3,7 @@
 
 # Set the targeted location of the emonmuc framework and the emoncms webserver.
 # If a specified directory is empty, the component will be installed.
-#EMONCMS_DIR="/var/www/html/emoncms"
+#EMONCMS_DIR="/var/www/emoncms"
 EMONCMS_USER="www-data"
 
 

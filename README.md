@@ -50,7 +50,7 @@ sudo /opt/emonmuc/setup.sh --emoncms /var/www/emoncms --apikey <apikey>
 Both parameters are optional and the webserver may be installed to a specified directory. This will be done automatically, if the directory does not exist already.
 
 ~~~
-sudo /opt/emonmuc/setup.sh -e /var/www/html/emoncms
+sudo /opt/emonmuc/setup.sh -e /var/www/emoncms
 ~~~
 
 If no API key was specified, the first existing user will be used to register a controller. Empty installations will be initialized with a default user "*admin*", authenticated with a temporary password: *admin*, that should be replaced with a secure password immediately in the Account configurations.  
