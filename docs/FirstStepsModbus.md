@@ -55,7 +55,7 @@ When done click **Save & Initialize**
 
 ![configure device](img/modbus/configure-device.png)
 
-Go to Channels and have a lock if the Energy Meter is getting some values. The values are getting measured every minute so be a bit patient. Also check in the Channels config-Menue wether the baud rate of the Energy Meter and the one given in the default settings are the same. When everything has been done correcty, the Channels view should look something like this: 
+Go to Channels and have a look if the Energy Meter is getting some values. The values are getting measured every minute so be a bit patient. Also check in the Channels config-Menue wether the baud rate of the Energy Meter and the one given in the default settings are the same. When everything has been done correcty, the Channels view should look something like this: 
 
 ![modbus channels](img/modbus/channels.png)
 
