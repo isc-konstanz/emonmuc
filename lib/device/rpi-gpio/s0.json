@@ -1,7 +1,7 @@
 {
     "name": "S0",
     "category": "Meter",
-    "group": "Pulse counter (Raspberry Pi)",
+    "group": "Pulses (Raspberry Pi)",
     "description": "Configuration for a Raspberry Pi pin as an S0 pulse counter.",
 
     "driver": "rpi-gpio",

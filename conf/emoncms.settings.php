@@ -185,5 +185,5 @@
     // Emonmuc module
     $muc_settings = array(
         'rootdir' => "/opt/emonmuc",
-		'libdir' => "/var/lib/emonmuc"
+        'libdir' => "/var/lib/emonmuc"
     );
