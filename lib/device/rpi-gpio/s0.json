@@ -2,7 +2,7 @@
     "name": "S0",
     "category": "Meter",
     "group": "Pulses (Raspberry Pi)",
-    "description": "Configuration for a Raspberry Pi pin as an S0 pulse counter.",
+    "description": "Requires the <b>GPIO</b> driver to be installed.<br><br>Configuration for a Raspberry Pi pin as an S0 pulse counter.",
 
     "driver": "rpi-gpio",
     "devices": [
@@ -45,11 +45,11 @@
             "processList": [
                 {
                     "process": "counter_accumulator",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "Energy"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Energy", "tag": "<name>"}
                 },
                 {
                     "process": "kwh_to_power",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "Power"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Power", "tag": "<name>"}
                 }
             ]
         }
@@ -57,14 +57,14 @@
 
     "feeds": [
         {
-            "name": "<node>",
-            "tag": "Energy",
+            "name": "Energy",
+            "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES"
         },
         {
-            "name": "<node>",
-            "tag": "Power",
+            "name": "Power",
+            "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES"
         }
