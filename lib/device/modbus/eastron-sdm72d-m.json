@@ -2,7 +2,7 @@
     "name": "SDM72D-M",
     "category": "Meter",
     "group": "EASTRON",
-    "description": "<b>Energy Meter SDM72D-M</b>:<br>Current: 10(100)A<br>Voltage : 3*230V<br>50(60)Hz",
+    "description": "Requires the <b>Modbus</b> (RTU and TCP/IP) driver to be installed.<br><br><b>Energy Meter SDM72D-M</b>:<br>Current: 10(100)A<br>Voltage : 3*230V<br>50(60)Hz",
 
     "driver": "modbus",
     "devices": [
@@ -49,7 +49,7 @@
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "Power"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Power", "tag": "<name>"}
                 }
             ]
         },
@@ -62,7 +62,7 @@
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*import", "tag": "Energy"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Import energy", "tag": "<name>"}
                 }
             ]
         },
@@ -75,7 +75,7 @@
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*export", "tag": "Energy"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Export energy", "tag": "<name>"}
                 }
             ]
         },
@@ -88,7 +88,7 @@
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*import", "tag": "Power"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Import power", "tag": "<name>"}
                 }
             ]
         },
@@ -101,7 +101,7 @@
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*export", "tag": "Power"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Export power", "tag": "<name>"}
                 }
             ]
         }
@@ -109,36 +109,36 @@
 
     "feeds": [
         {
-            "name": "<node>",
-            "tag": "Power",
+            "name": "Power",
+            "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "W"
         },
         {
-            "name": "<node>*import",
-            "tag": "Energy",
+            "name": "Import energy",
+            "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "kWh"
         },
         {
-            "name": "<node>*export",
-            "tag": "Energy",
+            "name": "Export energy",
+            "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "kWh"
         },
         {
-            "name": "<node>*import",
-            "tag": "Power",
+            "name": "Import power",
+            "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "W"
         },
         {
-            "name": "<node>*export",
-            "tag": "Power",
+            "name": "Export power",
+            "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "W"

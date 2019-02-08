@@ -409,13 +409,24 @@ var config =
             var optArr = config.options[group].split(syntax['separator']);
             for (var p = 0, i = 0; i < infos.length && p < optArr.length; i++) {
                 optInfo = infos[i];
-
+                
                 if (syntax['keyValue']) {
-                    var keyValue = optArr[p].split(syntax['assignment']);
-                    if (optInfo.key === keyValue[0]) {
-                        optList[optInfo.key] = keyValue[1];
-                        p++;
-                    }
+                	var keyValue;
+                	if (syntax['separator'] != syntax['assignment']) {
+                		var keyValue = optArr[p].split(syntax['assignment']);
+                        if (optInfo.key === keyValue[0]) {
+                            optList[optInfo.key] = keyValue[1];
+                            p++;
+                        }
+                	}
+                	else {
+                		var key = optArr[p];
+                		var value = optArr[p+1];
+                		if (optInfo.key === key) {
+                            optList[optInfo.key] = value;
+                            p += 2;
+                        }
+                	}
                 }
                 else {
                     if (optInfo['mandatory'] || optArr.length > optMandatoryCount) {

@@ -2,7 +2,7 @@
     "name": "SDM630M-CT-V2",
     "category": "Meter",
     "group": "EASTRON",
-    "description": "<b>Energy Meter SDM630M-CT-V2</b>:<br>Current: 0.25-5(6)A<br>Voltage : 3*230/400V<br>50/60Hz",
+    "description": "Requires the <b>Modbus</b> (RTU and TCP/IP) driver to be installed.<br><br><b>Energy Meter SDM630M-CT-V2</b>:<br>Current: 0.25-5(6)A<br>Voltage : 3*230/400V<br>50/60Hz",
 
     "driver": "modbus",
     "devices": [
@@ -49,7 +49,7 @@
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*l1", "tag": "Voltage"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Voltage", "tag": "<name> L1"}
                 }
             ]
         },
@@ -62,7 +62,7 @@
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*l2", "tag": "Voltage"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Voltage", "tag": "<name> L2"}
                 }
             ]
         },
@@ -75,7 +75,7 @@
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*l3", "tag": "Voltage"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Voltage", "tag": "<name> L3"}
                 }
             ]
         },
@@ -88,7 +88,7 @@
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*l1", "tag": "Current"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Current", "tag": "<name> L1"}
                 }
             ]
         },
@@ -101,7 +101,7 @@
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*l2", "tag": "Current"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Current", "tag": "<name> L2"}
                 }
             ]
         },
@@ -114,7 +114,7 @@
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*l3", "tag": "Current"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Current", "tag": "<name> L3"}
                 }
             ]
         },
@@ -127,7 +127,7 @@
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "Power"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Power", "tag": "<name>"}
                 }
             ]
         },
@@ -140,7 +140,7 @@
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "Frequency"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Frequency", "tag": "<name>"}
                 }
             ]
         },
@@ -153,11 +153,11 @@
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*l1*import", "tag": "Energy"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Import energy", "tag": "<name> L1"}
                 },
                 {
                     "process": "kwh_to_power",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*l1*import", "tag": "Power"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Import power", "tag": "<name> L1"}
                 }
             ]
         },
@@ -170,11 +170,11 @@
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*l2*import", "tag": "Energy"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Import energy", "tag": "<name> L2"}
                 },
                 {
                     "process": "kwh_to_power",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*l2*import", "tag": "Power"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Import power", "tag": "<name> L2"}
                 }
             ]
         },
@@ -187,11 +187,11 @@
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*l3*import", "tag": "Energy"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Import energy", "tag": "<name> L3"}
                 },
                 {
                     "process": "kwh_to_power",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*l3*import", "tag": "Power"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Import power", "tag": "<name> L3"}
                 },
                 {
                     "process": "reset2original",
@@ -199,19 +199,19 @@
                 },
                 {
                     "process": "add_input",
-                    "arguments": {"type": "ProcessArg::INPUTID", "value": "<node>*l1*import", "tag": "Energy"}
+                    "arguments": {"type": "ProcessArg::INPUTID", "value": "Import energy", "tag": "<name> L1"}
                 },
                 {
                     "process": "add_input",
-                    "arguments": {"type": "ProcessArg::INPUTID", "value": "<node>*l2*import", "tag": "Energy"}
+                    "arguments": {"type": "ProcessArg::INPUTID", "value": "Import energy", "tag": "<name> L2"}
                 },
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*import", "tag": "Energy"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Import energy", "tag": "<name>"}
                 },
                 {
                     "process": "kwh_to_power",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*import", "tag": "Power"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Import power", "tag": "<name>"}
                 }
             ]
         },
@@ -224,11 +224,11 @@
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*l1*export", "tag": "Energy"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Export energy", "tag": "<name> L1"}
                 },
                 {
                     "process": "kwh_to_power",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*l1*export", "tag": "Power"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Export power", "tag": "<name> L1"}
                 }
             ]
         },
@@ -241,11 +241,11 @@
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*l2*export", "tag": "Energy"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Export energy", "tag": "<name> L2"}
                 },
                 {
                     "process": "kwh_to_power",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*l2*export", "tag": "Power"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Export power", "tag": "<name> L2"}
                 }
             ]
         },
@@ -258,11 +258,11 @@
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*l3*export", "tag": "Energy"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Export energy", "tag": "<name> L3"}
                 },
                 {
                     "process": "kwh_to_power",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*l3*export", "tag": "Power"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Export power", "tag": "<name> L3"}
                 },
                 {
                     "process": "reset2original",
@@ -270,19 +270,19 @@
                 },
                 {
                     "process": "add_input",
-                    "arguments": {"type": "ProcessArg::INPUTID", "value": "<node>*l1*export", "tag": "Energy"}
+                    "arguments": {"type": "ProcessArg::INPUTID", "value": "Export energy", "tag": "<name> L1"}
                 },
                 {
                     "process": "add_input",
-                    "arguments": {"type": "ProcessArg::INPUTID", "value": "<node>*l2*export", "tag": "Energy"}
+                    "arguments": {"type": "ProcessArg::INPUTID", "value": "Export energy", "tag": "<name> L2"}
                 },
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*export", "tag": "Energy"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Export energy", "tag": "<name>"}
                 },
                 {
                     "process": "kwh_to_power",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*export", "tag": "Power"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Export power", "tag": "<name>"}
                 }
             ]
         }
@@ -290,169 +290,169 @@
 
     "feeds": [
         {
-            "name": "<node>*l1",
-            "tag": "Voltage",
+            "name": "Voltage",
+            "tag": "<name> L1",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "V"
         },
         {
-            "name": "<node>*l2",
-            "tag": "Voltage",
+            "name": "Voltage",
+            "tag": "<name> L2",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "V"
         },
         {
-            "name": "<node>*l3",
-            "tag": "Voltage",
+            "name": "Voltage",
+            "tag": "<name> L3",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "V"
         },
         {
-            "name": "<node>*l1",
-            "tag": "Current",
+            "name": "Current",
+            "tag": "<name> L1",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "A"
         },
         {
-            "name": "<node>*l2",
-            "tag": "Current",
+            "name": "Current",
+            "tag": "<name> L2",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "A"
         },
         {
-            "name": "<node>*l3",
-            "tag": "Current",
+            "name": "Current",
+            "tag": "<name> L3",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "A"
         },
         {
-            "name": "<node>",
-            "tag": "Power",
+            "name": "Power",
+            "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "W"
         },
         {
-            "name": "<node>",
-            "tag": "Frequency",
+            "name": "Frequency",
+            "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "Hz"
         },
         {
-            "name": "<node>*import",
-            "tag": "Energy",
+            "name": "Import energy",
+            "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "kWh"
         },
         {
-            "name": "<node>*l1*import",
-            "tag": "Energy",
+            "name": "Import energy",
+            "tag": "<name> L1",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "kWh"
         },
         {
-            "name": "<node>*l2*import",
-            "tag": "Energy",
+            "name": "Import energy",
+            "tag": "<name> L2",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "kWh"
         },
         {
-            "name": "<node>*l3*import",
-            "tag": "Energy",
+            "name": "Import energy",
+            "tag": "<name> L3",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "kWh"
         },
         {
-            "name": "<node>*export",
-            "tag": "Energy",
+            "name": "Export energy",
+            "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "kWh"
         },
         {
-            "name": "<node>*l1*export",
-            "tag": "Energy",
+            "name": "Export energy",
+            "tag": "<name> L1",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "kWh"
         },
         {
-            "name": "<node>*l2*export",
-            "tag": "Energy",
+            "name": "Export energy",
+            "tag": "<name> L2",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "kWh"
         },
         {
-            "name": "<node>*l3*export",
-            "tag": "Energy",
+            "name": "Export energy",
+            "tag": "<name> L3",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "kWh"
         },
         {
-            "name": "<node>*import",
-            "tag": "Power",
+            "name": "Import power",
+            "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "W"
         },
         {
-            "name": "<node>*l1*import",
-            "tag": "Power",
+            "name": "Import power",
+            "tag": "<name> L1",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "W"
         },
         {
-            "name": "<node>*l2*import",
-            "tag": "Power",
+            "name": "Import power",
+            "tag": "<name> L2",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "W"
         },
         {
-            "name": "<node>*l3*import",
-            "tag": "Power",
+            "name": "Import power",
+            "tag": "<name> L3",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "W"
         },
         {
-            "name": "<node>*export",
-            "tag": "Power",
+            "name": "Export power",
+            "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "W"
         },
         {
-            "name": "<node>*l1*export",
-            "tag": "Power",
+            "name": "Export power",
+            "tag": "<name> L1",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "W"
         },
         {
-            "name": "<node>*l2*export",
-            "tag": "Power",
+            "name": "Export power",
+            "tag": "<name> L2",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "W"
         },
         {
-            "name": "<node>*l3*export",
-            "tag": "Power",
+            "name": "Export power",
+            "tag": "<name> L3",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "W"

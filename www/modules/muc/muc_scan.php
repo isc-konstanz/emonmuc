@@ -36,14 +36,14 @@ class MucScan extends DeviceScan
     }
 
     public function start($userid, $type, $options) {
-        $result = $this->get_template($type);
-        if (is_array($result) && isset($result['success']) && $result['success'] == false) {
-            return $result;
+        $template = $this->get_template($type);
+        if (is_array($template) && isset($template['success']) && $template['success'] == false) {
+            return $template;
         }
-        if (empty($result->driver)) {
+        if (empty($template->driver)) {
             return array('success'=>false, 'message'=>'Unspecified driver in device template.');
         }
-        $driverid = $result->driver;
+        $driverid = $template->driver;
         
         if (empty($options['ctrlid'])) {
             return array('success'=>false, 'message'=>'Unspecified controller ID in device options.');
@@ -51,25 +51,31 @@ class MucScan extends DeviceScan
         $ctrlid = intval($options['ctrlid']);
         
         $settings = "";
-        if (isset($result->scan->settings)) {
-            $settings = $result->scan->settings;
-            
-            foreach ($result->options as $option) {
-                if (isset($option->syntax) && $option->syntax == self::DEVICE_SCAN_SETTINGS) {
-                    $id = $option->id;
-                    $settings = str_replace("<$id>", $options[$id], $settings);
+        if (isset($template->options)) {
+            if (isset($template->scan->settings)) {
+                $settings = $template->scan->settings;
+                
+                foreach ($template->options as $option) {
+                    if (strpos($settings, "<$option->id>") !== false) {
+                        if (isset($options[$option->id])) {
+                            $settings = str_replace("<$option->id>", $options[$option->id], $settings);
+                        }
+                        else if (isset($option->default)) {
+                            $settings = str_replace("<$option->id>", $option->default, $settings);
+                        }
+                    }
                 }
             }
-        }
-        else {
-            $settings = $this->encode_options($result, $options);
+            else {
+                $settings = $this->encode_options($template, $options);
+            }
         }
         
         if ($this->redis) {
             $this->redis->hMSet("user#$userid:device:$type", $options); // Temporary availability of auth for device ip address
             $this->redis->expire("user#$userid:device:$type", 600);     // Expire after 10 minutes
         }
-        return $this->parse_progress($userid, $ctrlid, $type, $result, 
+        return $this->parse_progress($userid, $ctrlid, $type, $template, 
             $this->device->scan_start($ctrlid, $driverid, $settings));
     }
 
