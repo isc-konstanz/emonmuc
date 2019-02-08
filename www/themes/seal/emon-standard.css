@@ -269,6 +269,9 @@ input[type=text][class=variable-name-edit] {
     margin-bottom: .5em
 }
 
+.group-actions.affix:before {
+    background: #323232;
+}
 .controls {
     transition: all .2s ease-out
 }
