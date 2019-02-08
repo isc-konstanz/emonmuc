@@ -2,7 +2,7 @@
     "name": "Counter",
     "category": "Meter",
     "group": "Pulses (Raspberry Pi)",
-    "description": "Configuration for a Raspberry Pi pin as an generic pulse counter.",
+    "description": "Requires the <b>GPIO</b> driver to be installed.<br><br>Configuration for a Raspberry Pi pin as an generic pulse counter.",
 
     "driver": "rpi-gpio",
     "devices": [
@@ -45,7 +45,7 @@
             "processList": [
                 {
                     "process": "counter_accumulator",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "Counter"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Counter", "tag": "<name>"}
                 }
             ]
         }
@@ -53,8 +53,8 @@
 
     "feeds": [
         {
-            "name": "<node>",
-            "tag": "Counter",
+            "name": "Counter",
+            "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES"
         }

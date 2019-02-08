@@ -5,7 +5,7 @@ PROJECT="OpenIEC62056-21"
 SERVICE="driver"
 ID="iec62056-21"
 
-VERSION="1.0.0"
+VERSION="1.0.1"
 
 install() {
   # Verify, if the specific version does exists already

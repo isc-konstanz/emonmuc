@@ -61,53 +61,51 @@ class MucTemplate extends DeviceTemplate
 
     public function get($type) {
         $file = $this->get_dir().$type.".json";
-        if (file_exists($file)) {
-            $content = file_get_contents($file);
-            $template = json_decode($content);
-            if (json_last_error() == 0) {
-                if (empty($template->options)) {
-                    $template->options = array();
-                }
-                $options = array();
-                
-                if (strpos($content, '*') !== false) {
-                    $options[] = array('id'=>'sep',
-                        'name'=>'Separator',
-                        'description'=>'The separator to use in the names of automatically created elements.',
-                        'type'=>'selection',
-                        'select'=>array(
-                            array('name'=>'Dot', 'value'=>'.'),
-                            array('name'=>'Hyphen', 'value'=>'-'),
-                            array('name'=>'Underscore', 'value'=>'_'),
-                            array('name'=>'Space', 'value'=>' ')
-                        ),
-                        'default'=>self::SEPARATOR,
-                        'mandatory'=>false,
-                    );
-                }
-                
-                $ctrls = $this->ctrl->get_all();
-                if (count($ctrls) > 0) {
-                    $select = array();
-                    foreach ($ctrls as $ctrl) {
-                        $select[] = array('name'=>$ctrl['description'], 'value'=>$ctrl['id']);
-                    }
-                    $options[] = array('id'=>'ctrlid',
-                        'name'=>'Controller',
-                        'description'=>'The communication controller this device should be registered for.',
-                        'type'=>'selection',
-                        'select'=>$select,
-                        'default'=>$ctrls[0]['id'],
-                        'mandatory'=>true,
-                    );
-                }
-                $template->options = array_merge($options, $template->options);
-                
-                return $template;
-            }
+        if (!file_exists($file)) {
+            return array('success'=>false, 'message'=>"Error reading template $type: $file does not exist");
+        }
+        $content = file_get_contents($file);
+        $template = json_decode($content);
+        if (json_last_error() != 0) {
             return array('success'=>false, 'message'=>"Error reading template $type: ".json_last_error_msg());
         }
-        return array('success'=>false, 'message'=>"Error reading template $type: $file does not exist");
+        $options = array();
+        
+        if (strpos($content, '*') !== false) {
+            $options[] = array('id'=>'sep',
+                'name'=>'Separator',
+                'description'=>'The separator to use in the names of automatically created elements.',
+                'type'=>'selection',
+                'select'=>array(
+                    array('name'=>'Dot', 'value'=>'.'),
+                    array('name'=>'Hyphen', 'value'=>'-'),
+                    array('name'=>'Underscore', 'value'=>'_'),
+                    array('name'=>'Space', 'value'=>' ')
+                ),
+                'default'=>self::SEPARATOR,
+                'mandatory'=>false,
+            );
+        }
+        
+        $ctrls = $this->ctrl->get_all();
+        if (count($ctrls) > 0) {
+            $select = array();
+            foreach ($ctrls as $ctrl) {
+                $select[] = array('name'=>$ctrl['description'], 'value'=>$ctrl['id']);
+            }
+            $options[] = array('id'=>'ctrlid',
+                'name'=>'Controller',
+                'description'=>'The communication controller this device should be registered for.',
+                'type'=>'selection',
+                'select'=>$select,
+                'default'=>$ctrls[0]['id'],
+                'mandatory'=>true,
+            );
+        }
+        $template->options = array_merge($options, isset($template->options) ? $template->options : array());
+        
+        // Recursively cast associative arrays to objects
+        return json_decode(json_encode($template));
     }
 
     protected function get_dir() {
@@ -132,112 +130,62 @@ class MucTemplate extends DeviceTemplate
         return $template->options;
     }
 
-    public function set_fields($device, $fields) {
-        $userid = intval($device['userid']);
-        $nodeid = $device['nodeid'];
-        
-        $template = $this->get($device['type']);
-        if (!is_object($template)) {
-            return $template;
-        }
-        
-        if (isset($fields->nodeid)) {
-            $options = $device['options'];
-            if (isset($options['ctrlid'])) {
-                $ctrlid = intval($options['ctrlid']);
-                
-                if (!$this->device->exist($ctrlid, $nodeid)) {
-                    return array('success'=>false, 'message'=>"Unable to rename unexisting device: $nodeid");
-                }
-                if (isset($template->channels)) {
-                    $separator = isset($options['sep']) ? $options['sep'] : self::SEPARATOR;
-                    
-                    $channels = $this->channel->get_list($userid, $ctrlid);
-                    if (isset($channels['success']) && $channels['success'] == false) {
-                        return $channels;
-                    }
-                    foreach($template->channels as $channel) {
-                        $id = str_replace("<node>", $nodeid, $channel->name);
-                        
-                        foreach ($channels as $configs) {
-                            if (fnmatch($id, $configs['id'])) {
-                                $id = $configs['id'];
-                                $newid = str_replace("<node>", $fields->nodeid, $channel->name);
-                                $newid = str_replace("*", $separator, $newid);
-                                $configs['id'] = $newid;
-                                
-                                if (isset($configs['logging'])) {
-                                    $configs['logging']['nodeid'] = $fields->nodeid;
-                                }
-                                else {
-                                    $configs['logging'] = array('nodeid' => $fields->nodeid);
-                                }
-                                $result = $this->channel->update($userid, $ctrlid, $nodeid, $id, json_encode($configs));
-                                if (isset($result['success']) && $result['success'] == false) {
-                                    return $result;
-                                }
-                                break;
-                            }
-                        }
-                    }
-                }
-                $configs = $this->device->get($userid, $ctrlid, $nodeid);
-                $configs['id'] = $fields->nodeid;
-                
-                $result = $this->device->update($userid, $ctrlid, $nodeid, json_encode($configs));
-                if (isset($result['success']) && $result['success'] == false) {
-                    return $result;
-                }
-            }
-        }
-        return array('success'=>true, 'message'=>"Device updated");
-    }
-
     public function prepare($device) {
         $userid = intval($device['userid']);
         $nodeid = $device['nodeid'];
-        
-        $template = $this->prepare_template($device);
-        if (!is_object($template)) {
-            return $template;
+        try {
+            $template = $this->prepare_template($device);
+            
+            if (isset($template->feeds)) {
+                $feeds = $template->feeds;
+                $this->prepare_feeds($userid, $nodeid, $feeds);
+            }
+            else {
+                $feeds = [];
+            }
+            
+            if (isset($template->channels)) {
+                $channels = $template->channels;
+                $this->prepare_inputs($userid, $nodeid, $channels);
+            }
+            else {
+                $channels = [];
+            }
+            
+            if (!empty($feeds)) {
+                $this->prepare_feed_processes($userid, $feeds, $channels);
+            }
+            if (!empty($channels)) {
+                $this->prepare_input_processes($userid, $feeds, $channels);
+            }
+        } catch(Exception $e) {
+            return array('success'=>false, 'message'=>$e->getMessage());
         }
-        
-        if (isset($template->feeds)) {
-            $feeds = $template->feeds;
-            $this->prepare_feeds($userid, $nodeid, $feeds);
-        }
-        else {
-            $feeds = [];
-        }
-        
-        if (isset($template->channels)) {
-            $channels = $template->channels;
-            $this->prepare_inputs($userid, $nodeid, $channels);
-        }
-        else {
-            $channels = [];
-        }
-        
-        if (!empty($feeds)) {
-            $this->prepare_feed_processes($userid, $feeds, $channels);
-        }
-        if (!empty($channels)) {
-            $this->prepare_input_processes($userid, $feeds, $channels);
-        }
-        
         return array('success'=>true, 'feeds'=>$feeds, 'inputs'=>$channels);
     }
 
     protected function prepare_template($device) {
         $file = $this->get_dir().$device['type'].".json";
         if (!file_exists($file)) {
-            return array('success'=>false, 'message'=>"Error reading template ".$device['type'].": $file does not exist");
+            throw new ParseError("Error reading template ".$device['type'].": $file does not exist");
         }
         $content = file_get_contents($file);
         $template = json_decode($content);
         if (json_last_error() != 0) {
-            return array('success'=>false, 'message'=>"Error reading template ".$device['type'].": ".json_last_error_msg());
+            throw new ParseError("Error reading template ".$device['type'].": ".json_last_error_msg());
         }
+        return $this->prepare_json($device, $template, $content);
+    }
+
+    protected function prepare_json($device, $template, $content) {
+        $result = json_decode($this->prepare_str($device, $template, $content));
+        if (json_last_error() != 0) {
+            throw new ParseError("Error preparing type ".$device['type'].": ".json_last_error_msg());
+        }
+        return $result;
+    }
+
+    protected function prepare_str($device, $template, $content) {
         $options = isset($device['options']) ? (array) $device['options'] : array();
         
         if (strpos($content, '*') !== false) {
@@ -246,6 +194,10 @@ class MucTemplate extends DeviceTemplate
         }
         if (strpos($content, '<node>') !== false) {
             $content = str_replace("<node>", $device['nodeid'], $content);
+        }
+        if (strpos($content, '<name>') !== false) {
+            $name = !empty($device['name']) ? preg_replace('/[^\p{N}\p{L}\-\_\.\:\s]/u', '', $device['name']) : $device['nodeid'];
+            $content = str_replace("<name>", $name, $content);
         }
         if (isset($template->options)) {
             foreach ($template->options as $option) {
@@ -259,12 +211,7 @@ class MucTemplate extends DeviceTemplate
                 }
             }
         }
-        
-        $template = json_decode($content);
-        if (json_last_error() != 0) {
-            return array('success'=>false, 'message'=>"Error preparing type ".$device['type'].": ".json_last_error_msg());
-        }
-        return $template;
+        return $content;
     }
 
     public function init($device, $template) {
@@ -279,72 +226,61 @@ class MucTemplate extends DeviceTemplate
         }
         if (!is_object($template)) $template = (object) $template;
         
-        $result = $this->prepare_template($device);
-        if (!is_object($result)) {
-            return $result;
-        }
-        
-        $options = $device['options'];
-        if (empty($options['ctrlid'])) {
-            return array('success'=>false, 'message'=>'Unspecified controller ID in device options.');
-        }
-        $ctrlid = intval($options['ctrlid']);
-        $driverid = isset($result->driver) ? $result->driver : null;
-        
-        $devices = $this->parse_devices($result, $options);
-        $response = $this->create_devices($userid, $ctrlid, $driverid, $device['nodeid'], $devices);
-        if (isset($response['success']) && $response['success'] == false) {
-            return $response;
-        }
-        
-        if (isset($template->inputs)) {
-            $channels = $this->parse_channels($result, $options, $template->inputs);
-            $response = $this->create_channels($userid, $ctrlid, $devices, $channels);
+        try {
+            $result = $this->prepare_template($device);
+            
+            $options = $device['options'];
+            if (empty($options['ctrlid'])) {
+                return array('success'=>false, 'message'=>'Unspecified controller ID in device options.');
+            }
+            $ctrlid = intval($options['ctrlid']);
+            $deviceid = $device['nodeid'];
+            
+            if (empty($result->devices)) {
+                return array('success'=>false, 'message'=>'Bad device template. Devices undefined.');
+            }
+            $devices = $this->parse_devices($deviceid, $result, $options);
+            $response = $this->create_devices($userid, $ctrlid, $devices);
             if (isset($response['success']) && $response['success'] == false) {
                 return $response;
             }
-            $this->create_inputs($userid, $channels);
+            
+            if (isset($template->inputs)) {
+                $channels = $this->parse_channels($deviceid, $template->inputs, $result, $options);
+                $response = $this->create_channels($userid, $ctrlid, $devices, $channels);
+                if (isset($response['success']) && $response['success'] == false) {
+                    return $response;
+                }
+                $this->create_inputs($userid, $channels);
+            }
+            else {
+                $channels = array();
+            }
+            
+            if (isset($template->feeds)) {
+                $feeds = $template->feeds;
+                $this->create_feeds($userid, $feeds);
+            }
+            else {
+                $feeds = array();
+            }
+            
+            if (!empty($feeds)) {
+                $this->create_feed_processes($userid, $feeds, $channels);
+            }
+            if (!empty($channels)) {
+                $this->create_input_processes($userid, $feeds, $channels);
+            }
+        } catch(Exception $e) {
+            return array('success'=>false, 'message'=>$e->getMessage());
         }
-        else {
-            $channels = array();
-        }
-        
-        if (isset($template->feeds)) {
-            $feeds = $template->feeds;
-            $this->create_feeds($userid, $feeds);
-        }
-        else {
-            $feeds = array();
-        }
-        
-        if (!empty($feeds)) {
-            $this->create_feed_processes($userid, $feeds, $channels);
-        }
-        if (!empty($channels)) {
-            $this->create_input_processes($userid, $feeds, $channels);
-        }
-        
         return array('success'=>true, 'message'=>'Device initialized');
     }
 
-    // Create the channels
-    private function create_devices($userid, $ctrlid, $driverid, $id, &$devices) {
-        if (empty($devices)) {
-            return array('success'=>false, 'message'=>'Bad device template. Undefined devices');
-        }
-        
-        foreach ($devices as $d) {
-            if (isset($d->name)) {
-                $d->id = $d->name;
-            }
-            else {
-                $d->id = $id;
-            }
-            if (empty($d->driver)) {
-                $d->driver = $driverid;
-            }
-            
-            $result = $this->device->create($userid, $ctrlid, $d->driver, json_encode($d));
+    // Create the devices
+    private function create_devices($userid, $ctrlid, $devices) {
+        foreach ($devices as $device) {
+            $result = $this->device->create($userid, $ctrlid, $device->driver, json_encode($device));
             if (isset($result['success']) && $result['success'] == false) {
                 if (strpos($result['message'], 'already exists') !== false) {
                     return array('success'=>true, 'message'=>'Devices already created');
@@ -359,21 +295,13 @@ class MucTemplate extends DeviceTemplate
     private function create_channels($userid, $ctrlid, $devices, &$channels) {
         foreach($channels as $id=>$c) {
             $configs = (array) $c;
-            $configs['id'] = $c->name;
             
             if (empty($c->logging)) {
                 if (empty($c->logging->loggingInterval)) {
                     // Remove the channel from list to avoid the unnecessary input creation
                     unset($channels[$id]);
                 }
-                $logging = array();
             }
-            else if (isset($c->logging)) {
-                $logging = (array) $c->logging;
-            }
-            $logging['nodeid'] = $c->node;
-            $configs['logging'] = $logging;
-            
             if (isset($configs['device'])) {
                 $deviceid = $configs['device'];
                 
@@ -399,26 +327,153 @@ class MucTemplate extends DeviceTemplate
         return array('success'=>true, 'message'=>'Channels successfully created');
     }
 
-    private function parse_devices($result, $parameters) {
-        return $this->parse_configs($result, $parameters, $result->devices, 'device');
+    public function set_fields($device, $fields) {
+        if (count($fields) < 1) {
+            return array('success'=>true, 'message'=>"No fields to update passed");
+        }
+        $template = $this->get($device['type']);
+        if (!is_object($template)) {
+            return $template;
+        }
+        
+        // TODO: check if the controller changed.
+        if (empty($device['options']) || empty($device['options']['ctrlid'])) {
+            return array('success'=>false, 'message'=>"Unable to update incorrectly configured device");
+        }
+        $ctrlid = intval($device['options']['ctrlid']);
+        
+        $update = $device;
+        if (isset($fields->options)) $update['options'] = (array) $fields->options;
+        if (isset($fields->nodeid)) $update['nodeid'] = $fields->nodeid;
+        if (isset($fields->name)) $update['name'] = $fields->name;
+        
+        if (isset($template->devices)) {
+            $this->update_devices($ctrlid, $device, $update, $template);
+        }
+        if (isset($template->channels)) {
+            $this->update_channels($ctrlid, $device, $update, $template);
+        }
+        if (isset($template->feeds)) {
+            $this->update_feeds($device, $update, $template);
+        }
+        return array('success'=>true, 'message'=>"Device updated");
     }
 
-    private function parse_channels($result, $parameters, &$channels) {
-        return $this->parse_configs($result, $parameters, $channels, 'channel');
+    protected function update_devices($ctrlid, $device, $update, $template) {
+        foreach($template->devices as $d) {
+            if (isset($d->name)) {
+                $id = $this->prepare_str($device, $template, $d->name);
+            }
+            else {
+                $id = $device['nodeid'];
+            }
+            if (!$this->device->exist($ctrlid, $id)) {
+                return array('success'=>false, 'message'=>"Unable to rename unexisting device: $id");
+            }
+            $configs = $this->parse_device($update['nodeid'], $this->prepare_json($update, $template, json_encode($d)),
+                $template, $update['options']);
+            
+            $result = $this->device->update(intval($device['userid']), $ctrlid, $id, json_encode($configs));
+            if (isset($result['success']) && $result['success'] == false) {
+                return $result;
+            }
+        }
     }
 
-    private function parse_configs($template, $parameters, &$configs, $type) {
-        foreach ($configs as &$config) {
-            foreach (array('address', 'settings') as $key) {
-                if (empty($config->$key)) {
-                    $config->$key = $this->parse_options($template, $parameters, $type.ucfirst($key));
+    protected function update_channels($ctrlid, $device, $update, $template) {
+        foreach($template->channels as $c) {
+            $id = $this->prepare_str($device, $template, $c->name);
+            
+            if ($this->channel->exist($ctrlid, $id)) {
+                $configs = $this->parse_channel($update['nodeid'], $this->prepare_json($update, $template, json_encode($c)),
+                    $template, $update['options']);
+                
+                $result = $this->channel->update(intval($device['userid']), $ctrlid, $device['nodeid'], $id, json_encode($configs));
+                if (isset($result['success']) && $result['success'] == false) {
+                    return $result;
                 }
+            }
+        }
+    }
+
+    protected function update_feeds($device, $update, $template) {
+        foreach($template->feeds as $f) {
+            $feed = $this->prepare_json($device, $template, json_encode($f));
+            $id = $this->feed->exists_tag_name(intval($device['userid']), isset($feed->tag) ? $feed->tag : $device['nodeid'], 
+                $this->prepare_str($device, $template, $feed->name));
+            
+            if ($id > 0) {
+                $feed = $this->prepare_json($update, $template, json_encode($f));
+                if (!isset($feed->tag)) {
+                    $feed->tag = $update['nodeid'];
+                }
+                $this->feed->set_feed_fields($id, json_encode(array('name' => $feed->name, 'tag' => $feed->tag)));
+            }
+        }
+    }
+
+    private function parse_devices($id, $template, $parameters) {
+        $devices = array();
+        foreach ($template->devices as $device) {
+            $devices[] = $this->parse_device($id, $device, $template, $parameters);
+        }
+        return $devices;
+    }
+
+    private function parse_device($id, $device, $template, $parameters) {
+        if (isset($device->name)) {
+            $device->id = $device->name;
+        }
+        else {
+            $device->id = $id;
+        }
+        if (empty($device->driver)) {
+            $device->driver = isset($template->driver) ? $template->driver : null;
+        }
+        if (isset($template->options)) {
+            $device = $this->parse_configs('device', $device, $template, $parameters);
+        }
+        return $device;
+    }
+
+    private function parse_channels($deviceid, $channels, $template, $parameters) {
+        $channels = array();
+        foreach ($channels as $channel) {
+            $channels[] = $this->parse_channel($deviceid, $channel, $template, $parameters);
+        }
+        return $channels;
+    }
+
+    private function parse_channel($deviceid, $channel, $template, $parameters) {
+        $channel->id = $channel->name;
+        if(!isset($channel->node)) {
+            $channel->node = $deviceid;
+        }
+        if (empty($channel->logging)) {
+            $logging = array();
+        }
+        else if (isset($channel->logging)) {
+            $logging = (array) $channel->logging;
+        }
+        $logging['nodeid'] = $channel->node;
+        $channel->logging = $logging;
+        
+        if (isset($template->options)) {
+            $channel = $this->parse_configs('channel', $channel, $template, $parameters);
+        }
+        return $channel;
+    }
+
+    private function parse_configs($type, $configs, $template, $parameters) {
+        foreach (array('address', 'settings') as $key) {
+            if (empty($configs->$key)) {
+                $configs->$key = $this->parse_options($type.ucfirst($key), $template, $parameters);
             }
         }
         return $configs;
     }
 
-    private function parse_options($template, $parameters, $key) {
+    private function parse_options($key, $template, $parameters) {
         $result = "";
         
         // Iterate all options as configured in the template and parse them accordingly, 

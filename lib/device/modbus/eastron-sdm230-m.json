@@ -2,7 +2,7 @@
     "name": "SDM230-M",
     "category": "Meter",
     "group": "EASTRON",
-    "description": "<b>Energy Meter SDM230-M</b>:<br>Current: 10(100)A<br>Voltage : 230V<br>50(60)Hz",
+    "description": "Requires the <b>Modbus</b> (RTU and TCP/IP) driver to be installed.<br><br><b>Energy Meter SDM230-M</b>:<br>Current: 10(100)A<br>Voltage : 230V<br>50(60)Hz",
 
     "driver": "modbus",
     "devices": [
@@ -49,7 +49,7 @@
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "Voltage"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Voltage", "tag": "<name>"}
                 }
             ]
         },
@@ -62,7 +62,7 @@
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "Current"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Current", "tag": "<name>"}
                 }
             ]
         },
@@ -75,7 +75,7 @@
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "Power"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Power", "tag": "<name>"}
                 }
             ]
         },
@@ -88,7 +88,7 @@
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "Frequency"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Frequency", "tag": "<name>"}
                 }
             ]
         },
@@ -101,11 +101,11 @@
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*import", "tag": "Energy"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Import energy", "tag": "<name>"}
                 },
                 {
                     "process": "kwh_to_power",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*import", "tag": "Power"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Import power", "tag": "<name>"}
                 }
             ]
         },
@@ -118,11 +118,11 @@
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*export", "tag": "Energy"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Export energy", "tag": "<name>"}
                 },
                 {
                     "process": "kwh_to_power",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*export", "tag": "Power"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Export power", "tag": "<name>"}
                 }
             ]
         }
@@ -130,57 +130,57 @@
 
     "feeds": [
         {
-            "name": "<node>",
-            "tag": "Voltage",
+            "name": "Voltage",
+            "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "V"
         },
         {
-            "name": "<node>",
-            "tag": "Current",
+            "name": "Current",
+            "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "A"
         },
         {
-            "name": "<node>",
-            "tag": "Power",
+            "name": "Power",
+            "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "W"
         },
         {
-            "name": "<node>",
-            "tag": "Frequency",
+            "name": "Frequency",
+            "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "Hz"
         },
         {
-            "name": "<node>*import",
-            "tag": "Energy",
+            "name": "Import energy",
+            "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "kWh"
         },
         {
-            "name": "<node>*import",
-            "tag": "Power",
+            "name": "Import power",
+            "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "kWh"
         },
         {
-            "name": "<node>*export",
-            "tag": "Energy",
+            "name": "Export energy",
+            "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "kWh"
         },
         {
-            "name": "<node>*export",
-            "tag": "Power",
+            "name": "Export power",
+            "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "kWh"

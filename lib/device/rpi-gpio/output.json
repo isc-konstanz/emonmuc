@@ -2,7 +2,7 @@
     "name": "Pin",
     "category": "Control",
     "group": "GPIO (Raspberry Pi)",
-    "description": "Configuration for a Raspberry Pi pin as an output.",
+    "description": "Requires the <b>GPIO</b> driver to be installed.<br><br>Configuration for a Raspberry Pi pin as an output.",
 
     "driver": "rpi-gpio",
     "devices": [
@@ -53,7 +53,7 @@
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "State"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "State", "tag": "<name>"}
                 }
             ]
         }
@@ -61,8 +61,8 @@
 
     "feeds": [
         {
-            "name": "<node>",
-            "tag": "State",
+            "name": "State",
+            "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60"

@@ -81,6 +81,7 @@ update() {
   #--------------------------------------------------------------------------------------------------
   core framework "org.apache.felix" "org.apache.felix.main"             "6.0.0"
 
+  cp -rf "$EMONMUC_DIR/lib/device" "$LIB_DIR/lib/"
   if [ -f "$EMONMUC_DIR/conf/bundles.conf" ]; then
     read -a bundles < "$EMONMUC_DIR/conf/bundles.conf"
     for bundle in "${bundles[@]}"; do

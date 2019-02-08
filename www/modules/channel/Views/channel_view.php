@@ -153,7 +153,7 @@ function draw(result) {
     $("#channel-groups").empty();
     
     if (typeof result.success !== 'undefined' && !result.success) {
-        alert("Error:\n" + result.message);
+        //alert("Error:\n" + result.message);
         return;
     }
     else if (result.length == 0) {

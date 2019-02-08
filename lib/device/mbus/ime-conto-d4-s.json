@@ -2,7 +2,7 @@
     "name": "CONTO D4-S",
     "category": "Meter",
     "group": "IME Messger&auml;te GmbH",
-    "description": "<b>Energy Meter CONTO D4-S</b>:<br>Current: 10(63)A<br>Voltage : 230(400) - 240(415)V",
+    "description": "Requires the <b>M-Bus</b> (Wired) driver to be installed.<br><br><b>Energy Meter CONTO D4-S</b>:<br>Current: 10(63)A<br>Voltage : 230(400) - 240(415)V",
 
     "driver": "mbus",
     "devices": [
@@ -49,11 +49,11 @@
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Energy", "tag": "<name>"}
                 },
                 {
                     "process": "kwh_to_power",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Power", "tag": "<name>"}
                 }
             ]
         }
@@ -61,15 +61,15 @@
 
     "feeds": [
         {
-            "name": "<node>",
-            "tag": "Energy",
+            "name": "Energy",
+            "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
 			"unit": "kWh"
         },
         {
-            "name": "<node>",
-            "tag": "Power",
+            "name": "Power",
+            "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
 			"unit": "W"
