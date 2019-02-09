@@ -17,7 +17,7 @@ else if (isset($options['dir'])) {
     $dir = $options['dir'];
 }
 else {
-    $dir = "/var/www/html/emoncms";
+    $dir = "/var/www/emoncms";
 }
 if(substr_compare($dir, '/', strlen($dir)-1, 1) !== 0) {
     $dir = $dir."/";
