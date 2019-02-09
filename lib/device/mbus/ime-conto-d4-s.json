@@ -7,6 +7,7 @@
     "driver": "mbus",
     "devices": [
         {
+            "name": "serial<serialPort>",
             "description": "Energy Meter",
             "settings": "9600"
         }
