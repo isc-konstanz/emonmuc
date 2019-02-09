@@ -295,6 +295,7 @@ class MucTemplate extends DeviceTemplate
     private function create_channels($userid, $ctrlid, $devices, &$channels) {
         foreach($channels as $id=>$c) {
             $configs = (array) $c;
+            $configs['id'] = $configs['name'];
             
             if (empty($c->logging)) {
                 if (empty($c->logging->loggingInterval)) {
@@ -385,8 +386,9 @@ class MucTemplate extends DeviceTemplate
             $id = $this->prepare_str($device, $template, $c->name);
             
             if ($this->channel->exist($ctrlid, $id)) {
-                $configs = $this->parse_channel($update['nodeid'], $this->prepare_json($update, $template, json_encode($c)),
-                    $template, $update['options']);
+                $channel = $this->prepare_json($update, $template, json_encode($c));
+                $configs = $this->parse_channel($update['nodeid'], $channel, $template, $update['options']);
+                $configs->id = $configs->name;
                 
                 $result = $this->channel->update(intval($device['userid']), $ctrlid, $device['nodeid'], $id, json_encode($configs));
                 if (isset($result['success']) && $result['success'] == false) {
@@ -437,15 +439,14 @@ class MucTemplate extends DeviceTemplate
     }
 
     private function parse_channels($deviceid, $channels, $template, $parameters) {
-        $channels = array();
+        $result = array();
         foreach ($channels as $channel) {
-            $channels[] = $this->parse_channel($deviceid, $channel, $template, $parameters);
+            $result[] = $this->parse_channel($deviceid, $channel, $template, $parameters);
         }
-        return $channels;
+        return $result;
     }
 
     private function parse_channel($deviceid, $channel, $template, $parameters) {
-        $channel->id = $channel->name;
         if(!isset($channel->node)) {
             $channel->node = $deviceid;
         }
