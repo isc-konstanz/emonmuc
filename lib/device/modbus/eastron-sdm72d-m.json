@@ -55,53 +55,53 @@
         },
         {
             "name": "<node>*import*energy",
-            "description": "Import energy",
+            "description": "Energy import",
             "address": "<unitId>:INPUT_REGISTERS:72:FLOAT",
             "logging": {"loggingInterval": 60000, "loggingMaxInterval": 180000},
             "configs": {"samplingInterval": 60000, "samplingTimeOffset": "<timeOffset>", "valueType":"FLOAT", "unit": "kWh"},
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Import energy", "tag": "<name>"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Energy import", "tag": "<name>"}
                 }
             ]
         },
         {
             "name": "<node>*export*energy",
-            "description": "Export energy",
+            "description": "Energy export",
             "address": "<unitId>:INPUT_REGISTERS:74:FLOAT",
             "logging": {"loggingInterval": 60000, "loggingMaxInterval": 180000},
             "configs": {"samplingInterval": 60000, "samplingTimeOffset": "<timeOffset>", "valueType":"FLOAT", "unit": "kWh"},
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Export energy", "tag": "<name>"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Energy export", "tag": "<name>"}
                 }
             ]
         },
         {
             "name": "<node>*import*power",
-            "description": "Import power",
+            "description": "Power import",
             "address": "<unitId>:INPUT_REGISTERS:1280:FLOAT",
             "logging": {"loggingInterval": 60000, "loggingMaxInterval": 180000},
             "configs": {"samplingInterval": 60000, "samplingTimeOffset": "<timeOffset>", "valueType":"FLOAT", "unit": "W"},
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Import power", "tag": "<name>"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Power import", "tag": "<name>"}
                 }
             ]
         },
         {
             "name": "<node>*export*power",
-            "description": "Export energy",
+            "description": "Energy export",
             "address": "<unitId>:INPUT_REGISTERS:1282:FLOAT",
             "logging": {"loggingInterval": 60000, "loggingMaxInterval": 180000},
             "configs": {"samplingInterval": 60000, "samplingTimeOffset": "<timeOffset>", "valueType":"FLOAT", "unit": "W"},
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Export power", "tag": "<name>"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Power export", "tag": "<name>"}
                 }
             ]
         }
@@ -116,28 +116,28 @@
             "unit": "W"
         },
         {
-            "name": "Import energy",
+            "name": "Energy import",
             "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "kWh"
         },
         {
-            "name": "Export energy",
+            "name": "Energy export",
             "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "kWh"
         },
         {
-            "name": "Import power",
+            "name": "Power import",
             "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "W"
         },
         {
-            "name": "Export power",
+            "name": "Power export",
             "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",

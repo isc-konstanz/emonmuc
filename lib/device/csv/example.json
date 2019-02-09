@@ -42,11 +42,11 @@
                 },
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Solar power", "tag": "<name>"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Power", "tag": "<name> solar"}
                 },
                 {
                     "process": "power_to_kwh",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Solar energy", "tag": "<name>"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Energy", "tag": "<name> solar"}
                 }
             ]
         },
@@ -67,11 +67,11 @@
                 },
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Import power", "tag": "<name>"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Power import", "tag": "<name>"}
                 },
                 {
                     "process": "power_to_kwh",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Import energy", "tag": "<name>"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Energy import", "tag": "<name>"}
                 },
                 {
                     "process": "reset2original",
@@ -87,11 +87,11 @@
                 },
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Export power", "tag": "<name>"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Power export", "tag": "<name>"}
                 },
                 {
                     "process": "power_to_kwh",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Export energy", "tag": "<name>"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Energy export", "tag": "<name>"}
                 }
             ]
         },
@@ -108,7 +108,7 @@
                 },
                 {
                     "process": "add_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Solar power", "tag": "<name>"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Power", "tag": "<name> solar"}
                 },
                 {
                     "process": "allowpositive",
@@ -116,11 +116,11 @@
                 },
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Consumption power", "tag": "<name>"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Power", "tag": "<name>"}
                 },
                 {
                     "process": "power_to_kwh",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Consumption energy", "tag": "<name>"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Energy", "tag": "<name>"}
                 }
             ]
         },
@@ -137,11 +137,11 @@
                 },
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Heat pump power", "tag": "<name>"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Power", "tag": "<name> HP"}
                 },
                 {
                     "process": "power_to_kwh",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Heat pump energy", "tag": "<name>"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Energy", "tag": "<name> HP"}
                 }
             ]
         },
@@ -158,11 +158,11 @@
                 },
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "EV power", "tag": "<name>"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Power", "tag": "<name> EV"}
                 },
                 {
                     "process": "power_to_kwh",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "EV energy", "tag": "<name>"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Energy", "tag": "<name> EV"}
                 }
             ]
         }
@@ -170,7 +170,23 @@
 
     "feeds": [
         {
-            "name": "Solar power",
+            "name": "Power",
+            "tag": "<name> solar",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPFINA",
+            "interval": "60",
+			"unit": "W"
+        },
+        {
+            "name": "Energy",
+            "tag": "<name> solar",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPFINA",
+            "interval": "60",
+			"unit": "kWh"
+        },
+        {
+            "name": "Power import",
             "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
@@ -178,7 +194,7 @@
 			"unit": "W"
         },
         {
-            "name": "Solar energy",
+            "name": "Energy import",
             "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
@@ -186,7 +202,7 @@
 			"unit": "kWh"
         },
         {
-            "name": "Import power",
+            "name": "Power export",
             "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
@@ -194,7 +210,7 @@
 			"unit": "W"
         },
         {
-            "name": "Import energy",
+            "name": "Energy export",
             "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
@@ -202,7 +218,7 @@
 			"unit": "kWh"
         },
         {
-            "name": "Export power",
+            "name": "Power",
             "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
@@ -210,7 +226,7 @@
 			"unit": "W"
         },
         {
-            "name": "Export energy",
+            "name": "Energy",
             "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
@@ -218,48 +234,32 @@
 			"unit": "kWh"
         },
         {
-            "name": "Consumption power",
-            "tag": "<name>",
+            "name": "Power",
+            "tag": "<name> HP",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
 			"unit": "W"
         },
         {
-            "name": "Consumption energy",
-            "tag": "<name>",
+            "name": "Energy",
+            "tag": "<name> HP",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
 			"unit": "kWh"
         },
         {
-            "name": "Heat pump power",
-            "tag": "<name>",
+            "name": "Power",
+            "tag": "<name> EV",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
 			"unit": "W"
         },
         {
-            "name": "Heat pump energy",
-            "tag": "<name>",
-            "type": "DataType::REALTIME",
-            "engine": "Engine::PHPFINA",
-            "interval": "60",
-			"unit": "kWh"
-        },
-        {
-            "name": "EV power",
-            "tag": "<name>",
-            "type": "DataType::REALTIME",
-            "engine": "Engine::PHPFINA",
-            "interval": "60",
-			"unit": "W"
-        },
-        {
-            "name": "EV energy",
-            "tag": "<name>",
+            "name": "Energy",
+            "tag": "<name> EV",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
