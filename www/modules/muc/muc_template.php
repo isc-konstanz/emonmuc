@@ -13,29 +13,16 @@ defined('EMONCMS_EXEC') or die('Restricted access');
 
 require_once "Modules/device/device_template.php";
 
-class MucTemplate extends DeviceTemplate
-{
-    const DEFAULT_DIR = "/var/lib/emonmuc/";
+class MucTemplate extends DeviceTemplate {
+    const DIR_DEFAULT = "/var/lib/emonmuc/";
 
     private $ctrl;
-    private $device;
-    private $channel;
 
     function __construct(&$parent) {
         parent::__construct($parent);
         
         require_once "Modules/muc/muc_model.php";
         $this->ctrl = new Controller($this->mysqli, $this->redis);
-        
-        require_once "Modules/muc/Models/channel_model.php";
-        require_once "Modules/channel/channel_model.php";
-        $this->channel = new ChannelCache($this->ctrl, 
-            new Channel($this->ctrl, $this->mysqli, $this->redis), $this->redis);
-        
-        require_once "Modules/muc/Models/device_model.php";
-        require_once "Modules/channel/device_model.php";
-        $this->device = new DeviceCache($this->ctrl, 
-            new DeviceConnection($this->ctrl), $this->channel, $this->redis);
     }
 
     protected function load_list() {
@@ -91,7 +78,7 @@ class MucTemplate extends DeviceTemplate
         if (count($ctrls) > 0) {
             $select = array();
             foreach ($ctrls as $ctrl) {
-                $select[] = array('name'=>$ctrl['description'], 'value'=>$ctrl['id']);
+                $select[] = array('name'=>$ctrl['name'], 'value'=>$ctrl['id']);
             }
             $options[] = array('id'=>'ctrlid',
                 'name'=>'Controller',
@@ -108,13 +95,13 @@ class MucTemplate extends DeviceTemplate
         return json_decode(json_encode($template));
     }
 
-    protected function get_dir() {
+    private function get_dir() {
         global $muc_settings;
         if (isset($muc_settings) && isset($muc_settings['libdir']) && $muc_settings['libdir'] !== "") {
             $muc_template_dir = $muc_settings['libdir'];
         }
         else {
-            $muc_template_dir = self::DEFAULT_DIR;
+            $muc_template_dir = self::DIR_DEFAULT;
         }
         if (substr($muc_template_dir, -1) !== "/") {
             $muc_template_dir .= "/";
@@ -240,14 +227,14 @@ class MucTemplate extends DeviceTemplate
                 return array('success'=>false, 'message'=>'Bad device template. Devices undefined.');
             }
             $devices = $this->parse_devices($deviceid, $result, $options);
-            $response = $this->create_devices($userid, $ctrlid, $devices);
+            $response = $this->create_devices($ctrlid, $devices);
             if (isset($response['success']) && $response['success'] == false) {
                 return $response;
             }
             
             if (isset($template->inputs)) {
                 $channels = $this->parse_channels($deviceid, $template->inputs, $result, $options);
-                $response = $this->create_channels($userid, $ctrlid, $devices, $channels);
+                $response = $this->create_channels($ctrlid, $devices, $channels);
                 if (isset($response['success']) && $response['success'] == false) {
                     return $response;
                 }
@@ -278,9 +265,10 @@ class MucTemplate extends DeviceTemplate
     }
 
     // Create the devices
-    private function create_devices($userid, $ctrlid, $devices) {
+    private function create_devices($ctrlid, $devices) {
+        $ctrl = $this->ctrl->get($ctrlid);
         foreach ($devices as $device) {
-            $result = $this->device->create($userid, $ctrlid, $device->driver, json_encode($device));
+            $result = $this->ctrl->device($ctrl)->create($device->driver, json_encode($device));
             if (isset($result['success']) && $result['success'] == false) {
                 if (strpos($result['message'], 'already exists') !== false) {
                     return array('success'=>true, 'message'=>'Devices already created');
@@ -292,7 +280,8 @@ class MucTemplate extends DeviceTemplate
     }
 
     // Create the channels
-    private function create_channels($userid, $ctrlid, $devices, &$channels) {
+    private function create_channels($ctrlid, $devices, &$channels) {
+        $ctrl = $this->ctrl->get($ctrlid);
         foreach($channels as $id=>$c) {
             $configs = (array) $c;
             $configs['id'] = $configs['name'];
@@ -318,12 +307,12 @@ class MucTemplate extends DeviceTemplate
                 $driverid = $devices{0}->driver;
             }
             
-            $result = $this->channel->create($userid, $ctrlid, $driverid, $deviceid, json_encode($configs));
+            $result = $this->ctrl->channel($ctrl)->create($driverid, $deviceid, json_encode($configs));
             if (isset($result['success']) && $result['success'] == false &&
-                strpos($result['message'], 'already exists') === false) {
-                    
-                    return $result;
-                }
+                   strpos($result['message'], 'already exists') === false) {
+                
+                return $result;
+            }
         }
         return array('success'=>true, 'message'=>'Channels successfully created');
     }
@@ -361,6 +350,7 @@ class MucTemplate extends DeviceTemplate
     }
 
     protected function update_devices($ctrlid, $device, $update, $template) {
+        $ctrl = $this->ctrl->get($ctrlid);
         foreach($template->devices as $d) {
             if (isset($d->name)) {
                 $id = $this->prepare_str($device, $template, $d->name);
@@ -368,13 +358,13 @@ class MucTemplate extends DeviceTemplate
             else {
                 $id = $device['nodeid'];
             }
-            if (!$this->device->exist($ctrlid, $id)) {
+            if (!$this->ctrl->device($ctrl)->exist($id)) {
                 return array('success'=>false, 'message'=>"Unable to rename unexisting device: $id");
             }
             $configs = $this->parse_device($update['nodeid'], $this->prepare_json($update, $template, json_encode($d)),
                 $template, $update['options']);
             
-            $result = $this->device->update(intval($device['userid']), $ctrlid, $id, json_encode($configs));
+            $result = $this->ctrl->device($ctrl)->update($id, json_encode($configs));
             if (isset($result['success']) && $result['success'] == false) {
                 return $result;
             }
@@ -382,15 +372,16 @@ class MucTemplate extends DeviceTemplate
     }
 
     protected function update_channels($ctrlid, $device, $update, $template) {
+        $ctrl = $this->ctrl->get($ctrlid);
         foreach($template->channels as $c) {
             $id = $this->prepare_str($device, $template, $c->name);
             
-            if ($this->channel->exist($ctrlid, $id)) {
+            if ($this->ctrl->channel($ctrl)->exist($id)) {
                 $channel = $this->prepare_json($update, $template, json_encode($c));
                 $configs = $this->parse_channel($update['nodeid'], $channel, $template, $update['options']);
                 $configs->id = $configs->name;
                 
-                $result = $this->channel->update(intval($device['userid']), $ctrlid, $device['nodeid'], $id, json_encode($configs));
+                $result = $this->ctrl->channel($ctrl)->update($device['nodeid'], $id, json_encode($configs));
                 if (isset($result['success']) && $result['success'] == false) {
                     return $result;
                 }
@@ -519,8 +510,9 @@ class MucTemplate extends DeviceTemplate
         $options = $device['options'];
         if (isset($options['ctrlid'])) {
             $ctrlid = intval($options['ctrlid']);
+            $ctrl = $this->ctrl->get($ctrlid);
             
-            $result = $this->device->delete($ctrlid, $nodeid);
+            $result = $this->ctrl->device($ctrl)->delete($nodeid);
             if (isset($result['success']) && $result['success'] == false) {
                 if (strpos($result['message'], 'does not exist') === false) {
                     return $result;
