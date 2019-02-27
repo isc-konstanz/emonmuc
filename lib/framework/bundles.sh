@@ -14,7 +14,7 @@ update() {
   core github "OpenMUC"             "openmuc-core-datamanager"          $OPENMUC_VERSION
   core github "OpenMUC"             "openmuc-server-restws"             $OPENMUC_VERSION
 
-  core github "emonjava"            "openmuc-datalogger-emoncms"        "1.1.5"
+  core github "emonjava"            "openmuc-datalogger-emoncms"        "1.2.1"
 
   #--------------------------------------------------------------------------------------------------
   # RXTX is a native interface to serial ports in java.
@@ -81,6 +81,7 @@ update() {
   #--------------------------------------------------------------------------------------------------
   core framework "org.apache.felix" "org.apache.felix.main"             "6.0.0"
 
+  cp -rf "$EMONMUC_DIR/lib/device" "$LIB_DIR/"
   if [ -f "$EMONMUC_DIR/conf/bundles.conf" ]; then
     read -a bundles < "$EMONMUC_DIR/conf/bundles.conf"
     for bundle in "${bundles[@]}"; do
@@ -110,6 +111,7 @@ bundle() {
   if [ -f "$EMONMUC_DIR/conf/bundles.conf" ]; then
     read -a bundles < "$EMONMUC_DIR/conf/bundles.conf"
   fi
+  installed=($(sort <<<"${bundles[*]}"))
 
   source "$EMONMUC_DIR/lib/framework/bundle/$bundle.sh"
   case "$1" in

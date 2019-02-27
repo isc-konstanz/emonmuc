@@ -12,13 +12,13 @@ To setup this driver, [emonmuc](https://github.com/isc-konstanz/emonmuc/) needs 
 With emonmuc being installed, the driver may be enabled
 
 ~~~
-emonmuc install csv
+emonmuc install rpi-gpio
 ~~~
 
 To disable the driver, use
 
 ~~~
-emonmuc remove csv
+emonmuc remove rpi-gpio
 ~~~
 
 To allow drivers to have access to GPIO pins of the Raspberry Pi even when not root, non-privileged accessed can be enabled since the Raspberry Pi 3.  
@@ -75,7 +75,7 @@ If done, click **Save and Initialize**.
 
 Now, navigate to the thing view via **Extra > Things**, to get a very basic block with one switch button:
 
-![thing view](img/rpi-gpio/device_things.png)
+![thing view](img/rpi-gpio/device-things.png)
 
 With it, simply turn the LED On and Off by toggling the button. Did you do everything correct? Congratulations!  
 The graph view shows you the history of the LED status: 1 equals high, 0 equals low.

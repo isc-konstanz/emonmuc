@@ -30,6 +30,7 @@ First, the framework can be downloaded either via git or simply copied into a di
 Git is a source code management and revision control system, but here it is used to download and update the emonmuc application.
 
 ~~~
+sudo apt-get update
 sudo apt-get install git-core
 ~~~
 
@@ -49,7 +50,7 @@ sudo /opt/emonmuc/setup.sh --emoncms /var/www/emoncms --apikey <apikey>
 Both parameters are optional and the webserver may be installed to a specified directory. This will be done automatically, if the directory does not exist already.
 
 ~~~
-sudo /opt/emonmuc/setup.sh -e /var/www/html/emoncms
+sudo /opt/emonmuc/setup.sh -e /var/www/emoncms
 ~~~
 
 If no API key was specified, the first existing user will be used to register a controller. Empty installations will be initialized with a default user "*admin*", authenticated with a temporary password: *admin*, that should be replaced with a secure password immediately in the Account configurations.  
@@ -78,7 +79,7 @@ emonmuc remove csv
 Several drivers can be enabled at once, while each needs to be selected individually. A list of possible integrated drivers are:
 
   - **csv**: Read CSV files
-  - **dlms**: [DLMS/COSEM](https://www.openmuc.org/openmuc/user-guide/#_dlms_cosem)
+  - **dlms**: [DLMS/COSEM](https://www.openmuc.org/openmuc/user-guide/#_dlmscosem)
   - **ehz**: [eHz for SML and IEC 62056-21](https://www.openmuc.org/openmuc/user-guide/#_ehz)
   - **homematic-cc1101**: [HomeMatic (CC1101)](https://github.com/isc-konstanz/OpenHomeMatic)
   - **iec60870**: [IEC 60870-5-104](https://www.openmuc.org/openmuc/user-guide/#_iec_60870_5_104)

@@ -3,7 +3,7 @@
 
 # Set the targeted location of the emonmuc framework and the emoncms webserver.
 # If a specified directory is empty, the component will be installed.
-#EMONCMS_DIR="/var/www/html/emoncms"
+#EMONCMS_DIR="/var/www/emoncms"
 EMONCMS_USER="www-data"
 
 
@@ -27,7 +27,7 @@ find_emonmuc_dir() {
     fi
   done
   SAVED="`pwd`"
-  cd "`dirname \"$PRG\"`/.." >/dev/null
+  cd "`dirname \"$PRG\"`" >/dev/null
   EMONMUC_DIR="`pwd -P`"
   cd "$SAVED" >/dev/null
 }
@@ -47,15 +47,16 @@ update_emonmuc() {
   sudo chown $EMONMUC_USER:root -R "$EMONMUC_DIR"
   sudo chown $EMONCMS_USER:root -R "$EMONMUC_DIR"/www
 
+  systemctl daemon-reload
   systemctl restart emonmuc
 }
 
 update_emoncms() {
   echo "Updating emoncms webserver"
-  pear update-channels
-  pear upgrade
-  pecl update-channels
-  pecl upgrade
+  #pear update-channels
+  #pear upgrade
+  #pecl update-channels
+  #pecl upgrade
 
   if [ "$RESET" ]; then
     sudo -u $EMONCMS_USER git -C "$EMONCMS_DIR" reset --hard

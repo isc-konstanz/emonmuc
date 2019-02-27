@@ -1,0 +1,62 @@
+{
+    "name": "Counter",
+    "category": "Meter",
+    "group": "Pulses (Raspberry Pi)",
+    "description": "Requires the <b>GPIO</b> driver to be installed.<br><br>Configuration for a Raspberry Pi pin as an generic pulse counter.",
+
+    "driver": "rpi-gpio",
+    "devices": [
+        {
+            "description": "Raspberry Pi Input",
+            "settings": "mode:DIGITAL_INPUT,pullResistance:PULL_DOWN,counter:true"
+        }
+    ],
+
+    "scan": {
+        "settings": "mode:DIGITAL_INPUT"
+    },
+
+    "options": [
+        {
+            "id": "pin",
+            "name": "Pin",
+            "description": "The Pin number, according to the <a href='http://pi4j.com/pin-numbering-scheme.html'>WiringPi Pin Numbering Scheme</a>",
+            "type": "text",
+            "scan": true,
+            "mandatory": true,
+            "syntax": "deviceAddress"
+        },
+        {
+            "id": "impulses",
+            "name": "imp./unit",
+            "description": "The amount of impulses corresponding to one unit.</a>",
+            "type": "text",
+            "mandatory": true,
+            "syntax": "channelSettings"
+        }
+    ],
+
+    "channels": [
+        {
+            "name": "<node>*counter",
+            "description": "Pulse counter",
+            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 900000},
+            "configs": {"samplingInterval": 60000, "valueType":"DOUBLE"},
+            "processList": [
+                {
+                    "process": "counter_accumulator",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Counter", "tag": "<name>"}
+                }
+            ]
+        }
+    ],
+
+    "feeds": [
+        {
+            "name": "Counter",
+            "tag": "<name>",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES"
+        }
+    ]
+}

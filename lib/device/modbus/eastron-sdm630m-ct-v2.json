@@ -1,0 +1,468 @@
+{
+    "name": "SDM630M-CT-V2",
+    "category": "Meter",
+    "group": "EASTRON",
+    "description": "Requires the <b>Modbus</b> (RTU and TCP/IP) driver to be installed.<br><br><b>Energy Meter SDM630M-CT-V2</b>:<br>Current: 0.25-5(6)A<br>Voltage : 3*230/400V<br>50/60Hz",
+
+    "driver": "modbus",
+    "devices": [
+        {
+            "name": "modbus<address>",
+            "description": "Modbus RTU connection",
+            "settings": "RTU:SERIAL_ENCODING_RTU:9600:DATABITS_8:PARITY_NONE:STOPBITS_2:ECHO_FALSE:FLOWCONTROL_NONE:FLOWCONTROL_NONE"
+        }
+    ],
+
+    "options": [
+        {
+            "id": "address",
+            "name": "Address",
+            "description": "The physical device address to uniquely identify a physical smart meter.<br><br><b>Example:</b><ol><li><b>Linux</b>: /dev/ttyS0 or /dev/ttyUSB0</li><li><b>Windows</b>: COM1</li></ol>",
+            "type": "text",
+            "mandatory": true,
+            "syntax": "deviceAddress"
+        },
+        {
+            "id": "unitId",
+            "name": "Unid ID",
+            "description": "The device address of the Modbus slave.<br>The slave device address is assigned form 1 to 247.<br>Address 0 is used as broadcast address.</li></ul>",
+            "type": "text",
+            "mandatory": true
+        },
+        {
+            "id": "timeOffset",
+            "name": "Time offset",
+            "description": "The time waited in milliseconds, until the serial connection will be used. Necessary for multiple meters on the same line.",
+            "type": "text",
+            "default": 0,
+            "mandatory": false
+        }
+    ],
+
+    "channels": [
+        {
+            "name": "<node>*l1*voltage",
+            "description": "Phase1 Voltage",
+            "address": "<unitId>:INPUT_REGISTERS:0:FLOAT",
+            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 180000, "loggingTolerance": 1, "average": true},
+            "configs": {"samplingInterval": 60000, "samplingTimeOffset": "<timeOffset>", "valueType":"FLOAT", "unit": "V"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Voltage", "tag": "<name> L1"}
+                }
+            ]
+        },
+        {
+            "name": "<node>*l2*voltage",
+            "description": "Phase2 Voltage",
+            "address": "<unitId>:INPUT_REGISTERS:2:FLOAT",
+            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 180000, "loggingTolerance": 1, "average": true},
+            "configs": {"samplingInterval": 60000, "samplingTimeOffset": "<timeOffset>", "valueType":"FLOAT", "unit": "V"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Voltage", "tag": "<name> L2"}
+                }
+            ]
+        },
+        {
+            "name": "<node>*l3*voltage",
+            "description": "Phase3 Voltage",
+            "address": "<unitId>:INPUT_REGISTERS:4:FLOAT",
+            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 180000, "loggingTolerance": 1, "average": true},
+            "configs": {"samplingInterval": 60000, "samplingTimeOffset": "<timeOffset>", "valueType":"FLOAT", "unit": "V"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Voltage", "tag": "<name> L3"}
+                }
+            ]
+        },
+        {
+            "name": "<node>*l1*current",
+            "description": "Phase1 current",
+            "address": "<unitId>:INPUT_REGISTERS:6:FLOAT",
+            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 180000},
+            "configs": {"samplingInterval": 60000, "samplingTimeOffset": "<timeOffset>", "valueType":"FLOAT", "unit": "A"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Current", "tag": "<name> L1"}
+                }
+            ]
+        },
+        {
+            "name": "<node>*l2*current",
+            "description": "Phase2 current",
+            "address": "<unitId>:INPUT_REGISTERS:8:FLOAT",
+            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 180000},
+            "configs": {"samplingInterval": 60000, "samplingTimeOffset": "<timeOffset>", "valueType":"FLOAT", "unit": "A"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Current", "tag": "<name> L2"}
+                }
+            ]
+        },
+        {
+            "name": "<node>*l3*current",
+            "description": "Phase3 current",
+            "address": "<unitId>:INPUT_REGISTERS:10:FLOAT",
+            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 180000},
+            "configs": {"samplingInterval": 60000, "samplingTimeOffset": "<timeOffset>", "valueType":"FLOAT", "unit": "A"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Current", "tag": "<name> L3"}
+                }
+            ]
+        },
+        {
+            "name": "<node>*power",
+            "description": "Power",
+            "address": "<unitId>:INPUT_REGISTERS:52:FLOAT",
+            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 180000},
+            "configs": {"samplingInterval": 60000, "samplingTimeOffset": "<timeOffset>", "valueType":"FLOAT", "unit": "W"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Power", "tag": "<name>"}
+                }
+            ]
+        },
+        {
+            "name": "<node>*frequency",
+            "description": "Frequency",
+            "address": "<unitId>:INPUT_REGISTERS:70:FLOAT",
+            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 180000, "loggingTolerance": 0.1, "average": true},
+            "configs": {"samplingInterval": 60000, "samplingTimeOffset": "<timeOffset>", "valueType":"FLOAT", "unit": "Hz"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Frequency", "tag": "<name>"}
+                }
+            ]
+        },
+        {
+            "name": "<node>*l1*import",
+            "description": "Phase1 Energy import",
+            "address": "<unitId>:INPUT_REGISTERS:346:FLOAT",
+            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 180000},
+            "configs": {"samplingInterval": 60000, "samplingTimeOffset": "<timeOffset>", "valueType":"FLOAT", "unit": "kWh"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Energy import", "tag": "<name> L1"}
+                },
+                {
+                    "process": "kwh_to_power",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Power import", "tag": "<name> L1"}
+                }
+            ]
+        },
+        {
+            "name": "<node>*l2*import",
+            "description": "Phase2 Energy import",
+            "address": "<unitId>:INPUT_REGISTERS:348:FLOAT",
+            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 180000},
+            "configs": {"samplingInterval": 60000, "samplingTimeOffset": "<timeOffset>", "valueType":"FLOAT", "unit": "kWh"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Energy import", "tag": "<name> L2"}
+                },
+                {
+                    "process": "kwh_to_power",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Power import", "tag": "<name> L2"}
+                }
+            ]
+        },
+        {
+            "name": "<node>*l3*import",
+            "description": "Phase3 Energy import",
+            "address": "<unitId>:INPUT_REGISTERS:350:FLOAT",
+            "logging": {"loggingInterval": 60000, "loggingTimeOffset": 1000, "loggingMaxInterval": 180000},
+            "configs": {"samplingInterval": 60000, "samplingTimeOffset": "<timeOffset>", "valueType":"FLOAT", "unit": "kWh"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Energy import", "tag": "<name> L3"}
+                },
+                {
+                    "process": "kwh_to_power",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Power import", "tag": "<name> L3"}
+                },
+                {
+                    "process": "reset2original",
+                    "arguments": {"type": "ProcessArg::NONE"}
+                },
+                {
+                    "process": "add_input",
+                    "arguments": {"type": "ProcessArg::INPUTID", "value": "Energy import", "tag": "<name> L1"}
+                },
+                {
+                    "process": "add_input",
+                    "arguments": {"type": "ProcessArg::INPUTID", "value": "Energy import", "tag": "<name> L2"}
+                },
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Energy import", "tag": "<name>"}
+                },
+                {
+                    "process": "kwh_to_power",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Power import", "tag": "<name>"}
+                }
+            ]
+        },
+        {
+            "name": "<node>*l1*export",
+            "description": "Phase1 Energy export",
+            "address": "<unitId>:INPUT_REGISTERS:352:FLOAT",
+            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 180000},
+            "configs": {"samplingInterval": 60000, "samplingTimeOffset": "<timeOffset>", "valueType":"FLOAT", "unit": "kWh"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Energy export", "tag": "<name> L1"}
+                },
+                {
+                    "process": "kwh_to_power",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Power export", "tag": "<name> L1"}
+                }
+            ]
+        },
+        {
+            "name": "<node>*l2*export",
+            "description": "Phase2 Energy export",
+            "address": "<unitId>:INPUT_REGISTERS:354:FLOAT",
+            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 180000},
+            "configs": {"samplingInterval": 60000, "samplingTimeOffset": "<timeOffset>", "valueType":"FLOAT", "unit": "kWh"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Energy export", "tag": "<name> L2"}
+                },
+                {
+                    "process": "kwh_to_power",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Power export", "tag": "<name> L2"}
+                }
+            ]
+        },
+        {
+            "name": "<node>*l3*export",
+            "description": "Phase3 Energy export",
+            "address": "<unitId>:INPUT_REGISTERS:356:FLOAT",
+            "logging": {"loggingInterval": 60000, "loggingTimeOffset": 1000, "loggingMaxInterval": 180000},
+            "configs": {"samplingInterval": 60000, "samplingTimeOffset": "<timeOffset>", "valueType":"FLOAT", "unit": "kWh"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Energy export", "tag": "<name> L3"}
+                },
+                {
+                    "process": "kwh_to_power",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Power export", "tag": "<name> L3"}
+                },
+                {
+                    "process": "reset2original",
+                    "arguments": {"type": "ProcessArg::NONE"}
+                },
+                {
+                    "process": "add_input",
+                    "arguments": {"type": "ProcessArg::INPUTID", "value": "Energy export", "tag": "<name> L1"}
+                },
+                {
+                    "process": "add_input",
+                    "arguments": {"type": "ProcessArg::INPUTID", "value": "Energy export", "tag": "<name> L2"}
+                },
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Energy export", "tag": "<name>"}
+                },
+                {
+                    "process": "kwh_to_power",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Power export", "tag": "<name>"}
+                }
+            ]
+        }
+    ],
+
+    "feeds": [
+        {
+            "name": "Voltage",
+            "tag": "<name> L1",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "V"
+        },
+        {
+            "name": "Voltage",
+            "tag": "<name> L2",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "V"
+        },
+        {
+            "name": "Voltage",
+            "tag": "<name> L3",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "V"
+        },
+        {
+            "name": "Current",
+            "tag": "<name> L1",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "A"
+        },
+        {
+            "name": "Current",
+            "tag": "<name> L2",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "A"
+        },
+        {
+            "name": "Current",
+            "tag": "<name> L3",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "A"
+        },
+        {
+            "name": "Power",
+            "tag": "<name>",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "W"
+        },
+        {
+            "name": "Frequency",
+            "tag": "<name>",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "Hz"
+        },
+        {
+            "name": "Energy import",
+            "tag": "<name>",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "kWh"
+        },
+        {
+            "name": "Energy import",
+            "tag": "<name> L1",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "kWh"
+        },
+        {
+            "name": "Energy import",
+            "tag": "<name> L2",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "kWh"
+        },
+        {
+            "name": "Energy import",
+            "tag": "<name> L3",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "kWh"
+        },
+        {
+            "name": "Energy export",
+            "tag": "<name>",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "kWh"
+        },
+        {
+            "name": "Energy export",
+            "tag": "<name> L1",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "kWh"
+        },
+        {
+            "name": "Energy export",
+            "tag": "<name> L2",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "kWh"
+        },
+        {
+            "name": "Energy export",
+            "tag": "<name> L3",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "kWh"
+        },
+        {
+            "name": "Power import",
+            "tag": "<name>",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "W"
+        },
+        {
+            "name": "Power import",
+            "tag": "<name> L1",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "W"
+        },
+        {
+            "name": "Power import",
+            "tag": "<name> L2",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "W"
+        },
+        {
+            "name": "Power import",
+            "tag": "<name> L3",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "W"
+        },
+        {
+            "name": "Power export",
+            "tag": "<name>",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "W"
+        },
+        {
+            "name": "Power export",
+            "tag": "<name> L1",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "W"
+        },
+        {
+            "name": "Power export",
+            "tag": "<name> L2",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "W"
+        },
+        {
+            "name": "Power export",
+            "tag": "<name> L3",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "W"
+        }
+    ],
+
+    "syntax": {
+        "deviceAddress": {
+            "keyValue": false,
+            "separator": ":"
+        }
+    }
+}

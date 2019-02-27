@@ -7,7 +7,7 @@ JVM_OPTS="-Djava.library.path=/usr/lib/jni -cp /usr/share/java/RXTXcomm.jar"
 
 # Set location for PID and Error output file. Default is "$EMONMUC_DIR/log/emonmuc.pid" or ".log"
 PID_FILE=/var/run/emonmuc/emonmuc.pid
-#ERR_FILE=/var/log/emonmuc/emonmuc.out
+#ERR_FILE=/var/log/emoncms/emonmuc.out
 ERR_FILE=/dev/null
 
 # Optionally set the location of the emonmuc framework. If the
@@ -42,13 +42,12 @@ fi
 cd "$EMONMUC_DIR"
 
 EMONMUC_USER=`stat -c "%U" bin/emonmuc`
+EMONMUC_UID=`id -u $EMONMUC_USER`
 
 # If root change user to owner of this script
-if [ $UID -eq 0 ] ; then
-  if [ "$EMONMUC_USER" != "root" ]; then
-    echo "Executed as root, will run as owner of this script: $EMONMUC_USER"
-    exec sudo -u $EMONMUC_USER bin/emonmuc "$@"
-  fi
+if [ ! $UID -eq $EMONMUC_UID ]; then
+  echo "Not executed as owner of this script and will be restarted as user: $EMONMUC_USER"
+  exec sudo -u $EMONMUC_USER bin/emonmuc "$@"
 fi
 
 # Determine the Java command to use to start the JVM.

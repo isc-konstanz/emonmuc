@@ -20,6 +20,7 @@
     #table th:nth-of-type(4) { font-weight:normal; }
     #table td:nth-of-type(5), th:nth-of-type(5) { width:20%; text-align: right; }
     #table td:nth-of-type(6) { width:14px; text-align: center; }
+    #table td:nth-of-type(6) { width:14px; text-align: center; }
     #table td:nth-of-type(7) { width:14px; text-align: center; }
     #table td:nth-of-type(8) { width:14px; text-align: center; }
 </style>
@@ -35,7 +36,7 @@
             <p>
                 <?php echo _('Multi Utility Communication (MUC) controller handle the communication protocols to a variety of devices and are the main entry point to configure metering units.'); ?>
                 <br><br>
-                <?php echo _('A MUC controller registers several drivers (see the drivers tab) and is needed to configure the communication protocol they implement.'); ?>
+                <?php echo _('A MUC controller registers several '); ?><a href="driver/view"><?php echo _('drivers'); ?></a><?php echo _(' and is needed to configure the communication protocol they implement.'); ?>
                 <br>
                 <?php echo _('Several MUC controllers may be added, but it is recommended to use the local platform, if geographically possible.'); ?>
                 <br>
@@ -57,11 +58,11 @@
     var path = "<?php echo $path; ?>";
 
     var types = {
-        HTTP: "HTTP",
-        HTTPS: "HTTPS",
-        MQTT: "MQTT"
+        http: "HTTP",
+        https: "HTTPS",
+        redis: "Redis"
     };
-    
+
     // Extend table library field types
     for (z in muctablefields) table.fieldtypes[z] = muctablefields[z];
     for (z in customtablefields) table.fieldtypes[z] = customtablefields[z];
@@ -69,28 +70,32 @@
     table.deletedata = false;
     table.fields = {
         'type':{'title':'<?php echo _("Type"); ?>','type':"select",'options':types},
-        'address':{'title':'<?php echo _("Address"); ?>','type':"text"},
-        'description':{'title':'<?php echo _('Location'); ?>','type':"text"},
-        'drivers':{'title':'<?php echo _("Drivers"); ?>','type':"driverlist"},
-        'password':{'title':'<?php echo _('Password'); ?>','type':"text"},
+        'name':{'title':'<?php echo _("Name"); ?>','type':"text"},
+        'description':{'title':'<?php echo _('Description'); ?>','type':"text"},
+        'drivers':{'title':'<?php echo _("Drivers"); ?>','type':"state-list"},
         // Actions
+        'reload-action':{'title':'', 'type':"iconbasic", 'icon':'icon-refresh'},
         'add-action':{'title':'', 'type':"icon-enabled", 'icon':'icon-plus-sign'},
-        'edit-action':{'title':'', 'type':"edit"},
-        'delete-action':{'title':'', 'type':"delete"}
+        'delete-action':{'title':'', 'type':"delete"},
+        'config-action':{'title':'', 'type':"iconconfig", 'icon':'icon-wrench'}
     }
 
     update();
 
     function update() {
         muc.list(function(data, textStatus, xhr) {
+            if (typeof data.success !== 'undefined' && !data.success) {
+                return;
+            }
             table.data = data;
-            
             table.draw();
-            if (table.data.length == 0) {
+            
+            if (data.length == 0) {
                 $("#api-help-header").hide();
                 $("#ctrl-header").hide();
                 $("#ctrl-none").show();
-            } else {
+            }
+            else {
                 $("#api-help-header").show();
                 $("#ctrl-header").show();
                 $("#ctrl-none").hide();
@@ -108,34 +113,18 @@
     }
     updaterStart(update, 5000);
 
-    $("#table").bind("onEdit", function(e) {
-        
-        updaterStart(update, 0);
-    });
-
-    $("#table").bind("onSave", function(e,id,fields_to_update) {
-        
-        $('#ctrl-loader').show();
-        
-        var result = muc.set(id,fields_to_update);
-        update();
-        
-        $('#ctrl-loader').hide();
-
-        if (!result.success) {
-            alert('Unable to update muc:\n'+result.message);
-            return false;
-        }
-    });
-
-    $("#table").bind("onResume", function(e) {
-        
-        updaterStart(update, 5000);
-    });
-
     $("#table").bind("onDelete", function(e,id,row) {
+        // Get MUC of clicked row
+        var ctrl = table.data[row];
         
-        muc_dialog.loadDelete(id, row);
+        muc_dialog.loadDelete(ctrl, row);
+    });
+
+    $("#table").on('click', '.icon-wrench', function() {
+        // Get device of clicked row
+        var ctrl = table.data[$(this).attr('row')];
+        
+        muc_dialog.loadConfig(ctrl);
     });
 
     $("#table").on('click', '.icon-plus-sign', function() {
@@ -145,18 +134,28 @@
         driver_dialog.loadNew(ctrl);
     });
 
-    $("#table").on('click', '.driver-label', function() {
+    $("#table").on('click', '.icon-refresh', function() {
+        // Get device of clicked row
+        var ctrl = table.data[$(this).attr('row')];
+        muc.load(ctrl.id, function(result) {
+            if (typeof result.success !== 'undefined' && !result.success) {
+                alert('Controller reload failed:\n'+result.message);
+                return false;
+            }
+        });
+    });
+
+    $("#table").on('click', '.state-label', function() {
         // Get the ids of the clicked lable
         var ctrl = table.data[$(this).closest('td').attr('row')];
-        var ctrlid = ctrl['id'];
         var driverid = $(this).data('id');
-
-        $('#ctrl-loader').show();
-        driver.get(ctrlid, driverid, function(result) {
-            driver_dialog.loadConfig(result);
-            
-            $('#ctrl-loader').hide();
-        });
+        var drivers = ctrl.drivers;
+        for (var i in drivers) {
+            if (drivers[i].id == driverid) {
+                driver_dialog.loadConfig(drivers[i]);
+                break;
+            }
+        }
     });
 
     $('#ctrl-new').on('click', function() {

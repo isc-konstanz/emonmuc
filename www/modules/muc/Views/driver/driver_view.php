@@ -69,7 +69,7 @@
         'disabled':{'title':'', 'type':"disable"},
         'name':{'title':'<?php echo _("Name"); ?>','type':"fixed"},
         'ctrl':{'title':'<?php echo _("Controller"); ?>','type':"fixed"},
-        'devices':{'title':'<?php echo _("Devices"); ?>','type':"devicelist"},
+        'devices':{'title':'<?php echo _("Devices"); ?>','type':"state-list"},
         // Actions
         'add-action':{'title':'', 'type':"icon-enabled", 'icon':'icon-plus-sign'},
         'scan-action':{'title':'', 'type':"icon-enabled", 'icon':'icon-search'},
@@ -89,9 +89,12 @@
 
     function update() {
         driver.list(function(data, textStatus, xhr) {
+            if (typeof data.success !== 'undefined' && !data.success) {
+                return;
+            }
             table.data = data;
-            
             table.draw();
+            
             if (table.data.length != 0) {
                 $("#driver-none").hide();
                 $("#driver-header").show();
@@ -115,7 +118,6 @@
     updaterStart(update, 5000);
 
     $("#table").bind("onEdit", function(e) {
-        
         updaterStart(update, 0);
     });
 
@@ -136,7 +138,6 @@
     });
 
     $("#table").bind("onResume", function(e) {
-        
         updaterStart(update, 5000);
     });
 
@@ -171,22 +172,20 @@
         }
     });
 
-    $("#table").on('click', '.device-label', function() {
+    $("#table").on('click', '.state-label', function() {
         // Get the ids of the clicked lable
         var driver = table.data[$(this).closest('td').attr('row')];
-        var ctrlid = driver['ctrlid'];
         var deviceid = $(this).data('id');
-
-        $('#driver-loader').show();
-        device.get(ctrlid, deviceid, function(result) {
-            device_dialog.loadConfig(result);
-            
-            $('#driver-loader').hide();
-        });
+        var devices = driver.devices;
+        for (var i in devices) {
+            if (devices[i].id == deviceid) {
+                device_dialog.loadConfig(devices[i]);
+                break;
+            }
+        }
     });
 
     $("#driver-new").on('click', function () {
-        
         driver_dialog.loadNew();
     });
 </script>

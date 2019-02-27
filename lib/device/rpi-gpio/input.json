@@ -1,8 +1,8 @@
 {
     "name": "Pin",
     "category": "Sensor",
-    "group": "Raspberry Pi (GPIO)",
-    "description": "Configuration for a Raspberry Pi pin as an input.",
+    "group": "GPIO (Raspberry Pi)",
+    "description": "Requires the <b>GPIO</b> driver to be installed.<br><br>Configuration for a Raspberry Pi pin as an input.",
 
     "driver": "rpi-gpio",
     "devices": [
@@ -38,20 +38,20 @@
                 "0":"Low",
                 "1":"High"
             },
-            "input": "<node>_state"
+            "input": "<node>*state"
         }
     ],
 
     "channels": [
         {
-            "name": "<node>_state",
+            "name": "<node>*state",
             "description": "Pin state",
             "logging": {"loggingInterval": 5000, "loggingMaxInterval": 60000},
             "configs": {"samplingInterval": 5000, "valueType":"BOOLEAN"},
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "State"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "State", "tag": "<name>"}
                 }
             ]
         }
@@ -59,8 +59,8 @@
 
     "feeds": [
         {
-            "name": "<node>",
-            "tag": "State",
+            "name": "State",
+            "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60"

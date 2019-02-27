@@ -1,5 +1,5 @@
-var muctablefields = 
-{
+var muctablefields = {
+
     'disable': {
         'draw': function(t,row,child_row,field) {
             var icon = "";
@@ -52,27 +52,11 @@ var muctablefields =
         }
     },
 
-    'driverlist': {
+    'state-list': {
         'draw': function (t,row,child_row,field) {
             var ctrlid = t.data[row]['id'];
-            var driverlist = t.data[row][field];
-            return list_format_driverlist(ctrlid, driverlist);
-        }
-    },
-
-    'devicelist': {
-        'draw': function (t,row,child_row,field) {
-            var ctrlid = t.data[row]['ctrlid'];
-            var devicelist = t.data[row][field];
-            return list_format_devicelist(ctrlid, devicelist);
-        }
-    },
-
-    'channellist': {
-        'draw': function (t,row,child_row,field) {
-            var ctrlid = t.data[row]['ctrlid'];
-            var channellist = t.data[row][field];
-            return list_format_channellist(ctrlid, channellist);
+            var items = t.data[row][field];
+            return list_format_states(ctrlid, items);
         }
     },
 
@@ -84,7 +68,8 @@ var muctablefields =
                 var state = t.data[row][field];
                 if (state !== 'CONNECTED' && state !== 'SAMPLING' && state !== 'LISTENING' && state !== 'VALID' && 
                         state !== 'READING' && state !== 'WRITING' && state !== 'STARTING_TO_LISTEN' && 
-                        state !== 'SCANNING_FOR_CHANNELS' && state !== 'NO_VALUE_RECEIVED_YET') {
+                        state !== 'SCANNING_FOR_CHANNELS' && state !== 'NO_VALUE_RECEIVED_YET' && 
+                        state !== 'DRIVER_UNAVAILABLE' && state !== 'LOADING') {
                     
                     errorstate = state;
                     break;
@@ -94,35 +79,23 @@ var muctablefields =
         }
     },
 
-    'group-devicelist': {
+    'group-state-list': {
         'draw': function(t,group,rows,field) {
             var out = "";
             for (i in rows) {
                 var row=rows[i];
                 var ctrlid = t.data[row]['ctrlid'];
-                var devicelist = t.data[row][field];
-                out += list_format_devicelist(ctrlid, devicelist, true);
-            }
-            return out;
-        }
-    },
-
-    'group-channellist': {
-        'draw': function(t,group,rows,field) {
-            var out = "";
-            for (i in rows) {
-                var row=rows[i];
-                var ctrlid = t.data[row]['ctrlid'];
-                var channellist = t.data[row][field];
-                out += list_format_devicelist(ctrlid, channellist, true);
+                var items = t.data[row][field];
+                out += list_format_states(ctrlid, items, true);
             }
             return out;
         }
     }
 }
 
-function list_format_state(state){
-
+function list_format_state(state) {
+	if (state === "") return "";
+    
     var color = "rgb(255,0,0)";
     if (state === 'CONNECTED' || 
             state === 'SAMPLING' || 
@@ -146,95 +119,77 @@ function list_format_state(state){
         color = "rgb(255,125,20)";
     }
     else if (state === 'LOADING' || 
-            state === 'SAMPLING_AND_LISTENING_DISABLED') {
+            state === 'SAMPLING_AND_LISTENING_DISABLED' ||
+            state === 'DRIVER_UNAVAILABLE') {
         
         color = "rgb(135,135,135)";
     }
     state = state.toLowerCase().split('_').join(' ');
-
+    
     return "<span style='color:"+color+";'>"+state+"</span>";
 }
 
-function list_format_driverlist(ctrlid, driverlist) {
+function list_format_states(ctrlid, items, group) {
+    if (group) return '';
 
     var out = '';
-    if (driverlist != null) {
-        for (var i = 0; i < driverlist.length; i++) {
-            var driver = driverlist[i];
-            var label = "<small>"+driver['id']+"</small>";
-            var title = "Driver "+driver['id'];
-            
-            var state = 'RUNNING';
-            if (!driver['running']) {
-                state = 'DRIVER_UNAVAILABLE';
+    if (items != null) {
+        for (var i = 0; i < items.length; i++) {
+            var item = items[i];
+            var label = "<small>"+item['id']+"</small>";
+            var title = item['id'];
+            if (typeof item['name'] !== 'undefined') {
+            	title = item['name'];
             }
-            else if (driver['disabled']) {
+            else if (typeof item['description'] !== 'undefined' && item['description'].length > 0) {
+            	title = item['description'];
+            }
+            
+            var state = 'DRIVER_UNAVAILABLE';
+            if (typeof item.state !== 'undefined') {
+            	state = item.state;
+            }
+            else if (item['disabled']) {
                 state = 'DISABLED';
             }
-            out += list_format_label(driver['id'], state, "driver", label, title, false);
+            else if (item['running']) {
+                state = 'RUNNING';
+            }
+            out += list_format_label(item['id'], state, label, title, false);
         }
     }
     return out;
 }
 
-function list_format_devicelist(ctrlid, devicelist, group) {
-
-    var out = '';
-    if (devicelist != null) {
-        for (var i = 0; i < devicelist.length; i++) {
-            var device = devicelist[i];
-            var label = "<small>"+device['id']+"</small>";
-            var title = "Device "+device['id'];
-            
-            out += list_format_label(device['id'], device['state'], "device", label, title, group);
-        }
-    }
-    return out;
-}
-
-function list_format_channellist(ctrlid, channellist, group) {
-
-    var out = '';
-    if (channellist != null) {
-        for (var i = 0; i < channellist.length; i++) {
-            var channel = channellist[i];
-            var record = channel['record'];
-            var label = "<small>"+channel['id']+"</small>";
-            var title = "Channel "+channel['id'];
-            
-            out += list_format_label(channel['id'], record['flag'], "channel", label, title, group);
-        }
-    }
-    return out;
-}
-
-function list_format_label(id, state, type, label, title, group) {
-    
+function list_format_label(id, state, label, title, group) {
     if (group) return '';
     
-    var labeltype = null;
-    if (state != null) {
+    var type = null;
+    if (state != null && state != '') {
         if (state === 'CONNECTING' || 
                 state === 'WAITING_FOR_CONNECTION_RETRY' || 
                 state === 'DISCONNECTING') {
             
-            labeltype = 'warning';
+            type = 'warning';
         }
-        else if (state === 'DELETED' || state === 'DISABLED' || 
-                state === 'DRIVER_UNAVAILABLE' || 
+        else if (state === 'DELETED' || 
+        		state === 'DISABLED' || 
                 state === 'SAMPLING_AND_LISTENING_DISABLED') {
             
-            labeltype = 'important';
+            type = 'important';
+        }
+        else if (state === 'DRIVER_UNAVAILABLE') {
+            type = 'default';
         }
         else {
-            labeltype = 'info';
+            type = 'info';
         }
         
         state = state.toLowerCase().split('_').join(' ');
         title += " (State: "+state+")";
     }
-    else labeltype = 'default';
+    else type = 'default';
 
-    var label = "<span class='label label-"+labeltype+"' title='"+title+"' style='cursor:pointer'>"+label+"</span> ";
-    return "<a class='"+type+"-label' data-id='"+id+"'>"+label+"</a>";
+    var label = "<span class='label label-"+type+"' title='"+title+"' style='cursor:pointer'>"+label+"</span> ";
+    return "<a class='state-label' data-id='"+id+"'>"+label+"</a>";
 }

@@ -5,7 +5,7 @@ GIT_BRANCH="stable"
 
 # Set the targeted location of the emonmuc framework and the emoncms webserver.
 # If a specified directory is empty, the component will be installed.
-#EMONCMS_DIR="/var/www/html/emoncms"
+#EMONCMS_DIR="/var/www/emoncms"
 EMONCMS_USER="www-data"
 EMONMUC_PORT=8080
 
@@ -84,10 +84,9 @@ install_emonmuc() {
     sleep 0.1
   done
 
-  if [ "$CLEAN" ] && [ -e "/var/tmp/emonmuc/setup/conf" ]; then
+  if [ "$CLEAN" ] && [ -e "$EMONMUC_TMP/conf" ]; then
     rm -rf "$EMONMUC_DIR"/conf
-    mv /var/tmp/emonmuc/setup/conf "$EMONMUC_DIR"/conf
-    rm -rf /var/tmp/emonmuc/setup
+    mv $EMONMUC_TMP/conf "$EMONMUC_DIR"/conf
   fi
   if [ -n "$EMONCMS_DIR" ]; then
     sudo -u $EMONCMS_USER ln -sf "$EMONMUC_DIR"/www/modules/channel "$EMONCMS_DIR"/Modules/
@@ -101,10 +100,9 @@ install_emonmuc() {
     php "$EMONMUC_DIR"/setup.php --dir "$EMONCMS_DIR" --apikey $API_KEY
     chown $EMONMUC_USER -R "$EMONMUC_DIR"/conf
   fi
-  systemctl stop emonmuc.service
-  sleep 10
+
   rm /var/log/emoncms/emonmuc* >/dev/null 2>&1
-  systemctl start emonmuc.service
+  systemctl restart emonmuc.service
 }
 
 install_emoncms() {
@@ -120,37 +118,39 @@ install_emoncms() {
   chmod 666 /var/log/emoncms/emoncms.log
 
   sudo git clone -b seal "https://github.com/isc-konstanz/emoncms.git" "$EMONCMS_DIR"
-  #sudo git clone -b $GIT_BRANCH $GIT_SERVER/emoncms.git "$EMONCMS_DIR"
   chown $EMONCMS_USER:root /var/log/emoncms/emoncms.log
   chown $EMONCMS_USER:root -R "$EMONCMS_DIR" /var/lib/emoncms
 
-  sudo -u $EMONCMS_USER git clone -b seal "https://github.com/isc-konstanz/device.git" $EMONCMS_DIR/Modules/device
-  #sudo -u $EMONCMS_USER git clone -b master $GIT_SERVER/device.git $EMONCMS_DIR/Modules/device
+  sudo -u $EMONCMS_USER git clone "https://github.com/isc-konstanz/emoncms-device.git" $EMONCMS_DIR/Modules/device
   sudo -u $EMONCMS_USER git clone -b $GIT_BRANCH $GIT_SERVER/graph.git $EMONCMS_DIR/Modules/graph
-  #sudo -u $EMONCMS_USER git clone -b $GIT_BRANCH $GIT_SERVER/app.git $EMONCMS_DIR/Modules/app
-  if [ "$EMONCMS_DIR" != "/var/www/html/emoncms" ]; then
-    sudo chown $EMONCMS_USER:root -R /var/www/html
-    sudo -u $EMONCMS_USER ln -sf "$EMONCMS_DIR" /var/www/html/emoncms
+  if [ "$EMONCMS_DIR" != "/var/www/emoncms" ]; then
+    chown $EMONCMS_USER:root -R /var/www
+    sudo -u $EMONCMS_USER ln -sf "$EMONCMS_DIR" /var/www/emoncms
   fi
 
+  if [ -f "/etc/apache2/sites-available/000-default.conf" ]; then
+    sed -i "s:.*DocumentRoot .*$:	DocumentRoot $(dirname ${EMONCMS_DIR}):" /etc/apache2/sites-available/000-default.conf
+  fi
   cp -f "$EMONMUC_DIR"/conf/emoncms.apache2.conf /etc/apache2/sites-available/emoncms.conf
   a2ensite emoncms
   systemctl reload apache2
 
-  if [ "$CLEAN" ] && [ -f "/var/tmp/emonmuc/setup/settings.php" ]; then
-    mv -f /var/tmp/emonmuc/setup/settings.php "$EMONCMS_DIR"/settings.php >/dev/null 2>&1
+  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq mariadb-server mariadb-client redis-server
 
-  else
-    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq mariadb-server mariadb-client redis-server
-
+  if ! mysql -uroot --execute="use emoncms"; then
     mysql -uroot --execute="\
 CREATE DATABASE emoncms DEFAULT CHARACTER SET utf8;\
 CREATE USER 'emoncms'@'localhost' IDENTIFIED BY 'emoncms';\
 GRANT ALL ON emoncms.* TO 'emoncms'@'localhost';"
-
+  fi
+  if [ "$CLEAN" ] && [ -f "$EMONMUC_TMP/settings.php" ]; then
+    mv -f $EMONMUC_TMP/settings.php "$EMONCMS_DIR"/settings.php >/dev/null 2>&1
+  else
     cp -f "$EMONMUC_DIR"/conf/emoncms.settings.php "$EMONCMS_DIR"/settings.php
     install_passwords
   fi
+  chown $EMONCMS_USER:root "$EMONCMS_DIR"/settings.php
+
   php "$EMONMUC_DIR"/lib/www/upgrade.php
 }
 
@@ -211,14 +211,16 @@ fi
 find_emonmuc_user
 
 if [ "$CLEAN" ]; then
-  mkdir -p /var/tmp/emonmuc/setup
-  mv -f "$EMONMUC_DIR"/conf /var/tmp/emonmuc/setup/ >/dev/null 2>&1
-  mv -f "$EMONCMS_DIR"/settings.php /var/tmp/emonmuc/setup/ >/dev/null 2>&1
+  EMONMUC_TMP="/var/tmp/emonmuc/setup"
+  mkdir -p $EMONMUC_TMP
+  mv -f "$EMONMUC_DIR"/conf $EMONMUC_TMP/ >/dev/null 2>&1
+  mv -f "$EMONCMS_DIR"/settings.php $EMONMUC_TMP/ >/dev/null 2>&1
   rm -rf "$EMONMUC_DIR" >/dev/null 2>&1
   rm -rf "$EMONCMS_DIR" >/dev/null 2>&1
   rm -rf /srv/www/emoncms* >/dev/null 2>&1
   rm -rf /var/www/emoncms* >/dev/null 2>&1
   rm -rf /var/www/html/emoncms* >/dev/null 2>&1
+  rm -rf /var/lib/emonmuc/device >/dev/null 2>&1
 fi
 
 if [ ! -d "$EMONMUC_DIR" ]; then

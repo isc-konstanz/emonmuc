@@ -2,14 +2,14 @@
     global $path;
 ?>
 
-<link href="<?php echo $path; ?>Modules/channel/Views/channel.css" rel="stylesheet">
 <link href="<?php echo $path; ?>Modules/muc/Views/muc.css" rel="stylesheet">
 <link href="<?php echo $path; ?>Modules/muc/Lib/tablejs/titatoggle-dist-min.css" rel="stylesheet">
+<link href="<?php echo $path; ?>Modules/channel/Views/channel.css" rel="stylesheet">
 <link href="<?php echo $path; ?>Modules/channel/Lib/groupjs/groups.css" rel="stylesheet">
 <script type="text/javascript" src="<?php echo $path; ?>Modules/channel/Lib/groupjs/groups.js"></script>
 <script type="text/javascript" src="<?php echo $path; ?>Modules/muc/Lib/configjs/config.js"></script>
-<script type="text/javascript" src="<?php echo $path; ?>Modules/channel/Views/device.js"></script>
-<script type="text/javascript" src="<?php echo $path; ?>Modules/channel/Views/channel.js"></script>
+<script type="text/javascript" src="<?php echo $path; ?>Modules/muc/Views/channel/channel.js"></script>
+<script type="text/javascript" src="<?php echo $path; ?>Modules/muc/Views/device/device.js"></script>
 
 <div class="view-container">
     <div id="channel-header" class="hide">
@@ -29,7 +29,8 @@
     <div id="channel-groups"></div>
     
     <div id="channel-footer" class="hide">
-        <button id="device-new" class="btn btn-small" >&nbsp;<i class="icon-plus-sign" ></i>&nbsp;<?php echo _('New device connection'); ?></button>
+        <button id="device-new" class="btn btn-small"><span class="icon-plus-sign"></span>&nbsp;<?php echo _('New device connection'); ?></button>
+        <a id="ctrl-config" class="btn btn-small" href="<?php echo $path; ?>muc/view"><span class="icon-cog"></span>&nbsp;<?php echo _('Controllers'); ?></a>
     </div>
     <div id="channel-loader" class="ajax-loader"></div>
 </div>
@@ -95,10 +96,7 @@ var selected = {};
 setTimeout(function() {
     device.list(function(result) {
         draw(result);
-        device.load();
-        channel.load();
         channel.records(drawRecords);
-        
         updaterStart();
     });
 }, 100);
@@ -153,7 +151,7 @@ function draw(result) {
     $("#channel-groups").empty();
     
     if (typeof result.success !== 'undefined' && !result.success) {
-        alert("Error:\n" + result.message);
+        //alert("Error:\n" + result.message);
         return;
     }
     else if (result.length == 0) {
@@ -166,7 +164,6 @@ function draw(result) {
     }
     devices = {};
     channels = {};
-    records = {};
     
     $("#channel-header").show();
     $("#channel-actions").show();
@@ -202,11 +199,14 @@ function drawDevice(device) {
         for (var i in device.channels) {
             var channel = device.channels[i];
             var channelid = 'channel-muc'+channel.ctrlid+'-'+channel.id.toLowerCase().replace(/[_.:/]/g, '-');
-            
             channels[channelid] = channel;
-            records[channelid] = { 'configs': { 'valueType': channel.configs.valueType },
-                    'flag': channel.flag, 'time': channel.time, 'value': channel.value };
             
+            if (typeof channel.time !== 'undefined' || 
+                    typeof records[channelid] === 'undefined') {
+                
+                records[channelid] = { 'configs': { 'valueType': channel.configs.valueType },
+                        'flag': channel.flag, 'time': channel.time, 'value': channel.value };
+            }
             if (typeof selected[channelid] === 'undefined') {
                 selected[channelid] = false;
             }
@@ -723,9 +723,9 @@ function registerEvents() {
             var id = $(self).closest('.group-item').data('id');
             
             var value = null;
-            if (typeof records[id] !== 'undefined') {
+            if (typeof records[id] !== 'undefined' && typeof records[id].value !== 'undefined') {
                 value = records[id].value;
-                if (!isNaN(value)) {
+                if (value != null && !isNaN(value)) {
                     value = value.toFixed(3);
                 }
             }

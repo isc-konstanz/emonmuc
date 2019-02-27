@@ -1,12 +1,11 @@
-var config =
-{
-    'container': null,
+var config = {
+    container: null,
 
-    'groups': {},
-    'options': null,
-    'infos': null,
+    groups: {},
+    options: null,
+    infos: null,
 
-    'load':function(parent, groups) {
+    load: function(parent, groups) {
         this.groups = groups;
         this.options = null;
         this.infos = null;
@@ -40,7 +39,7 @@ var config =
         });
     },
 
-    'draw':function(options, infos) {
+    draw: function(options, infos) {
         if (options == null) options = {};
         this.options = options;
         
@@ -57,7 +56,7 @@ var config =
             
             // If group option is a String, parse it depending on its syntax info
             if (typeof options[group] === 'string' || options[group] instanceof String) {
-                this.decode(group);
+            	this.options[group] = this.decode(group, options[group]);
             }
         }
         this.drawOptions();
@@ -65,7 +64,7 @@ var config =
         $('#option-overlay', config.container).hide();
     },
 
-    'drawOptions':function() {
+    drawOptions: function() {
         var select = $('#option-select', config.container);
         select.html('<option hidden="true" value="">Select an option</option></optgroup>').val('');
         select.css('color', '#888').css('font-style', 'italic');
@@ -106,7 +105,7 @@ var config =
         config.registerEvents();
     },
 
-    'drawOptionGroup':function(group, select) {
+    drawOptionGroup: function(group, select) {
         $('#option-'+group+'-table', config.container).empty();
         
         // Show options, if at least one of them is defined or mandatory
@@ -145,7 +144,7 @@ var config =
         }
     },
 
-    'drawOptionInput':function(group, info) {
+    drawOptionInput: function(group, info) {
         var key = info['key'];
         var name = info['name'];
         if (typeof name === 'undefined') {
@@ -236,7 +235,7 @@ var config =
         }
     },
 
-    'registerEvents':function() {
+    registerEvents: function() {
         $('#options', config.container).off();
 
         $('#options', config.container).on("click", '.option-header', function() {
@@ -331,7 +330,7 @@ var config =
             
             var group = value.data('group');
             var key = value.val();
-            if (key != "" && $("#option-"+group+"-"+key+"-row").val() === undefined) {
+            if (key != "" && $("#option-"+group+"-"+key+"-row", config.container).val() === undefined) {
                 value.remove();
                 
                 var info = config.infos[group].options.find(function(result) {
@@ -365,7 +364,7 @@ var config =
         });
     },
 
-    'get':function(group) {
+    get: function(group) {
         var options = {};
         if (typeof config.infos[group] !== 'undefined') {
             for (var i = 0; i < config.infos[group].options.length; i++) {
@@ -393,43 +392,54 @@ var config =
         return options;
     },
 
-    'decode':function(group) {
-        if (typeof config.options[group] !== 'undefined') {
-            var infos = config.infos[group]['options']
-            var syntax = config.infos[group]['syntax']
-            
-            if (!syntax['keyValue']) {
-                var optMandatoryCount = 0;
-                for (var i = 0; i < infos.length; i++) {
-                    if (infos[i]['mandatory']) optMandatoryCount++;
-                }
+    decode: function(group, options) {
+        var infos = config.infos[group]['options']
+        var syntax = config.infos[group]['syntax']
+        
+        if (!syntax['keyValue']) {
+            var optMandatoryCount = 0;
+            for (var i = 0; i < infos.length; i++) {
+                if (infos[i]['mandatory']) optMandatoryCount++;
             }
+        }
+        
+        var optList = {};
+        var optArr = options.split(syntax['separator']);
+        for (var p = 0, i = 0; i < infos.length && p < optArr.length; i++) {
+            optInfo = infos[i];
             
-            var optList = {};
-            var optArr = config.options[group].split(syntax['separator']);
-            for (var p = 0, i = 0; i < infos.length && p < optArr.length; i++) {
-                optInfo = infos[i];
-
-                if (syntax['keyValue']) {
-                    var keyValue = optArr[p].split(syntax['assignment']);
+            if (syntax['keyValue']) {
+            	var keyValue;
+            	if (syntax['separator'] != syntax['assignment']) {
+            		var keyValue = optArr[p].split(syntax['assignment']);
                     if (optInfo.key === keyValue[0]) {
                         optList[optInfo.key] = keyValue[1];
                         p++;
                     }
-                }
-                else {
-                    if (optInfo['mandatory'] || optArr.length > optMandatoryCount) {
-                        optList[optInfo.key] = optArr[p];
-                        p++;
+            	}
+            	else {
+            		var key = optArr[p];
+            		var value = optArr[p+1];
+            		if (optInfo.key === key) {
+                        optList[optInfo.key] = value;
+                        p += 2;
                     }
+            	}
+            }
+            else {
+                if (optInfo['mandatory'] || optArr.length > optMandatoryCount) {
+                    optList[optInfo.key] = optArr[p];
+                    p++;
                 }
             }
-            config.options[group] = optList;
         }
+        return optList;
     },
 
-    'encode':function(group) {
-        var options = config.get(group);
+    encode: function(group, options) {
+    	if (typeof options === 'undefined') {
+    		options = config.get(group);
+    	}
         if (Object.keys(options).length > 0) {
             var optArr = [];
             // Add options in the defined order of the information
@@ -454,7 +464,7 @@ var config =
         return "";
     },
 
-    'valid':function() {
+    valid: function() {
         for (var group in config.groups) {
             if (config.groups.hasOwnProperty(group)) {
                 var options = config.get(group);
