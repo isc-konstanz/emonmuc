@@ -66,7 +66,7 @@ Create a *New device* in the device view and select its type **Control > GPIO (R
 
 **Caution**: Pins are sorted according to the [WiringPi Pin Numbering Scheme](http://pi4j.com/pin-numbering-scheme.html). This might be different to the numbering you know from former projects!
 
-![device config](img/rpi-gpio/configure-device.png)
+![device config](img/rpi-gpio/device-config.png)
 
 If done, click **Save and Initialize**. 
 

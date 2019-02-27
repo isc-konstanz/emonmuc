@@ -1,4 +1,4 @@
-![preparation](img/modbus/setup-hardware.png)
+![preparation](img/modbus/modbus-prepare.png)
 
 This document describes the configuration and control of a Modbus Single Phase Energy Meter with emonmuc (**E**nergy **mon**itoring **M**ulty **U**tility **C**ommunication controller).
 
@@ -31,7 +31,6 @@ Then plug the whole construction in a socket and check the Meter, if it is worki
 The last thing you need is a converter to transfer the data measured to the Raspberry. The one we use is a USB to serial RS485 converter from Digitus. 
 Then simply connect the converter to the Energy Meter via a three strings cable and plug in the converter into an USB slot of the raspberry. 
 
-![setup complete](img/modbus/setup-complete.jpg)
 
 # Preparing the Raspberry
 
@@ -53,9 +52,9 @@ Now create a new device and select **Meter > EASTRON > SDM230-M**. Choose a key 
 The UnidID in our case is 1 and can be found out when activating the Energy Meter as said in the beginning.
 When done click **Save & Initialize**
 
-![configure device](img/modbus/configure-device.png)
+![configure device](img/modbus/device-config.png)
 
 Go to Channels and have a look if the Energy Meter is getting some values. The values are getting measured every minute so be a bit patient. Also check in the Channels config-Menue wether the baud rate of the Energy Meter and the one given in the default settings are the same. When everything has been done correcty, the Channels view should look something like this: 
 
-![modbus channels](img/modbus/channels.png)
+![modbus channels](img/modbus/channel-view.png)
 
