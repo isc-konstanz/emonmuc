@@ -156,4 +156,4 @@ Click **New controller** and confirm the default settings, if the framework is r
 
 Energy meters and other utility devices connected to the platform can now be configured in the **Channels** site.
 
-To learn about the features of EmonMUC, a [First Steps guide](https://github.com/isc-konstanz/emonmuc/blob/master/doc/FirstSteps.md) was documented and may be followed.
+To learn about the features of EmonMUC, a [First Steps guide](FirstSteps.md) was documented and may be followed.

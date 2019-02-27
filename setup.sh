@@ -128,6 +128,9 @@ install_emoncms() {
     sudo -u $EMONCMS_USER ln -sf "$EMONCMS_DIR" /var/www/emoncms
   fi
 
+  if [ -f "/etc/apache2/sites-available/000-default.conf" ]; then
+    sed -i "s:.*DocumentRoot .*$:	DocumentRoot $(dirname ${EMONCMS_DIR}):" /etc/apache2/sites-available/000-default.conf
+  fi
   cp -f "$EMONMUC_DIR"/conf/emoncms.apache2.conf /etc/apache2/sites-available/emoncms.conf
   a2ensite emoncms
   systemctl reload apache2
