@@ -1,0 +1,124 @@
+{
+    "name": "A1500 (Import/Export)",
+    "category": "Meter",
+    "group": "Elster",
+    "description": "A1500 bidirectional domestic supply meter",
+
+    "driver": "iec62056p21",
+    "devices": [
+        {
+		    "name": "serial<serialPort>",
+            "description": "Serial port",
+            "settings": "baudrate:9600"
+        }
+    ],
+
+    "options": [
+        {
+            "id": "serialPort",
+            "name": "Serial port",
+            "description": "The physical device address to uniquely identify a physical smart meter.<br><br><b>Example:</b><ol><li><b>Linux</b>: /dev/ttyS0 or /dev/ttyUSB0</li><li><b>Windows</b>: COM1</li></ol>",
+            "type": "text",
+            "mandatory": true,
+            "syntax": "deviceAddress"
+        },
+        {
+            "id": "address",
+            "name": "Device address",
+            "description": "The address to uniquely identify a device, representing an IEC62056-21 slave.<br>For many devices, this is a number that can be read off a label on the meter.<br><br><i>If left empty, a single meter can be addressed without an identifier.<i>",
+            "type": "text",
+            "mandatory": false,
+            "syntax": "deviceAddress"
+        },
+        {
+            "id": "import",
+            "name": "Import OBIS code",
+            "description": "The OBIS code of the import register in the format A-B:C.D.E*F or an older EDIS code of the format C.D.E. that specifies exactly what the value of this data set represents.<br> C is the type of the measured quantity (e.g 1 = positive active power), D describes the measurement mode and E is the tariff (e.g. 0 for total or 1 for tariff 1 only) associated with this value.",
+            "type": "text",
+            "default": "1.8.0",
+            "mandatory": false
+        },
+        {
+            "id": "export",
+            "name": "Export OBIS code",
+            "description": "The OBIS code of the export register in the format A-B:C.D.E*F or an older EDIS code of the format C.D.E. that specifies exactly what the value of this data set represents.<br> C is the type of the measured quantity (e.g 1 = positive active power), D describes the measurement mode and E is the tariff (e.g. 0 for total or 1 for tariff 1 only) associated with this value.",
+            "type": "text",
+            "default": "2.8.0",
+            "mandatory": false
+        },
+        {
+            "id": "timeOffset",
+            "name": "Time offset",
+            "description": "The time waited in milliseconds, until the serial connection will be used. Necessary for multiple meters on the same line.",
+            "type": "text",
+            "default": 0,
+            "mandatory": false
+        }
+    ],
+
+    "channels": [
+        {
+            "name": "<node>*import",
+            "address": "<import>",
+            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 900000 },
+            "configs": {"samplingInterval": 60000, "samplingTimeOffset": "<timeOffset>", "valueType":"DOUBLE", "unit": "kWh"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Energy import", "tag": "<name>"}
+                },
+                {
+                    "process": "kwh_to_power",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Power import", "tag": "<name>"}
+                }
+            ]
+        },
+        {
+            "name": "<node>*export",
+            "address": "<export>",
+            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 900000 },
+            "configs": {"samplingInterval": 60000, "samplingTimeOffset": "<timeOffset>", "valueType":"DOUBLE", "unit": "kWh"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Energy export", "tag": "<name>"}
+                },
+                {
+                    "process": "kwh_to_power",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Power export", "tag": "<name>"}
+                }
+            ]
+        }
+    ],
+
+    "feeds": [
+        {
+            "name": "Energy import",
+            "tag": "<name>",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "kWh"
+        },
+        {
+            "name": "Power import",
+            "tag": "<name>",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "W"
+        },
+        {
+            "name": "Energy export",
+            "tag": "<name>",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "kWh"
+        },
+        {
+            "name": "Power export",
+            "tag": "<name>",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "W"
+        }
+    ]
+}
