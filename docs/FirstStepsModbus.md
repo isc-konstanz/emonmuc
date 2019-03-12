@@ -31,7 +31,7 @@ If the serial port is not connected to the Raspberry Pi via e.g. an USB interfac
 For this simple demonstration, an EASTRON SDM230 Modbus RTU single phase energy meter was used, additional to a serial RS485 converter from Digitus.
 This guide tries to encourage to use any modbus device though, to get accustomed with 
 
-![modbus-prepare](img/modbus/modbus-prepare.png)
+<img src="img/modbus/modbus-prepare.png" height="350"> <img src="img/modbus/modbus-setup.jpg" height="350">
 
 
 # 2 Configure Channels
@@ -74,14 +74,20 @@ To address the *Input Register* for Active Power 30013, the address 12 has to be
 
 ## 2.2 Device connections
 
-Independent of emoncms devices, connections may represent e.g. separate metering units or a cable bus system, depending on its protocol driver. For the modbus driver, a connection represents the serial RTU or the converter. Each connection can configure several channels.
+Independent of emoncms devices, connections may represent e.g. separate metering units or a cable bus system, depending on its protocol driver. For the modbus driver, a connection represents the serial RTU or the converter:
 
-![connect-config](img/modbus/connect-config.png)
+![connect-config](img/modbus/connect-config.jpg)
+
+Here, the baudrate or parity can be changed if necessary, or even configured to use modbus TCP/IP.  
+Each connection can configure several channels.
 
 
 ## 2.3 Channels
 
-Channels represents single data points, representing e.g. the metered active power of a smart meter, the temperature of a temperature sensor, any value of digital or analog I/O modules or the manufacture data of the device.
+Channels represent single data points, e.g. the metered active power of a smart meter, the temperature of a temperature sensor, any value of digital or analog I/O modules or the manufacture data of the device.
 
-![channel-config](img/modbus/channel-config.png)
+![channel-config](img/modbus/channel-config.jpg)
+
+Each channel that is configured to post data to emoncms, will automatically have an input with the same key associated. Its node and posting time interval needs to be configured manually.  
+The *post interval* is independent of the *sampling interval* though and a channel can be configured to e.g. read new values every 15 seconds, while posting them once per minute to the emoncms database.
 
