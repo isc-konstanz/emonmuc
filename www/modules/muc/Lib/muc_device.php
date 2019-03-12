@@ -120,10 +120,12 @@ abstract class ControllerDevice {
         else {
             $newid = $id;
         }
-        if (empty($device['driverid'])) {
-            $result = $this->get_redis($newid);
-            $device['driverid'] = $result['driverid'];
-            $device['driver'] = $result['driver'];
+        if (!isset($device['disabled']) || empty($device['driverid'])) {
+            $result = $this->get_redis($id);
+            
+            if (!isset($device['disabled'])) $device['disabled'] = $result['disabled'];
+            if (empty($device['driverid']))$device['driverid'] = $result['driverid'];
+            if (empty($device['driver']))$device['driver'] = $result['driver'];
         }
         $driver = $device['driverid'];
         

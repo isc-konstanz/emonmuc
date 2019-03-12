@@ -12,6 +12,7 @@
 defined('EMONCMS_EXEC') or die('Restricted access');
 
 require_once "Modules/device/device_template.php";
+require_once "Modules/muc/muc_model.php";
 
 class MucTemplate extends DeviceTemplate {
     const DIR_DEFAULT = "/var/lib/emonmuc/";
@@ -20,8 +21,6 @@ class MucTemplate extends DeviceTemplate {
 
     function __construct(&$parent) {
         parent::__construct($parent);
-        
-        require_once "Modules/muc/muc_model.php";
         $this->ctrl = new Controller($this->mysqli, $this->redis);
     }
 
@@ -268,12 +267,16 @@ class MucTemplate extends DeviceTemplate {
     private function create_devices($ctrlid, $devices) {
         $ctrl = $this->ctrl->get($ctrlid);
         foreach ($devices as $device) {
-            $result = $this->ctrl->device($ctrl)->create($device->driver, json_encode($device));
-            if (isset($result['success']) && $result['success'] == false) {
-                if (strpos($result['message'], 'already exists') !== false) {
-                    return array('success'=>true, 'message'=>'Devices already created');
+            try {
+                $result = $this->ctrl->device($ctrl)->create($device->driver, json_encode($device));
+                if (isset($result['success']) && $result['success'] == false) {
+                    return $result;
                 }
-                return $result;
+            }
+            catch(ControllerException $e) {
+                if (stristr($e->getMessage(), 'already exists') === false) {
+                    return $e->getResult();
+                }
             }
         }
         return array('success'=>true, 'message'=>'Devices successfully created');
@@ -306,12 +309,16 @@ class MucTemplate extends DeviceTemplate {
                 $deviceid = $devices{0}->id;
                 $driverid = $devices{0}->driver;
             }
-            
-            $result = $this->ctrl->channel($ctrl)->create($driverid, $deviceid, json_encode($configs));
-            if (isset($result['success']) && $result['success'] == false &&
-                   strpos($result['message'], 'already exists') === false) {
-                
-                return $result;
+            try {
+                $result = $this->ctrl->channel($ctrl)->create($driverid, $deviceid, json_encode($configs));
+                if (isset($result['success']) && $result['success'] == false) {
+                    return $result;
+                }
+            }
+            catch(ControllerException $e) {
+                if (stristr($e->getMessage(), 'already exists') === false) {
+                    return $e->getResult();
+                }
             }
         }
         return array('success'=>true, 'message'=>'Channels successfully created');
@@ -358,15 +365,17 @@ class MucTemplate extends DeviceTemplate {
             else {
                 $id = $device['nodeid'];
             }
-            if (!$this->ctrl->device($ctrl)->exist($id)) {
-                return array('success'=>false, 'message'=>"Unable to rename unexisting device: $id");
+            if (!$this->ctrl->device($ctrl)->exists($id)) {
+                continue;
             }
             $configs = $this->parse_device($update['nodeid'], $this->prepare_json($update, $template, json_encode($d)),
                 $template, $update['options']);
             
-            $result = $this->ctrl->device($ctrl)->update($id, json_encode($configs));
-            if (isset($result['success']) && $result['success'] == false) {
-                return $result;
+            try {
+                $this->ctrl->device($ctrl)->update($id, json_encode($configs));
+            }
+            catch(ControllerException $e) {
+                // Do nothing
             }
         }
     }
@@ -376,15 +385,17 @@ class MucTemplate extends DeviceTemplate {
         foreach($template->channels as $c) {
             $id = $this->prepare_str($device, $template, $c->name);
             
-            if ($this->ctrl->channel($ctrl)->exist($id)) {
-                $channel = $this->prepare_json($update, $template, json_encode($c));
-                $configs = $this->parse_channel($update['nodeid'], $channel, $template, $update['options']);
-                $configs->id = $configs->name;
-                
-                $result = $this->ctrl->channel($ctrl)->update($device['nodeid'], $id, json_encode($configs));
-                if (isset($result['success']) && $result['success'] == false) {
-                    return $result;
-                }
+            if (!$this->ctrl->channel($ctrl)->exists($id)) {
+                continue;
+            }
+            $channel = $this->prepare_json($update, $template, json_encode($c));
+            $configs = $this->parse_channel($update['nodeid'], $channel, $template, $update['options']);
+            $configs->id = $configs->name;
+            try {
+                $this->ctrl->channel($ctrl)->update($id, $device['nodeid'], json_encode($configs));
+            }
+            catch(ControllerException $e) {
+                // Do nothing
             }
         }
     }

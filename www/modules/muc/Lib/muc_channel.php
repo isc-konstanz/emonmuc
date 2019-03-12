@@ -166,8 +166,12 @@ abstract class ControllerChannel {
             $newid = $id;
         }
         
-        if (empty($channel['driverid']) || empty($channel['deviceid'])) {
-            $channel = $this->channel()->get($newid);
+        if (!isset($channel['disabled']) || empty($channel['deviceid']) || empty($channel['driverid'])) {
+            $result = $this->get_redis($id);
+            
+            if (!isset($channel['disabled'])) $channel['disabled'] = $result['disabled'];
+            if (empty($channel['driverid'])) $channel['driverid'] = $result['driverid'];
+            if (empty($channel['deviceid'])) $channel['deviceid'] = $result['deviceid'];
         }
         $driver = $channel['driverid'];
         $device = $channel['deviceid'];
@@ -287,7 +291,7 @@ abstract class ControllerChannel {
         $channel['configs'] = $configs;
         
         $record = $details['record'];
-        $channel['time'] = isset($record['timestamp']) ? $record['timestamp'] : null; // TODO: round($record['timestamp']/1000) : null;
+        $channel['time'] = isset($record['timestamp']) ? $record['timestamp'] : null; // round($record['timestamp']/1000) : null;
         $channel['value'] = isset($record['value']) ? $record['value'] : null;
         $channel['flag'] = $record['flag'];
         $channel['state'] = $details['state'];
@@ -314,7 +318,7 @@ abstract class ControllerChannel {
             'userid'=>$this->ctrl['userid'],
             'ctrlid'=>$this->ctrl['id'],
             'id'=>$details['id'],
-            'time'=>isset($record['timestamp']) ? $record['timestamp'] : null, // TODO: round($record['timestamp']/1000) : null,
+            'time'=>isset($record['timestamp']) ? $record['timestamp'] : null, // round($record['timestamp']/1000) : null,
             'value'=>isset($record['value']) ? $record['value'] : null,
             'flag'=>$record['flag'],
             'configs'=>array('valueType'=>$type),
