@@ -71,8 +71,13 @@ class MucScan extends DeviceScan {
             $this->redis->hMSet("user#$userid:device:$type", $options); // Temporary availability of auth for device ip address
             $this->redis->expire("user#$userid:device:$type", 600);     // Expire after 10 minutes
         }
-        return $this->parse_progress($userid, $ctrlid, $type, $template, 
-            $this->ctrl->device($ctrl)->scan_start($driverid, $settings));
+        try {
+            return $this->parse_progress($userid, $ctrlid, $type, $template,
+                $this->ctrl->device($ctrl)->scan_start($driverid, $settings));
+            
+        } catch(ControllerException $e) {
+            return $e->getResult();
+        }
     }
 
     public function progress($userid, $type) {
@@ -97,9 +102,13 @@ class MucScan extends DeviceScan {
         }
         $ctrlid = intval($options['ctrlid']);
         $ctrl = $this->ctrl->get($ctrlid);
-        
-        return $this->parse_progress($userid, $ctrlid, $type, $result, 
-            $this->ctrl->device($ctrl)->scan_progress($driverid));
+        try {
+            return $this->parse_progress($userid, $ctrlid, $type, $result,
+                $this->ctrl->device($ctrl)->scan_progress($driverid));
+            
+        } catch(ControllerException $e) {
+            return $e->getResult();
+        }
     }
 
     public function cancel($userid, $type) {
@@ -121,8 +130,12 @@ class MucScan extends DeviceScan {
         }
         $ctrlid = intval($options['ctrlid']);
         $ctrl = $this->ctrl->get($ctrlid);
-        
-        return $this->ctrl->device($ctrl)->scan_cancel($driverid);
+        try {
+            return $this->ctrl->device($ctrl)->scan_cancel($driverid);
+            
+        } catch(ControllerException $e) {
+            return $e->getResult();
+        }
     }
 
     protected function get_template($type) {
