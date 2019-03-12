@@ -12,6 +12,7 @@
 defined('EMONCMS_EXEC') or die('Restricted access');
 
 require_once "Modules/device/device_thing.php";
+require_once "Modules/muc/muc_model.php";
 
 class MucThing extends DeviceThing {
     const DIR_DEFAULT = "/var/lib/emonmuc/";
@@ -21,8 +22,6 @@ class MucThing extends DeviceThing {
     // Module required constructor, receives parent as reference
     public function __construct(&$parent) {
         parent::__construct($parent);
-        
-        require_once "Modules/muc/muc_model.php";
         $this->ctrl = new Controller($this->mysqli, $this->redis);
     }
 

@@ -9,11 +9,11 @@ GIT_BRANCH="stable"
 EMONCMS_USER="www-data"
 EMONMUC_PORT=8080
 
-
 if [[ $EUID -ne 0 ]]; then
   echo "Please make sure to run the emonmuc setup as root user"
   exit 1
 fi
+echo "Starting emonmuc setup"
 
 if type -p java >/dev/null 2>&1; then
   JAVA_CMD=java
@@ -95,14 +95,16 @@ install_emonmuc() {
 
     # Wait a while for the server to be available.
     # TODO: Explore necessity. May be necessary for Raspberry Pi V1
+    printf "Finishing emonmuc setup\nPlease wait..."
     sleep 10
 
     php "$EMONMUC_DIR"/setup.php --dir "$EMONCMS_DIR" --apikey $API_KEY
     chown $EMONMUC_USER -R "$EMONMUC_DIR"/conf
   fi
-
   rm /var/log/emoncms/emonmuc* >/dev/null 2>&1
+
   systemctl restart emonmuc.service
+  echo "Setup complete"
 }
 
 install_emoncms() {
@@ -174,8 +176,6 @@ FLUSH PRIVILEGES;"
   echo "root:$SQL_ROOT" >> "$EMONMUC_DIR"/setup.conf
   echo "emoncms:$SQL_EMONMUC_USER" >> "$EMONMUC_DIR"/setup.conf
 }
-
-echo "Starting emonmuc setup"
 
 API_KEY=""
 while [[ $# -gt 0 ]]; do
