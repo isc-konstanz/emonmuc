@@ -25,12 +25,6 @@ class Muc_ProcessList
         $this->redis = &$parent->redis;
         $this->feed = &$parent->feed;
         
-        require_once "Modules/muc/muc_model.php";
-        $ctrl = new Controller($this->mysqli, $this->redis);
-        
-        require_once "Modules/muc/Models/channel_model.php";
-        $this->channel = new Channel($ctrl, $this->mysqli, $this->redis);
-        
         $this->log = new EmonLogger(__FILE__);
     }
 

@@ -12,27 +12,21 @@
 defined('EMONCMS_EXEC') or die('Restricted access');
 
 require_once "Modules/device/device_scan.php";
+require_once "Modules/muc/muc_model.php";
 
-class MucScan extends DeviceScan
-{
-    const DEFAULT_DIR = "/var/lib/emonmuc/";
+class MucScan extends DeviceScan {
+    const DIR_DEFAULT = "/var/lib/emonmuc/";
 
     const DEVICE_ADDRESS = "deviceAddress";
     const DEVICE_SETTINGS = "deviceSettings";
     const DEVICE_SCAN_SETTINGS = "deviceScanSettings";
 
-    protected $ctrl;
-    protected $device;
+    private $ctrl;
 
     // Module required constructor, receives parent as reference
     public function __construct(&$parent) {
         parent::__construct($parent);
-        
-        require_once "Modules/muc/muc_model.php";
         $this->ctrl = new Controller($this->mysqli, $this->redis);
-        
-        require_once "Modules/muc/Models/device_model.php";
-        $this->device = new DeviceConnection($this->ctrl);
     }
 
     public function start($userid, $type, $options) {
@@ -49,6 +43,7 @@ class MucScan extends DeviceScan
             return array('success'=>false, 'message'=>'Unspecified controller ID in device options.');
         }
         $ctrlid = intval($options['ctrlid']);
+        $ctrl = $this->ctrl->get($ctrlid);
         
         $settings = "";
         if (isset($template->options)) {
@@ -75,8 +70,13 @@ class MucScan extends DeviceScan
             $this->redis->hMSet("user#$userid:device:$type", $options); // Temporary availability of auth for device ip address
             $this->redis->expire("user#$userid:device:$type", 600);     // Expire after 10 minutes
         }
-        return $this->parse_progress($userid, $ctrlid, $type, $template, 
-            $this->device->scan_start($ctrlid, $driverid, $settings));
+        try {
+            return $this->parse_progress($userid, $ctrlid, $type, $template,
+                $this->ctrl->device($ctrl)->scan_start($driverid, $settings));
+            
+        } catch(ControllerException $e) {
+            return $e->getResult();
+        }
     }
 
     public function progress($userid, $type) {
@@ -100,9 +100,14 @@ class MucScan extends DeviceScan
             return array('success'=>false, 'message'=>'Unspecified controller ID in device options.');
         }
         $ctrlid = intval($options['ctrlid']);
-        
-        return $this->parse_progress($userid, $ctrlid, $type, $result, 
-            $this->device->scan_progress($ctrlid, $driverid));
+        $ctrl = $this->ctrl->get($ctrlid);
+        try {
+            return $this->parse_progress($userid, $ctrlid, $type, $result,
+                $this->ctrl->device($ctrl)->scan_progress($driverid));
+            
+        } catch(ControllerException $e) {
+            return $e->getResult();
+        }
     }
 
     public function cancel($userid, $type) {
@@ -123,8 +128,13 @@ class MucScan extends DeviceScan
             return array('success'=>false, 'message'=>'Unspecified controller ID in device options.');
         }
         $ctrlid = intval($options['ctrlid']);
-        
-        return $this->device->scan_cancel($ctrlid, $driverid);
+        $ctrl = $this->ctrl->get($ctrlid);
+        try {
+            return $this->ctrl->device($ctrl)->scan_cancel($driverid);
+            
+        } catch(ControllerException $e) {
+            return $e->getResult();
+        }
     }
 
     protected function get_template($type) {
@@ -145,7 +155,7 @@ class MucScan extends DeviceScan
             $muc_template_dir = $muc_settings['libdir'];
         }
         else {
-            $muc_template_dir = self::DEFAULT_DIR;
+            $muc_template_dir = self::DIR_DEFAULT;
         }
         if (substr($muc_template_dir, -1) !== "/") {
             $muc_template_dir .= "/";

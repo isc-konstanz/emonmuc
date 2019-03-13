@@ -12,23 +12,17 @@
 defined('EMONCMS_EXEC') or die('Restricted access');
 
 require_once "Modules/device/device_thing.php";
+require_once "Modules/muc/muc_model.php";
 
-class MucThing extends DeviceThing
-{
-    const DEFAULT_DIR = "/var/lib/emonmuc/";
+class MucThing extends DeviceThing {
+    const DIR_DEFAULT = "/var/lib/emonmuc/";
 
-    protected $ctrl;
-    protected $channel;
+    private $ctrl;
 
     // Module required constructor, receives parent as reference
     public function __construct(&$parent) {
         parent::__construct($parent);
-        
-        require_once "Modules/muc/muc_model.php";
         $this->ctrl = new Controller($this->mysqli, $this->redis);
-        
-        require_once "Modules/muc/Models/channel_model.php";
-        $this->channel = new Channel($this->ctrl, $this->mysqli, $this->redis);
     }
 
     public function get_item_list($device) {
@@ -88,26 +82,28 @@ class MucThing extends DeviceThing
     }
 
     public function set_item($itemid, $mapping) {
-        if (isset($mapping['ctrlid']) && isset($mapping['channelid']) && isset($mapping['value'])) {
-            $ctrlid = intval($mapping['ctrlid']);
-            
-            if (isset($mapping['valueType'])) {
-                $valueType = $mapping['valueType'];
-            }
-            else $valueType = null;
-            
+        if (empty($mapping['ctrlid']) || empty($mapping['channelid']) || empty($mapping['value'])) {
+            return array('success'=>false, 'message'=>"Error while seting item value");
+        }
+        $ctrlid = intval($mapping['ctrlid']);
+        $ctrl = $this->ctrl->get($ctrlid);
+        
+        if (isset($mapping['valueType'])) {
+            $valueType = $mapping['valueType'];
+        }
+        else $valueType = null;
+        
+        try {
             if (isset($mapping['write']) && !$mapping['write']) {
-                $result = $this->channel->set($ctrlid, $mapping['channelid'], $mapping['value'], $valueType);
+                $this->ctrl->channel($ctrl)->set($mapping['channelid'], $mapping['value'], $valueType);
             }
             else {
-                $result = $this->channel->write($ctrlid, $mapping['channelid'], $mapping['value'], $valueType);
+                $this->ctrl->channel($ctrl)->write($mapping['channelid'], $mapping['value'], $valueType);
             }
-            if (isset($result['success']) && $result['success'] == false) {
-                return $result;
-            }
-            return array('success'=>true, 'message'=>"Item value set");
+        } catch(ControllerException $e) {
+            return array('success'=>false, 'message'=>"Error while seting item value: ".$e->getMessage());
         }
-        return array('success'=>false, 'message'=>"Error while seting item value");
+        return array('success'=>true, 'message'=>"Item value set");
     }
 
     protected function get_template($device) {
@@ -155,24 +151,11 @@ class MucThing extends DeviceThing
             $muc_template_dir = $muc_settings['libdir'];
         }
         else {
-            $muc_template_dir = self::DEFAULT_DIR;
+            $muc_template_dir = self::DIR_DEFAULT;
         }
         if (substr($muc_template_dir, -1) !== "/") {
             $muc_template_dir .= "/";
         }
         return $muc_template_dir."device/";
-    }
-
-    protected function get_ctrl_id($userid, $name, $driver) {
-        require_once "Modules/muc/Models/device_model.php";
-        $device = new DeviceConnection($this->ctrl);
-        
-        $devices = $device->get_list($userid);
-        foreach($devices as $d) {
-            if ($d['id'] == $name && $d['driverid'] == $driver) {
-                return intval($d['ctrlid']);
-            }
-        }
-        return null;
     }
 }

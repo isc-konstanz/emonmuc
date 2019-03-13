@@ -1,10 +1,10 @@
 var channel_dialog = {
-    'ctrlid': null,
-    'driverid': null,
-    'deviceid': null,
-    'channel': null,
+    ctrlid: null,
+    driverid: null,
+    deviceid: null,
+    channel: null,
 
-    'loadNew':function(device) {
+    loadNew: function(device) {
         if (device != null) {
             this.ctrlid = device.ctrlid;
             this.driverid = device.driverid;
@@ -20,7 +20,7 @@ var channel_dialog = {
         this.drawConfig();
     },
 
-    'loadConfig': function(channel) {
+    loadConfig: function(channel) {
         this.ctrlid = null;
         this.driverid = null;
         this.deviceid = null;
@@ -29,7 +29,7 @@ var channel_dialog = {
         this.drawConfig();
     },
 
-    'drawConfig':function() {
+    drawConfig: function() {
         $("#channel-config-modal").modal('show');
         
         channel_dialog.adjustConfig();
@@ -55,11 +55,22 @@ var channel_dialog = {
             if (typeof channel_dialog.channel.scanned !== 'undefined' && channel_dialog.channel.scanned) {
                 $('#channel-config-back').show();
                 $('#channel-config-scan').hide();
+                $('#channel-config-disable').hide();
                 $('#channel-config-delete').hide();
             }
             else {
                 $('#channel-config-back').hide();
                 $('#channel-config-scan').hide();
+                
+                if (channel_dialog.channel.disabled) {
+                	$('#channel-config-disable').removeClass('btn-warning').addClass('btn-success')
+        	            .html('<span class="icon-ok icon-white"></span> Enable');
+                }
+                else {
+                	$('#channel-config-disable').removeClass('btn-success').addClass('btn-warning')
+            	        .html('<span class="icon-remove icon-white"></span> Disable');
+                }
+                $('#channel-config-disable').show();
                 $('#channel-config-delete').show();
             }
             channel_dialog.drawPreferences('config');
@@ -68,8 +79,9 @@ var channel_dialog = {
             $('#channel-config-label').html('New Channel');
             $('#channel-config-key').val('');
             $('#channel-config-description').val('');
-
+            
             $('#channel-config-back').hide();
+            $('#channel-config-disable').hide();
             $('#channel-config-delete').hide();
             
             if (channel_dialog.driverid != null) {
@@ -88,7 +100,7 @@ var channel_dialog = {
         channel_dialog.registerConfigEvents();
     },
 
-    'drawDevices':function(modal) {
+    drawDevices: function(modal) {
         device.list(function(data, textStatus, xhr) {
             // Append devices from database to select
             var deviceSelect = $('#channel-'+modal+'-device-select');
@@ -113,7 +125,7 @@ var channel_dialog = {
         });
     },
 
-    'drawPreferences':function(modal) {
+    drawPreferences: function(modal) {
         $('#channel-'+modal+'-loader').show();
         
         var ctrlid;
@@ -147,7 +159,7 @@ var channel_dialog = {
         });
     },
 
-    'closeConfig':function(result) {
+    closeConfig: function(result) {
         $('#channel-config-loader').hide();
         
         if (typeof result.success !== 'undefined' && !result.success) {
@@ -158,14 +170,14 @@ var channel_dialog = {
         $('#channel-config-modal').modal('hide');
     },
 
-    'adjustConfig':function() {
+    adjustConfig: function() {
         if ($("#channel-config-modal").length) {
             var h = $(window).height() - $("#channel-config-modal").position().top - 180;
             $("#channel-config-body").height(h);
         }
     },
 
-    'registerConfigEvents':function() {
+    registerConfigEvents: function() {
 
         $('#channel-config-device-select').off('change').on('change', function() {
             channel_dialog.ctrlid = $('option:selected', this).attr('ctrlid');
@@ -199,13 +211,10 @@ var channel_dialog = {
                     'deviceid': deviceid,
                     'description': description,
             };
-            
             configs['address'] = config.encode('address');
             configs['settings'] = config.encode('settings');
-            
-            // Make sure JSON.stringify gets passed the right object type
-            configs['logging'] = $.extend({}, config.get('logging'));
-            configs['configs'] = $.extend({}, config.get('configs'));
+            configs['logging'] = config.get('logging');
+            configs['configs'] = config.get('configs');
             
             if (channel_dialog.channel != null 
                     && !(typeof channel_dialog.channel.scanned !== 'undefined' && channel_dialog.channel.scanned)) {
@@ -234,6 +243,17 @@ var channel_dialog = {
             channel_dialog.loadScan();
         });
 
+        $("#channel-config-disable").off('click').on('click', function () {
+            $('#channel-config-loader').show();
+        	var configs = channel_dialog.channel;
+        	configs.disabled = !configs.disabled;
+            configs.address = config.encode('address', configs.address);
+            configs.settings = config.encode('settings', configs.settings);
+            
+            var result = channel.update(configs.ctrlid, configs.nodeid, configs.id, configs,
+            		channel_dialog.closeConfig);
+        });
+
         $("#channel-config-delete").off('click').on('click', function () {
             $('#channel-config-modal').modal('hide');
             
@@ -241,7 +261,7 @@ var channel_dialog = {
         });
     },
 
-    'loadScan':function(device) {
+    loadScan: function(device) {
         if (device != null) {
             this.ctrlid = device.ctrlid;
             this.driverid = device.driverid;
@@ -258,7 +278,7 @@ var channel_dialog = {
         this.drawScan();
     },
 
-    'drawScan':function() {
+    drawScan: function() {
         $("#channel-scan-modal").modal('show');
         
         channel_dialog.adjustScan();
@@ -287,7 +307,7 @@ var channel_dialog = {
         channel_dialog.registerScanEvents();
     },
 
-    'drawScanProgress':function() {
+    drawScanProgress: function() {
         if (channel_dialog.scanChannels.length > 0) {
             $('#channel-scan-results').show();
             $('#channel-scan-results-none').hide();
@@ -304,14 +324,14 @@ var channel_dialog = {
         }
     },
 
-    'adjustScan':function() {
+    adjustScan: function() {
         if ($("#channel-scan-modal").length) {
             var h = $(window).height() - $("#channel-scan-modal").position().top - 180;
             $("#channel-scan-body").height(h);
         }
     },
 
-    'registerScanEvents':function() {
+    registerScanEvents: function() {
 
         $('#channel-scan-device-select').off('change').on('change', function(){
             channel_dialog.ctrlid = $('option:selected', this).attr('ctrlid');
@@ -363,7 +383,7 @@ var channel_dialog = {
         });
     },
 
-    'loadDelete': function(channel, tablerow) {
+    loadDelete: function(channel, tablerow) {
         this.ctrlid = null;
         this.driverid = null;
         this.deviceid = null;
@@ -375,7 +395,7 @@ var channel_dialog = {
         this.registerDeleteEvents(tablerow);
     },
 
-    'closeDelete':function(result) {
+    closeDelete: function(result) {
         $('#channel-delete-loader').hide();
         
         if (typeof result.success !== 'undefined' && !result.success) {
@@ -387,7 +407,7 @@ var channel_dialog = {
         $('#channel-delete-modal').modal('hide');
     },
 
-    'registerDeleteEvents':function(row) {
+    registerDeleteEvents: function(row) {
         
         $("#channel-delete-confirm").off('click').on('click', function() {
             $('#channel-delete-loader').show();

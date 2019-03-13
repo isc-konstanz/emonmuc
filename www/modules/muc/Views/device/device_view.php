@@ -19,7 +19,7 @@
     #table td:nth-of-type(1) { width:14px; text-align: center; }
     #table td:nth-of-type(2) { width:10%;}
     #table td:nth-of-type(3) { width:10%;}
-    #table td:nth-of-type(4) { width:10%;}
+    #table td:nth-of-type(4) { width:20%;}
     #table th:nth-of-type(5) { font-weight:normal; }
     #table td:nth-of-type(6), th:nth-of-type(6) { text-align: right; }
     #table th[fieldg="channels"] { font-weight:normal; }
@@ -73,7 +73,7 @@
     table.groupby = 'driver';
     table.groupfields = {
         'dummy-4':{'title':'', 'type':"blank"},
-        'channels':{'title':'<?php echo _("Channels"); ?>','type':"group-channellist"},
+        'channels':{'title':'<?php echo _("Channels"); ?>','type':"group-state-list"},
         'state':{'title':'<?php echo _('State'); ?>', 'type':"group-state"},
         'dummy-7':{'title':'', 'type':"blank"},
         'dummy-8':{'title':'', 'type':"blank"},
@@ -87,7 +87,7 @@
         'driver':{'title':'<?php echo _("Driver"); ?>','type':"fixed"},
         'id':{'title':'<?php echo _("Name"); ?>','type':"text"},
         'description':{'title':'<?php echo _('Description'); ?>','type':"text"},
-        'channels':{'title':'<?php echo _("Channels"); ?>','type':"channellist"},
+        'channels':{'title':'<?php echo _("Channels"); ?>','type':"state-list"},
         'state':{'title':'<?php echo _("State"); ?>', 'type':"state"},
         // Actions
         'add-action':{'title':'', 'type':"icon-enabled", 'icon':'icon-plus-sign'},
@@ -101,9 +101,12 @@
 
     function update() {
         device.list(function(data, textStatus, xhr) {
+            if (typeof data.success !== 'undefined' && !data.success) {
+                return;
+            }
             table.data = data;
-
             table.draw();
+            
             if (table.data.length != 0) {
                 $("#device-none").hide();
                 $("#device-header").show();
@@ -127,7 +130,6 @@
     updaterStart(update, 5000);
 
     $("#table").bind("onEdit", function(e) {
-        
         updaterStart(update, 0);
     });
 
@@ -148,7 +150,6 @@
     });
 
     $("#table").bind("onResume", function(e) {
-        
         updaterStart(update, 5000);
     });
 
@@ -183,27 +184,24 @@
         }
     });
 
-    $("#table").on('click', '.channel-label', function() {
+    $("#table").on('click', '.state-label', function() {
         // Get the ids of the clicked lable
         var device = table.data[$(this).closest('td').attr('row')];
-        var ctrlid = device['ctrlid'];
         var channelid = $(this).data('id');
-
-        $('#device-loader').show();
-        channel.get(ctrlid, channelid, function(result) {
-            $('#device-loader').hide();
-            
-            channel_dialog.loadConfig(result);
-        });
+        var channels = device.channels;
+        for (var i in channels) {
+            if (channels[i].id == channelid) {
+            	channel_dialog.loadConfig(channels[i]);
+                break;
+            }
+        }
     });
 
     $("#device-new").on('click', function () {
-        
         device_dialog.loadNew();
     });
 
     $("#device-scan").on('click', function () {
-        
         device_dialog.loadScan();
     });
 </script>

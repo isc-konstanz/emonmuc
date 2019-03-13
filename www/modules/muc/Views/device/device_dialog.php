@@ -52,6 +52,7 @@
         <button id="device-config-back" class="btn" style="display:none; float:left"><?php echo _('Back'); ?></button>
         <button id="device-config-cancel" class="btn" data-dismiss="modal" aria-hidden="true"><?php echo _('Cancel'); ?></button>
         <button id="device-config-delete" class="btn btn-danger" style="display:none"><i class="icon-trash icon-white"></i> <?php echo _('Delete'); ?></button>
+        <button id="device-config-disable" class="btn btn-warning" style="display:none;"><span class="icon-remove icon-white"></span> <?php echo _('Disable'); ?></button>
         <button id="device-config-scan" class="btn btn-info" style="display:none"><i class="icon-search icon-white"></i> <?php echo _('Scan'); ?></button>
         <button id="device-config-save" class="btn btn-primary"><?php echo _('Save'); ?></button>
     </div>

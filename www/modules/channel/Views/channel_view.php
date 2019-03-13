@@ -2,14 +2,14 @@
     global $path;
 ?>
 
-<link href="<?php echo $path; ?>Modules/channel/Views/channel.css" rel="stylesheet">
 <link href="<?php echo $path; ?>Modules/muc/Views/muc.css" rel="stylesheet">
 <link href="<?php echo $path; ?>Modules/muc/Lib/tablejs/titatoggle-dist-min.css" rel="stylesheet">
+<link href="<?php echo $path; ?>Modules/channel/Views/channel.css" rel="stylesheet">
 <link href="<?php echo $path; ?>Modules/channel/Lib/groupjs/groups.css" rel="stylesheet">
 <script type="text/javascript" src="<?php echo $path; ?>Modules/channel/Lib/groupjs/groups.js"></script>
 <script type="text/javascript" src="<?php echo $path; ?>Modules/muc/Lib/configjs/config.js"></script>
-<script type="text/javascript" src="<?php echo $path; ?>Modules/channel/Views/device.js"></script>
-<script type="text/javascript" src="<?php echo $path; ?>Modules/channel/Views/channel.js"></script>
+<script type="text/javascript" src="<?php echo $path; ?>Modules/muc/Views/channel/channel.js"></script>
+<script type="text/javascript" src="<?php echo $path; ?>Modules/muc/Views/device/device.js"></script>
 
 <div class="view-container">
     <div id="channel-header" class="hide">
@@ -29,7 +29,8 @@
     <div id="channel-groups"></div>
     
     <div id="channel-footer" class="hide">
-        <button id="device-new" class="btn btn-small" >&nbsp;<i class="icon-plus-sign" ></i>&nbsp;<?php echo _('New device connection'); ?></button>
+        <button id="device-new" class="btn btn-small"><span class="icon-plus-sign"></span>&nbsp;<?php echo _('New device connection'); ?></button>
+        <a id="ctrl-config" class="btn btn-small" href="<?php echo $path; ?>muc/view"><span class="icon-cog"></span>&nbsp;<?php echo _('Controllers'); ?></a>
     </div>
     <div id="channel-loader" class="ajax-loader"></div>
 </div>
@@ -95,10 +96,7 @@ var selected = {};
 setTimeout(function() {
     device.list(function(result) {
         draw(result);
-        device.load();
-        channel.load();
         channel.records(drawRecords);
-        
         updaterStart();
     });
 }, 100);

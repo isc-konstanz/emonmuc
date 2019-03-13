@@ -1,9 +1,9 @@
 var driver_dialog = {
-    'ctrlid': null,
-    'driverid': null,
-    'driver': null,
+    ctrlid: null,
+    driverid: null,
+    driver: null,
 
-    'loadNew': function(ctrl) {
+    loadNew: function(ctrl) {
         if (ctrl != null) {
             this.ctrlid = ctrl.id;
         }
@@ -17,7 +17,7 @@ var driver_dialog = {
         this.registerConfigEvents();
     },
 
-    'loadConfig': function(driver) {
+    loadConfig: function(driver) {
         this.ctrlid = null
         this.driverid = driver.id;
         this.driver = driver;
@@ -26,7 +26,7 @@ var driver_dialog = {
         this.registerConfigEvents();
     },
 
-    'drawConfig':function() {
+    drawConfig: function() {
         $("#driver-config-modal").modal('show');
         
         driver_dialog.adjustConfig();
@@ -43,7 +43,16 @@ var driver_dialog = {
             $('#driver-config-select').hide().text('');
             $("#driver-config-ctrl-select").text('');
             $('#driver-config-ctrl').hide();
-            
+
+            if (driver_dialog.driver.disabled) {
+            	$('#driver-config-disable').removeClass('btn-warning').addClass('btn-success')
+    	            .html('<span class="icon-ok icon-white"></span> Enable');
+            }
+            else {
+            	$('#driver-config-disable').removeClass('btn-success').addClass('btn-warning')
+        	        .html('<span class="icon-remove icon-white"></span> Disable');
+            }
+            $('#driver-config-disable').show();
             $('#driver-config-delete').show();
             
             driver_dialog.drawPreferences()
@@ -53,7 +62,8 @@ var driver_dialog = {
             $('#driver-config-select').show().prop('disabled', true).empty();
             $("#driver-config-ctrl-select").text('');
             $('#driver-config-ctrl').show();
-            
+
+            $('#driver-config-disable').hide();
             $('#driver-config-delete').hide();
             
             if (this.ctrlid != null) {
@@ -63,19 +73,19 @@ var driver_dialog = {
             }
             else {
                 // Append MUCs from database to select
-                muc.list(function(data, textStatus, xhr) {
+                muc.list(function(result, textStatus, xhr) {
                     ctrlSelect = $("#driver-config-ctrl-select");
                     ctrlSelect.append("<option selected hidden='true' value=''>Select a controller</option>").val('');
-                    
-                    $.each(data, function() {
-                        ctrlSelect.append($("<option />").val(this.id).text(this.description));
-                    });
+                    for (var i in result) {
+                    	var ctrl = result[i];
+                        ctrlSelect.append($("<option />").val(ctrl.id).text(ctrl.name));
+                    }
                 });
             }
         }
     },
 
-    'drawDrivers':function() {
+    drawDrivers: function() {
         if (driver_dialog.ctrlid > 0) {
             $('#driver-config-loader').show();
             
@@ -89,16 +99,9 @@ var driver_dialog = {
                     driverSelect.prop('disabled', false);
                     driverSelect.append("<option selected hidden='true' value=''>Select a driver</option>").val('');
                     
-                    for (var i = 0; i < result.length; i++) {
-                        var driverDesc = result[i];
-                        var driverName;
-                        if (typeof driverDesc.name !== 'undefined') {
-                            driverName = driverDesc.name;
-                        }
-                        else {
-                            driverName = driverDesc.id;
-                        }
-                        driverSelect.append($("<option />").val(driverDesc.id).text(driverName));
+                    for (var i in result) {
+                        var driver = result[i];
+                        driverSelect.append($("<option />").val(driver.id).text(driver.name));
                     }
                 }
                 $('#driver-config-loader').hide();
@@ -106,7 +109,7 @@ var driver_dialog = {
         }
     },
 
-    'drawPreferences':function() {
+    drawPreferences: function() {
         $('#driver-config-loader').show();
         
         var ctrlid;
@@ -135,7 +138,7 @@ var driver_dialog = {
         });
     },
 
-    'closeConfig':function(result) {
+    closeConfig: function(result) {
         $('#driver-config-loader').hide();
         
         if (typeof result.success !== 'undefined' && !result.success) {
@@ -146,14 +149,14 @@ var driver_dialog = {
         $('#driver-config-modal').modal('hide');
     },
 
-    'adjustConfig':function() {
+    adjustConfig: function() {
         if ($("#driver-config-modal").length) {
             var h = $(window).height() - $("#driver-config-modal").position().top - 180;
             $("#driver-config-body").height(h);
         }
     },
 
-    'registerConfigEvents':function() {
+    registerConfigEvents: function() {
 
         $('#driver-config-ctrl-select').off('change').on('change', function(){
             var ctrlid = this.value;
@@ -188,13 +191,11 @@ var driver_dialog = {
             $('#driver-config-loader').show();
             
             var configs = { 'id': driver_dialog.driverid };
-            
-            // Make sure JSON.stringify gets passed the right object type
-            configs['configs'] = $.extend({}, config.get('configs'));
+            configs['configs'] = config.get('configs');
             
             var result;
             if (driver_dialog.driver != null) {
-                configs['devices'] = $.extend([], driver_dialog.driver.devices);
+                configs['devices'] = driver_dialog.driver.devices;
                 
                 result = driver.update(driver_dialog.driver.ctrlid, driver_dialog.driver.id, configs, 
                         driver_dialog.closeConfig);
@@ -205,15 +206,23 @@ var driver_dialog = {
             }
         });
 
-        $("#driver-config-delete").off('click').on('click', function () {
+        $("#driver-config-disable").off('click').on('click', function () {
+            $('#driver-config-loader').show();
+        	var configs = driver_dialog.driver;
+        	configs.disabled = !configs.disabled;
             
+            var result = driver.update(configs.ctrlid, configs.id, configs,
+            		driver_dialog.closeConfig);
+        });
+
+        $("#driver-config-delete").off('click').on('click', function () {
             $('#driver-config-modal').modal('hide');
             
             driver_dialog.loadDelete(driver_dialog.driver);
         });
     },
 
-    'loadDelete': function(driver, tablerow) {
+    loadDelete: function(driver, tablerow) {
         this.ctrlid = null;
         this.driverid = null;
         this.driver = driver;
@@ -224,7 +233,7 @@ var driver_dialog = {
         this.registerDeleteEvents(tablerow, null);
     },
 
-    'closeDelete':function(result) {
+    closeDelete: function(result) {
         $('#driver-delete-loader').hide();
         
         if (typeof result.success !== 'undefined' && !result.success) {
@@ -236,7 +245,7 @@ var driver_dialog = {
         $('#driver-delete-modal').modal('hide');
     },
 
-    'registerDeleteEvents':function(row) {
+    registerDeleteEvents: function(row) {
         
         $("#driver-delete-confirm").off('click').on('click', function() {
             $('#driver-delete-loader').show();
