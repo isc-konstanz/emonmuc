@@ -97,9 +97,12 @@
     channel.states = null;
     function update() {
         channel.list(function(data, textStatus, xhr) {
+            if (typeof data.success !== 'undefined' && !data.success) {
+                return;
+            }
             table.data = data;
-            
             table.draw();
+            
             if (table.data.length != 0) {
                 $("#channel-none").hide();
                 $("#channel-header").show();

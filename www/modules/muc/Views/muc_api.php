@@ -38,7 +38,7 @@
 <table class="table">
     <tr><td><?php echo _('List MUC Controllers'); ?></td><td><a href="<?php echo $path; ?>muc/list.json"><?php echo $path; ?>muc/list.json</a></td></tr>
     <tr><td><?php echo _('Get MUC Controller details'); ?></td><td><a href="<?php echo $path; ?>muc/get.json?id=1"><?php echo $path; ?>muc/get.json?id=1</a></td></tr>
-    <tr><td><?php echo _('Register new MUC Controller'); ?></td><td><a href="<?php echo $path; ?>muc/create.json?type=HTTP&address=localhost&description=Local"><?php echo $path; ?>muc/create.json?type=HTTP&address=localhost&description=Local</a></td></tr>
+    <tr><td><?php echo _('Register new MUC Controller'); ?></td><td><a href="<?php echo $path; ?>muc/create.json?type=http&name=local&options={%22address%22:%22localhost%22,%22port%22:8080,%22password%22:%22emoncms%22}"><?php echo $path; ?>muc/create.json?type=http&name=local&options={"address":"localhost","port":8080,"password":"emoncms"}</a></td></tr>
     <tr><td><?php echo _('Delete existing MUC Controller'); ?></td><td><a href="<?php echo $path; ?>muc/delete.json?id=1"><?php echo $path; ?>muc/delete.json?id=1</a></td></tr>
-    <tr><td><?php echo _('Update MUC Controller fields'); ?></td><td><a href="<?php echo $path; ?>muc/set.json?id=1&fields={%22type%22:%22HTTP%22,%22address%22:%22localhost%22,%22description%22:%22Local%22,%22password%22:%22new password%22}"><?php echo $path; ?>muc/set.json?id=1&fields={"type":"HTTP","address":"localhost","description":"Local","password":"new password"}</a></td></tr>
+    <tr><td><?php echo _('Update MUC Controller fields'); ?></td><td><a href="<?php echo $path; ?>muc/set.json?id=1&fields={%22type%22:%22http%22,%22name%22:%22local%22,%22options%22:{%22address%22:%22localhost%22,%22port%22:8080,%22password%22:%22emoncms%22}}"><?php echo $path; ?>muc/set.json?id=1&fields={"type":"http","name":"local","options":{"address":"localhost","port":8080,"password":"emoncms"}}</a></td></tr>
 </table>

@@ -111,6 +111,7 @@ bundle() {
   if [ -f "$EMONMUC_DIR/conf/bundles.conf" ]; then
     read -a bundles < "$EMONMUC_DIR/conf/bundles.conf"
   fi
+  installed=($(sort <<<"${bundles[*]}"))
 
   source "$EMONMUC_DIR/lib/framework/bundle/$bundle.sh"
   case "$1" in

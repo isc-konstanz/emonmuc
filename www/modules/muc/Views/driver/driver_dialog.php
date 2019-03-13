@@ -24,7 +24,8 @@
     </div>
     <div class="modal-footer">
         <button class="btn" data-dismiss="modal" aria-hidden="true"><?php echo _('Cancel'); ?></button>
-        <button id="driver-config-delete" class="btn btn-danger" style="display:none; cursor:pointer;"><i class="icon-trash icon-white"></i> <?php echo _('Delete'); ?></button>
+        <button id="driver-config-delete" class="btn btn-danger" style="display:none;"><span class="icon-trash icon-white"></span> <?php echo _('Delete'); ?></button>
+        <button id="driver-config-disable" class="btn btn-warning" style="display:none;"><span class="icon-remove icon-white"></span> <?php echo _('Disable'); ?></button>
         <button id="driver-config-save" class="btn btn-primary"><?php echo _('Save'); ?></button>
     </div>
     <div id="driver-config-loader" class="ajax-loader" style="display:none"></div>

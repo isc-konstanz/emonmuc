@@ -11,9 +11,8 @@
 // no direct access
 defined('EMONCMS_EXEC') or die('Restricted access');
 
-class Controller
-{
-    const DEFAULT_DIR = "/opt/emonmuc/";
+class Controller {
+    private static $cache = array();
 
     private $mysqli;
     private $redis;
@@ -25,115 +24,136 @@ class Controller
         $this->log = new EmonLogger(__FILE__);
     }
 
-    public function create($userid, $type, $address, $description) {
-        $userid = intval($userid);
-        $type = strtoupper($type);
-        if ($type === 'MQTT') {
-            return array('success'=>false, 'message'=>'MQTT controller communication not yet implemented');
-        }
-        elseif ($type !== 'HTTP' && $type !== 'HTTPS') {
-            return array('success'=>false, 'message'=>'Unknown Controller communication method: '.$type);
-        }
-        
-        if (!ctype_alnum(str_replace(array(' ', '.', '_', '-'), '', $description))) {
-            return array('success'=>false, 'message'=>_("Invalid characters in device description"));
-        }
-        $password = md5(uniqid(mt_rand(), true));
-        
-        // Make sure, the defined address is valid
-        if(substr_compare($address, '/', strlen($address)-1, 1) === 0) {
-            $address = substr($address, 0, strlen($address)-1);
-        }
+    public function driver($ctrl): ControllerDriver {
+        require_once "Modules/muc/Lib/muc_driver.php";
+        return ControllerDriver::build($ctrl);
+    }
 
-        if (substr($address, 0, 7) === 'http://') {
-            $address = substr($address, 7, strlen($address));
-        }
-        else if (substr($address, 0, 8) === 'https://') {
-            $address = substr($address, 8, strlen($address));
-        }
+    public function device($ctrl): ControllerDevice {
+        require_once "Modules/muc/Lib/muc_device.php";
+        return ControllerDevice::build($ctrl, $this->redis);
+    }
+
+    public function channel($ctrl): ControllerChannel {
+        require_once "Modules/muc/Lib/muc_channel.php";
+        return ControllerChannel::build($ctrl, $this->mysqli, $this->redis);
+    }
+
+    public function load($ctrl) {
+        $this->device($ctrl)->load();
+        $this->channel($ctrl)->load();
         
-        $result = $this->mysqli->query("SELECT id, password FROM muc WHERE `address` = '$address'");
-        if ($row = (array) $result->fetch_object()) {
-            $id = $row['id'];
-            $password = $row['password'];
+        return array('success'=>true, 'message'=>'Controller cache reload successful');
+    }
+
+    public function create($userid, $type, $name, $description, $options) {
+        $userid = intval($userid);
+        
+        if (preg_replace('/[^\p{N}\p{L}\-\_\.\:\/]/u', '', $name) != $name) {
+            return array('success'=>false, 'message'=>"Controller name only contain a-z A-Z 0-9 - _ . : / and space characters");
+        }
+        if (empty($description)) {
+            $description = '';
+        }
+        $options = json_decode($options, true);
+        
+        $type = strtolower($type);
+        if ($type === 'redis') {
+            return array('success'=>false, 'message'=>'Redis controller communication not implemented yet');
+        }
+        elseif ($type === 'http' || $type === 'https') {
+            $this->create_http($type, $options);
         }
         else {
-            $result = $this->mysqli->query("INSERT INTO muc (userid, type, address, description, password) VALUES ('$userid','$type','$address','$description','$password')");
-            $id = $this->mysqli->insert_id;
-            if ($id > 0) {
-                if ($this->redis) {
-                    $this->redis->sAdd("user:muc:$userid", $id);
-                    $this->redis->hMSet("muc:$id",array(
-                            'id'=>$id,
-                            'userid'=>$userid,
-                            'type'=>$type,
-                            'address'=>$address,
-                            'description'=>$description,
-                            'password'=>$password));
-                }
-                else {
-                    return array('success'=>false, 'message'=>'Foo');
-                }
-            }
-            else {
-                return array('success'=>false, 'message'=>'Unknown error while adding MUC');
+            return array('success'=>false, 'message'=>'Unknown controller type: '.$type);
+        }
+        $options = json_encode($options);
+        
+        $this->mysqli->query("INSERT INTO muc (userid, type, name, description, options) VALUES ('$userid','$type','$name','$description','$options')");
+        $id = $this->mysqli->insert_id;
+        if ($id > 0) {
+            if ($this->redis) {
+                $this->redis->sAdd("user:muc:$userid", $id);
+                $this->redis->hMSet("muc:$id",array(
+                    'id'=>$id,
+                    'userid'=>$userid,
+                    'type'=>$type,
+                    'name'=>$name,
+                    'description'=>$description,
+                    'options'=>$options));
             }
         }
+        else {
+            return array('success'=>false, 'message'=>'Unknown error while adding MUC');
+        }
+        return array('success'=>true, 'id'=>$id, 'message'=>'MUC successfully registered');
+    }
+
+    private function create_http($type, &$options) {
+        $password = md5(uniqid(mt_rand(), true));
+        $options['password'] = $password;
         
-        // Request the muc to register the user
-        // TODO: Add ports to be configurable in settings
-        $url = 'http://'.$address.':8080/rest/users';
-        $data = array('id' => 'emoncms', 
-                'password' => $password,
-                'groups' => array(),
-                'description' => 'Emoncms admin user'
+        $http = $this->get_http($type, $options, 'admin');
+        $http->user = 'admin';
+        $http->password = 'admin';
+        $data = array('id' => 'emoncms',
+            'password' => $password,
+            'groups' => array(),
+            'description' => 'Emoncms admin user'
         );
-        
-        $response = $this->sendHttpRequest('admin', 'admin', $url, 'POST', array('configs' => $data));
-        if (isset($response['success']) && $response['success'] == false) {
-            return $response;
-        }
+        $http->post('users', array('configs' => $data));
         
         // Try to delete default admin account if still existing
-        $this->sendHttpRequest('admin', 'admin', $url, 'DELETE', array('configs' => array('id' => 'admin', 'password' => 'admin')));
-        
-        return array('success'=>true, 'id'=>$id, 'message'=>'MUC successfully registered');
+        $http->delete('users', array('configs' => array('id'=>'admin')));
     }
 
     public function exists($id) {
         $id = intval($id);
         
-        static $ctrl_exists_cache = array(); // Array to hold the cache
-        if (isset($ctrl_exists_cache[$id])) {
-            $ctrl_exists = $ctrl_exists_cache[$id]; // Retrieve from static cache
+        if (isset(self::$cache[$id])) {
+            $exists = self::$cache[$id]; // Retrieve from static cache
         } else {
-            $ctrl_exists = false;
+            $exists = false;
             if ($this->redis) {
                 if (!$this->redis->exists("muc:$id")) {
                     if ($this->load_redis_ctrl($id)) {
-                        $ctrl_exists = true;
+                        $exists = true;
                     }
                 } else {
-                    $ctrl_exists = true;
+                    $exists = true;
                 }
             } else {
                 $result = $this->mysqli->query("SELECT id FROM muc WHERE id = '$id'");
                 if ($result->num_rows>0) {
-                    $ctrl_exists = true;
+                    $exists = true;
                 }
             }
             // Cache it
-            $ctrl_exists_cache[$id] = $ctrl_exists;
+            self::$cache[$id] = $exists;
         }
-        return $ctrl_exists;
+        return $exists;
+    }
+
+    public function get_all() {
+        $ctrls = array();
+        
+        $result = $this->mysqli->query("SELECT id, userid, type, name, description, options FROM muc");
+        while ($ctrl = (array) $result->fetch_object()) {
+            $ctrls[] = $ctrl;
+        }
+        return $ctrls;
     }
 
     public function get_list($userid) {
         if ($this->redis) {
-            return $this->get_redis_list($userid);
+            $ctrls = $this->get_redis_list($userid);
         } else {
-            return $this->get_mysql_list($userid);
+            $ctrls = $this->get_mysql_list($userid);
         }
+        usort($ctrls, function($c1, $c2) {
+            return strcmp($c1['name'], $c2['name']);
+        });
+        return $ctrls;
     }
 
     private function get_redis_list($userid) {
@@ -143,12 +163,17 @@ class Controller
         
         $ctrls = array();
         $ctrlids = $this->redis->sMembers("user:muc:$userid");
-        foreach ($ctrlids as $id)
-        {
-            $row = $this->redis->hGetAll("muc:$id");
-            $row['drivers'] = $this->get_driver_list($userid, $id);
-            
-            $ctrls[] = $row;
+        foreach ($ctrlids as $id) {
+            $ctrl = $this->redis->hGetAll("muc:$id");
+            $ctrl['options'] = json_decode($ctrl['options'], true);
+            try {
+                $ctrl['drivers'] = $this->driver($ctrl)->get_list(0);
+            }
+            catch(ControllerException $e) {
+                $ctrl['drivers'] = array();
+                $this->log->warn($e->getResult());
+            }
+            $ctrls[] = $ctrl;
         }
         return $ctrls;
     }
@@ -156,44 +181,24 @@ class Controller
     private function get_mysql_list($userid) {
         $userid = intval($userid);
         $ctrls = array();
-
-        $result = $this->mysqli->query("SELECT id, userid, type, address, description, password FROM muc WHERE userid = '$userid'");
-        while ($row = (array) $result->fetch_object())
-        {
-            $drivers = $this->get_driver_list($userid, $row['id']);
+        
+        $result = $this->mysqli->query("SELECT id, userid, type, name, description, options FROM muc WHERE userid = '$userid'");
+        while ($row = (array) $result->fetch_object()) {
             $ctrl = array(
                 'id'=>$row['id'],
                 'userid'=>$row['userid'],
                 'type'=>$row['type'],
-                'address'=>$row['address'],
+                'name'=>$row['name'],
                 'description'=>$row['description'],
-                'password'=>$row['password'],
-                'drivers'=>$drivers
+                'options'=>json_decode($row['options'], true)
             );
-            
-            $ctrls[] = $ctrl;
-        }
-        return $ctrls;
-    }
-
-    private function get_driver_list($userid, $id) {
-        $id = intval($id);
-        
-        require_once "Modules/muc/Models/driver_model.php";
-        $driver = new Driver($this);
-        
-        $result = $driver->get_list($userid, $id);
-        if (isset($result['success']) && $result['success'] == false) {
-            return array();
-        }
-        return $result;
-    }
-
-    public function get_all() {
-        $ctrls = array();
-        
-        $result = $this->mysqli->query("SELECT id, userid, type, address, description, password FROM muc");
-        while ($ctrl = (array) $result->fetch_object()) {
+            try {
+                $ctrl['drivers'] = $this->driver($ctrl)->get_list(0);
+            }
+            catch(ControllerException $e) {
+                $ctrl['drivers'] = array();
+                $this->log->warn($e->getResult());
+            }
             $ctrls[] = $ctrl;
         }
         return $ctrls;
@@ -204,101 +209,117 @@ class Controller
 
         if ($this->redis) {
             if (!$this->redis->exists("muc:$id")) $this->load_redis_ctrl($id);
-            return $this->redis->hGetAll("muc:$id");
-        } else {
-            $result = $this->mysqli->query("SELECT id, userid, type, address, description, password FROM muc WHERE id = '$id'");
-            return (array) $result->fetch_object();
+            $ctrl = $this->redis->hGetAll("muc:$id");
         }
+        else {
+            $result = $this->mysqli->query("SELECT id, userid, type, name, description, options FROM muc WHERE id = '$id'");
+            $ctrl = (array) $result->fetch_object();
+        }
+        $ctrl['options'] = json_decode($ctrl['options'], true);
+        
+        return $ctrl;
     }
 
-    public function set_fields($userid, $id, $fields) {
+    public function update($userid, $id, $fields) {
         $id = intval($id);
-
-        $fields = json_decode(stripslashes($fields));
+        $fields = json_decode(stripslashes($fields), true);
         $array = array();
-        $data = array('id' => $id);
-
-        // Repeat this line changing the field address to add fields that can be updated:
-        if (isset($fields->type)) {
-            $type = $fields->type;
-            if ($type === 'MQTT') {
-                return array('success'=>false, 'message'=>'MQTT controller communication not yet implemented');
+        
+        if (isset($fields['name'])) {
+            $name = $fields['name'];
+            
+            if (preg_replace('/[^\p{N}\p{L}\-\_\.\:\/]/u', '', $name) != $name) {
+                return array('success'=>false, 'message'=>"Controller name only contain a-z A-Z 0-9 - _ . : / and space characters");
             }
-            elseif ($type !== 'HTTP' && $type !== 'HTTPS') {
-                return array('success'=>false, 'message'=>'Unknown Controller communication method: '.$type);
+            $array[] = "`name` = '".$name."'";
+        }
+        if (isset($fields['description'])) {
+            $array[] = "`description` = '".$fields['description']."'";
+        }
+        if (isset($fields['type'])) {
+            if (isset($fields['options'])) {
+                $options = $fields['options'];
+                $array[] = "`options` = '".json_encode($options)."'";
+            }
+            else {
+                $ctrl = $this->get($id);
+                $options = $ctrl['options'];
             }
             
+            $type = strtolower($fields['type']);
+            if ($type === 'redis') {
+                return array('success'=>false, 'message'=>'Redis controller communication not implemented yet');
+            }
+            elseif ($type === 'http' || $type === 'https') {
+                $this->create_http($type, $options);
+            }
+            else {
+                return array('success'=>false, 'message'=>'Unknown controller type: '.$type);
+            }
             $array[] = "`type` = '".$type."'";
         }
-        if (isset($fields->address)) {
-            $address = $fields->address;
-            
-            // Make sure, the defined address is valid
-            if(substr_compare($address, '/', strlen($address)-1, 1) !== 0) {
-                $address = $address."/";
-            }
-            $array[] = "`address` = '".$address."'";
-        }
-        if (isset($fields->description)) {
-            $description = preg_replace('/[^\p{L}_\p{N}\s-:]/u','',$fields->description);
-            
-            $array[] = "`description` = '".$description."'";
-        }
-        if (isset($fields->password)) {
-            $password = preg_replace('/[^\p{L}_\p{N}\s-:]/u','',$fields->password);
-            $result = $this->mysqli->query("SELECT password FROM muc WHERE password='$password'");
-            if ($result->num_rows > 0)
-            {
-                return array('success'=>false, 'message'=>'Field password is invalid'); // is duplicate
-            }
-            
-
+        else if (isset($fields['options'])) {
             $ctrl = $this->get($id);
-            $data['id'] = 'emoncms';
-            $data['oldPassword'] = $ctrl['password'];
-            $data['password'] = $fields->password;
-            
-            $array[] = "`password` = '".$password."'";
-        }
-
-        if (count($data) > 1) {
-            $response = $this->request($id, 'users', 'PUT', array('configs' => $data));
-            if (isset($response['success']) && $response['success'] == false) {
-                return $response;
+            $options = $fields['options'];
+            $type = $ctrl['type'];
+            if ($type === 'redis') {
+                return array('success'=>false, 'message'=>'Redis controller communication not implemented yet');
             }
+            elseif ($type === 'http' || $type === 'https') {
+                $this->update_http($type, $ctrl['options'], $options);
+            }
+            else {
+                return array('success'=>false, 'message'=>'Unknown controller type: '.$type);
+            }
+            $array[] = "`options` = '".json_encode($options)."'";
         }
-
+        
         // Convert to a comma seperated string for the mysql query
         $fieldstr = implode(",",$array);
         $this->mysqli->query("UPDATE muc SET ".$fieldstr." WHERE `id` = '$id'");
-
-        if ($this->mysqli->affected_rows>0){
-            // Update redis
-            if ($this->redis) {
-                if (isset($fields->type)) $this->redis->hset("muc:$id",'type',$type);
-                if (isset($fields->address)) $this->redis->hset("muc:$id",'address',$address);
-                if (isset($fields->description)) $this->redis->hset("muc:$id",'description',$description);
-                if (isset($fields->password)) $this->redis->hset("muc:$id",'password',$password);
-            }
-            
-            return array('success'=>true, 'message'=>'Fields updated');
-        } else {
+        
+        if ($this->mysqli->affected_rows<1) {
             return array('success'=>false, 'message'=>'Fields could not be updated');
+        }
+        if ($this->redis) {
+            if (isset($fields['type'])) $this->redis->hset("muc:$id",'type',$type);
+            if (isset($fields['name'])) $this->redis->hset("muc:$id",'name',$name);
+            if (isset($fields['description'])) $this->redis->hset("muc:$id",'description',$fields['description']);
+            if (isset($fields['options'])) $this->redis->hset("muc:$id",'options',json_encode($fields['options']));
+        }
+        return array('success'=>true, 'message'=>'Fields updated');
+    }
+
+    private function update_http($type, $options, &$update) {
+        $http = $this->get_http($type, $options);
+        
+        if ($update['password'] != $options['password']) {
+            $configs = array(
+                'id' => 'emoncms',
+                'oldPassword' => $options['password'],
+                'password' => $update['password']
+            );
+            $http->put('users', array('configs' => $configs));
         }
     }
 
     public function delete($userid, $id) {
-        $id = intval($id);
         $userid = intval($userid);
+        $id = intval($id);
+        $ctrl = $this->get($id);
         
-        $data = array('id' => $id);
-        $response = $this->request($id, 'users', 'DELETE', array('configs' => $data));
-        if (isset($response['success']) && $response['success'] == false) {
-            $this->log->warn("Controller model: User on Controller with id=$id was not deregistered, as the controller is not available.");
+        $type = $ctrl['type'];
+        if ($type === 'redis') {
+            return array('success'=>false, 'message'=>'Redis controller communication not implemented yet');
         }
-        
+        elseif ($type === 'http' || $type === 'https') {
+            $this->delete_http($userid, $ctrl);
+        }
+        else {
+            return array('success'=>false, 'message'=>'Unknown controller type: '.$type);
+        }
         $this->mysqli->query("DELETE FROM muc WHERE `userid` = '$userid' AND `id` = '$id'");
-
+        
         // Remove from redis
         if ($this->redis) {
             $this->redis->del("muc:$id");
@@ -306,148 +327,85 @@ class Controller
         }
         
         // Clear static cache
-        if (isset($muc_exists_cache[$id])) { unset($muc_exists_cache[$id]); }
-        
+        if (isset(self::$cache[$id])) {
+            unset(self::$cache[$id]);
+        }
         return array('success'=>true, 'message'=>'Controller successfully removed');
     }
 
-    public function request($id, $action, $type, $data) {
-        $id = intval($id);
-
-        $ctrl = $this->get($id);
-
-        // TODO: Add ports to be configurable in settings
-        if ($ctrl['type'] === 'HTTP'){
-            $url = 'http://'.$ctrl['address'].':8080/rest/'.$action;
-            return $this->sendHttpRequest('emoncms', $ctrl['password'], $url, $type, $data);
+    private function delete_http($userid, $ctrl) {
+        $http = $this->get_http($ctrl['type'], $ctrl['options']);
+        
+        $driver = $this->driver($ctrl);
+        foreach ($driver->get_list($userid) as $d) {
+            $driver->delete($d['id']);
         }
-        elseif ($ctrl['type'] === 'HTTPS') {
-            $url = 'https://'.$ctrl['address'].':8443/rest/'.$action;
-            return $this->sendHttpRequest('emoncms', $ctrl['password'], $url, $type, $data);
-        }
-        elseif ($ctrl['type'] === 'MQTT') {
-            return array('success'=>false, 'message'=>'MQTT controller communication not yet implemented');
-        }
-        else {
-            return array('success'=>false, 'message'=>'Unknown Controller communication method: '.$ctrl['type']);
-        }
+        $http->delete('users', array('configs'=>array('id'=>'emoncms')));
     }
 
-    private function sendHttpRequest($username, $password, $url, $type, $data) {
-//         $this->log->info('Sending request to "'.$url.'"');
-
-        $ch = curl_init();
-        curl_setopt_array($ch, array(
-                CURLOPT_URL => $url,
-                CURLOPT_CUSTOMREQUEST => $type,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_FAILONERROR => true,
-                CURLOPT_CONNECTTIMEOUT => 5,
-                CURLOPT_TIMEOUT => 10,
-                //TODO: This prevents curl from detecting man in the middle attacks. Implement SSL cert verification instead of unsafely disabling it
-                //CURLOPT_CAINFO => "PATH_TO/cacert.pem");
-                CURLOPT_SSL_VERIFYHOST => 0,
-                CURLOPT_SSL_VERIFYPEER => 0
-        ));
-        
-        if (isset($data)) {
-            if ($type == 'GET') {
-                $parameters = http_build_query($data);
-                curl_setopt_array($ch, array(
-                        CURLOPT_URL => $url.'?'.$parameters,
-                        CURLOPT_HTTPHEADER => array(
-                                "Accept: application/json",
-                                'Content-Type: application/json',
-                                'Content-Length: 0')
-                ));
-            }
-            else {
-                $data_json = json_encode($data);
-                curl_setopt_array($ch, array(
-                        CURLOPT_POSTFIELDS => $data_json,
-                        CURLOPT_HTTPHEADER => array(
-                                "Accept: application/json",
-                                'Content-Type: application/json',
-                                'Content-Length: '.strlen($data_json))
-                ));
-            }
+    private function get_http($type, &$options) {
+        if (empty($options['address'])) {
+            throw new ControllerException("Server address needs to be configured");
         }
-        else {
-            curl_setopt_array($ch, array(
-                    CURLOPT_HTTPHEADER => array(
-                            "Accept: application/json",
-                            'Content-Type: application/json',
-                            'Content-Length: 0')
-            ));
+        $address = $options['address'];
+        
+        // Make sure, the defined address is valid
+        if(substr_compare($address, '/', strlen($address)-1, 1) === 0) {
+            $address = substr($address, 0, strlen($address)-1);
+        }
+        if (substr($address, 0, 7) === 'http://') {
+            $address = substr($address, 7, strlen($address));
+        }
+        else if (substr($address, 0, 8) === 'https://') {
+            $address = substr($address, 8, strlen($address));
+        }
+        if (empty($options['port']) || !is_numeric($options['port'])) {
+            throw new ControllerException("Server port invalid");
+        }
+        if (empty($options['password']) || strlen($options['password'])>32) {
+            throw new ControllerException("Server password invalid");
         }
         
-        if (isset($username) && isset($password)) {
-            curl_setopt($ch, CURLOPT_USERPWD, $username.":".$password);
-        }
-        
-        $response = curl_exec($ch);
-        
-        $errno = curl_errno($ch);
-        if ($errno) {
-            if ($errno == 7) {
-                $error = 'No Controller available for: '.$url;
-            }
-            else {
-                $error = curl_error($ch);
-            }
-            curl_close($ch);
-            
-            return array('success'=>false, 'message'=>$error);
-        }
-//         $info = curl_getinfo($ch);
-//         $this->log->info('Received response after '.$info['total_time'].' seconds: '.$response);
-        
-        curl_close($ch);
-        
-        if (trim($response) === '') {
-            return array('success'=>true);
-        }
-        
-        $result = json_decode($response, true);
-        if (!isset($result)) {
-            return array('success'=>false, 'message'=>$response);
-        }
-        return $result;
+        require_once "Modules/muc/Lib/http/http.php";
+        return new Http($type=='https', $address, $options['port'], $options['password']);
     }
 
     private function load_redis($userid) {
         $this->redis->delete("user:muc:$userid");
-        $result = $this->mysqli->query("SELECT id, userid, type, address, description, password FROM muc WHERE userid = '$userid'");
-        while ($row = (array) $result->fetch_object())
-        {
+        $result = $this->mysqli->query("SELECT id, userid, type, name, description, options FROM muc WHERE userid = '$userid'");
+        while ($row = (array) $result->fetch_object()) {
             $this->redis->sAdd("user:muc:$userid", $row['id']);
             $this->redis->hMSet("muc:".$row['id'],array(
                 'id'=>$row['id'],
                 'userid'=>$row['userid'],
                 'type'=>$row['type'],
-                'address'=>$row['address'],
+                'name'=>$row['name'],
                 'description'=>$row['description'],
-                'password'=>$row['password']
+                'options'=>$row['options']
             ));
         }
     }
 
     private function load_redis_ctrl($id) {
-        $result = $this->mysqli->query("SELECT id, userid, type, address, description, password FROM muc WHERE id = '$id'");
+        $result = $this->mysqli->query("SELECT id, userid, type, name, description, options FROM muc WHERE id = '$id'");
         $row = (array) $result->fetch_object();
         if (!$row) {
             $this->log->warn("MUC model: Requested MUC with id=$id does not exist");
             return false;
         }
-            
         $this->redis->hMSet("muc:".$id,array(
-                'id'=>$id,
-                'userid'=>$row['userid'],
-                'type'=>$row['type'],
-                'address'=>$row['address'],
-                'description'=>$row['description'],
-                'password'=>$row['password']
+            'id'=>$id,
+            'userid'=>$row['userid'],
+            'type'=>$row['type'],
+            'name'=>$row['name'],
+            'description'=>$row['description'],
+            'options'=>$row['options']
         ));
+    }
+}
+
+class ControllerException extends Exception {
+    public function getResult() {
+        return array('success'=>false, 'message'=>$this->getMessage());
     }
 }

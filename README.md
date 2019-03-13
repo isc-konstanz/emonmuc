@@ -79,7 +79,7 @@ emonmuc remove csv
 Several drivers can be enabled at once, while each needs to be selected individually. A list of possible integrated drivers are:
 
   - **csv**: Read CSV files
-  - **dlms**: [DLMS/COSEM](https://www.openmuc.org/openmuc/user-guide/#_dlms_cosem)
+  - **dlms**: [DLMS/COSEM](https://www.openmuc.org/openmuc/user-guide/#_dlmscosem)
   - **ehz**: [eHz for SML and IEC 62056-21](https://www.openmuc.org/openmuc/user-guide/#_ehz)
   - **homematic-cc1101**: [HomeMatic (CC1101)](https://github.com/isc-konstanz/OpenHomeMatic)
   - **iec60870**: [IEC 60870-5-104](https://www.openmuc.org/openmuc/user-guide/#_iec_60870_5_104)
@@ -109,12 +109,16 @@ The [Serial Port preparation guide](docs/LinuxSerialPort.md) may be followed to 
 # Guides
 
 With the system being prepared, some first steps can be taken to learn about the features of emonmuc.  
-For this purpose, a [First Steps guide](docs/FirstSteps.md) was documented to be followed.
+For this purpose, some guides were documented to be followed, 
 
-To get accustomed with the some of the drivers or the general emonmuc framework, a set of specified guides were written:
+  - [First Steps with emonmcms/muc](docs/FirstSteps.md)
+  - [Setup an electric household meter](docs/FirstStepsMetering.md)
+
+To get accustomed with some of the drivers or the general emonmuc framework, a set of specified guides were written:
 
   - [Switching Raspberry Pi GPIOs](docs/FirstStepsGpio.md)
   - [Scanning HomeMatic Smart Plugs](https://github.com/isc-konstanz/OpenHomeMatic/blob/master/docs/FirstSteps.md)
+  - [Configure Channels of a Modbus RTU device](docs/FirstStepsModbus.md)
 
 
 ----------

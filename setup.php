@@ -7,7 +7,7 @@ db_schema_setup($mysqli,load_db_schema(),true);
 $ctrl = new Controller($mysqli,$redis);
 $user = new User($mysqli,$redis);
 
-$type = 'HTTP';
+$type = 'http';
 $address = 'localhost';
 $path = '/';
 
@@ -38,22 +38,24 @@ else {
 $user->set_preferences($userid, array('deviceView' => true));
 
 if (count($ctrl->get_list($userid)) == 0) {
-    $result = $ctrl->create($userid, $type, $address, 'Local');
-    if (isset($result['success']) && $result['success'] == false) {
-        echo "Unable to create MUC for user $userid: ".$result['message']."\n"; die;
+    try {
+        $ctrl->create($userid, 'http', 'Local', '', '{"address":"'.$address.'","port":8080}');
+        
+        if (!is_file($root.'/conf/emoncms.default.conf')) {
+            echo "Unable to find default emoncms configuration ".$root."/conf/emoncms.default.conf\n"; die;
+        }
+        if (!is_writable($root.'/conf') || (is_file($root.'/conf/emoncms.conf') && !is_writable($root.'/conf/emoncms.conf'))) {
+            echo "Unable to edit emoncms configution file in ".$root."/conf\n"; die;
+        }
+        
+        $url = $type.'://'.$address.$path;
+        $contents = file_get_contents($root.'/conf/emoncms.default.conf');
+        $contents = str_replace(';address = http://localhost/emoncms/', 'address = '.$url, $contents);
+        $contents = str_replace(';authorization = WRITE', 'authorization = WRITE', $contents);
+        $contents = str_replace(';authentication = <apikey>', 'authentication = '.$apikey, $contents);
+        file_put_contents($root.'/conf/emoncms.conf', $contents);
     }
-    
-    if (!is_file($root.'/conf/emoncms.default.conf')) {
-        echo "Unable to find default emoncms configuration ".$root."/conf/emoncms.default.conf\n"; die;
+    catch(Exception $e) {
+        echo "Unable to register controller for user $userid: ".$e->getMessage()."\n";
     }
-    if (!is_writable($root.'/conf') || (is_file($root.'/conf/emoncms.conf') && !is_writable($root.'/conf/emoncms.conf'))) {
-        echo "Unable to edit emoncms configution file in ".$root."/conf\n"; die;
-    }
-    
-    $url = strtolower($type).'://'.$address.$path;
-    $contents = file_get_contents($root.'/conf/emoncms.default.conf');
-    $contents = str_replace(';address = http://localhost/emoncms/', 'address = '.$url, $contents);
-    $contents = str_replace(';authorization = WRITE', 'authorization = WRITE', $contents);
-    $contents = str_replace(';authentication = <apikey>', 'authentication = '.$apikey, $contents);
-    file_put_contents($root.'/conf/emoncms.conf', $contents);
 }
