@@ -523,10 +523,12 @@ class MucTemplate extends DeviceTemplate {
             $ctrlid = intval($options['ctrlid']);
             $ctrl = $this->ctrl->get($ctrlid);
             
-            $result = $this->ctrl->device($ctrl)->delete($nodeid);
-            if (isset($result['success']) && $result['success'] == false) {
-                if (strpos($result['message'], 'does not exist') === false) {
-                    return $result;
+            try {
+                $this->ctrl->device($ctrl)->delete($nodeid);
+            }
+            catch(ControllerException $e) {
+                if (stristr($e->getMessage(), 'does not exist') === false) {
+                    return $e->getResult();
                 }
             }
         }

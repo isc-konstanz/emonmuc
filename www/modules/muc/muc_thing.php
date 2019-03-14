@@ -82,8 +82,8 @@ class MucThing extends DeviceThing {
     }
 
     public function set_item($itemid, $mapping) {
-        if (empty($mapping['ctrlid']) || empty($mapping['channelid']) || empty($mapping['value'])) {
-            return array('success'=>false, 'message'=>"Error while seting item value");
+        if (empty($mapping['ctrlid']) || empty($mapping['channelid']) || !isset($mapping['value'])) {
+            return array('success'=>false, 'message'=>"Error while setting item value");
         }
         $ctrlid = intval($mapping['ctrlid']);
         $ctrl = $this->ctrl->get($ctrlid);
