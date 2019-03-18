@@ -485,7 +485,15 @@ class MucTemplate extends DeviceTemplate {
             if (empty($option->syntax)) {
                 continue;
             }
-            $value = $parameters[$option->id];
+            if (isset($parameters[$option->id])) {
+                $value = $parameters[$option->id];
+            }
+            else if (isset($option->default)) {
+                $value = $option->default;
+            }
+            else {
+                continue;
+            }
             
             $types = explode(',', $option->syntax);
             foreach($types as $type) {
