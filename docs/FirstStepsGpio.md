@@ -21,6 +21,12 @@ To disable the driver, use
 emonmuc remove rpi-gpio
 ~~~
 
+The GPIO driver is based on the [Pi4J](https://www.pi4j.com/) library, that links to the [Wiring Pi](http://wiringpi.com/) debian package binaries. This has to be installed first
+
+~~~
+sudo apt-get install wiringpi
+~~~
+
 To allow drivers to have access to GPIO pins of the Raspberry Pi even when not root, non-privileged accessed can be enabled since the Raspberry Pi 3.  
 Non-privileged access for GPIO is not enabled by default due to the fact that some functions such as PWM are not yet supported in a non-privileged context.
 
