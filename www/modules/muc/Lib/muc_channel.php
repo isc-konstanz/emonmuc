@@ -291,7 +291,7 @@ abstract class ControllerChannel {
         $channel['configs'] = $configs;
         
         $record = $details['record'];
-        $channel['time'] = isset($record['timestamp']) ? $record['timestamp'] : null; // round($record['timestamp']/1000) : null;
+        $channel['time'] = isset($record['timestamp']) ? round($record['timestamp']/1000) : null;
         $channel['value'] = isset($record['value']) ? $record['value'] : null;
         $channel['flag'] = $record['flag'];
         $channel['state'] = $details['state'];
@@ -318,7 +318,7 @@ abstract class ControllerChannel {
             'userid'=>$this->ctrl['userid'],
             'ctrlid'=>$this->ctrl['id'],
             'id'=>$details['id'],
-            'time'=>isset($record['timestamp']) ? $record['timestamp'] : null, // round($record['timestamp']/1000) : null,
+            'time'=>isset($record['timestamp']) ? round($record['timestamp']/1000) : null,
             'value'=>isset($record['value']) ? $record['value'] : null,
             'flag'=>$record['flag'],
             'configs'=>array('valueType'=>$type),
