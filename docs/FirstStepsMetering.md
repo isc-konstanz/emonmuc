@@ -23,7 +23,7 @@ To disable the driver use
 emonmuc remove iec62056p21
 ~~~
 
-Also, the [Serial Port should be prepared](https://github.com/isc-konstanz/emonmuc/blob/master/docs/LinuxSerialPort.md) accordingly.
+To conclude, the [Serial Port should be prepared](https://github.com/isc-konstanz/emonmuc/blob/master/docs/LinuxSerialPort.md) accordingly.
 
 
 ## 1.1 Assembling the hardware
