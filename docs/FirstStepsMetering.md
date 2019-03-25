@@ -23,7 +23,7 @@ To disable the driver use
 emonmuc remove iec62056p21
 ~~~
 
-If the serial port is not connected to the Raspberry Pi via e.g. an USB interface but the Raspberrys internal UART pins, the [Serial Port should be prepared](https://github.com/isc-konstanz/emonmuc/blob/master/docs/LinuxSerialPort.md) accordingly.
+To conclude, the [Serial Port should be prepared](https://github.com/isc-konstanz/emonmuc/blob/master/docs/LinuxSerialPort.md) accordingly.
 
 
 ## 1.1 Assembling the hardware

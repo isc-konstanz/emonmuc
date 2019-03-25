@@ -485,7 +485,15 @@ class MucTemplate extends DeviceTemplate {
             if (empty($option->syntax)) {
                 continue;
             }
-            $value = $parameters[$option->id];
+            if (isset($parameters[$option->id])) {
+                $value = $parameters[$option->id];
+            }
+            else if (isset($option->default)) {
+                $value = $option->default;
+            }
+            else {
+                continue;
+            }
             
             $types = explode(',', $option->syntax);
             foreach($types as $type) {
@@ -523,10 +531,12 @@ class MucTemplate extends DeviceTemplate {
             $ctrlid = intval($options['ctrlid']);
             $ctrl = $this->ctrl->get($ctrlid);
             
-            $result = $this->ctrl->device($ctrl)->delete($nodeid);
-            if (isset($result['success']) && $result['success'] == false) {
-                if (strpos($result['message'], 'does not exist') === false) {
-                    return $result;
+            try {
+                $this->ctrl->device($ctrl)->delete($nodeid);
+            }
+            catch(ControllerException $e) {
+                if (stristr($e->getMessage(), 'does not exist') === false) {
+                    return $e->getResult();
                 }
             }
         }

@@ -100,7 +100,7 @@ The scan button for the **Home** device allows the selection of the provided exa
 When clicking scan, you might get to choose between two file paths.  
 After selecting one of them by clicking its name, **Save** and **Initialize** the device.
 
-The initialization will prepare each 6 channels and inputs, as well as 12 feeds and a set of processes.
+The initialization will prepare each 5 channels and inputs, as well as 12 feeds and a set of processes.
 
 
 ## 3.2 Channels
@@ -124,7 +124,7 @@ The wrench icon on the right of each input allows the detailed configuration of 
 
 ![input view](img/csv/input-view.jpg)
 
-The processes in this example include e.g. for *home_pv_generation_power*:
+The processes in this example include e.g. for *home_pv*:
 
 - **x**: Mathematical multiplication operator. Here, every value is multiplied with 1000, as the power values read from the CSV file come in *kW* and further processing requires the [SI unit](https://en.wikipedia.org/wiki/International_System_of_Units) Watts.
 - **log**: Logs the power value in Watts to a specified feed.

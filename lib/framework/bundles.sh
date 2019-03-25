@@ -1,6 +1,6 @@
 #!/bin/bash
 #Description: Setup script to install EmonMUC bundles
-OPENMUC_VERSION="0.17.1"
+OPENMUC_VERSION="0.17.2"
 
 BUNDLES_DIR="$EMONMUC_DIR/bundle"
 CONF_DIR="$EMONMUC_DIR/conf"
@@ -27,7 +27,7 @@ update() {
   core maven  "org.apache.felix"    "org.apache.felix.gogo.runtime"     "1.1.0"
   core maven  "org.apache.felix"    "org.apache.felix.gogo.command"     "1.0.2"
   core maven  "org.apache.felix"    "org.apache.felix.gogo.jline"       "1.1.0"
-  core maven  "org.jline"           "jline"                             "3.8.0"
+  core maven  "org.jline"           "jline"                             "3.9.0"
 
   #--------------------------------------------------------------------------------------------------
   # Adds a telnet server so that the Felix Gogo Shell can be accessed
@@ -41,29 +41,32 @@ update() {
   # Apache Felix Service Component Runtime that implements the OSGi Declarative Services Specification
   # the OpenMUC core bundles use declarative services and thus depend on them
   #--------------------------------------------------------------------------------------------------
-  core maven  "org.apache.felix"    "org.apache.felix.scr"              "2.1.0"
+  core maven  "org.apache.felix"    "org.apache.felix.scr"              "2.1.14"
 
   #--------------------------------------------------------------------------------------------------
-  # An implementation of the OSGi HTTP Service Specification, needed by the WebUI bundles
+  # An implementation of the OSGi HTTP Service Specification, needed by the web bundles
   #--------------------------------------------------------------------------------------------------
   core maven  "org.apache.felix"    "org.apache.felix.http.servlet-api" "1.1.2"
   core maven  "org.apache.felix"    "org.apache.felix.http.api"         "3.0.0"
-  core maven  "org.apache.felix"    "org.apache.felix.http.jetty"       "4.0.0"
+  core maven  "org.apache.felix"    "org.apache.felix.http.jetty"       "4.0.6"
+
+  core maven  "javax.annotation"    "javax.annotation-api"              "1.3.2"
+  core maven  "javax.xml.bind"      "jaxb-api"                          "2.3.1"
 
   #--------------------------------------------------------------------------------------------------
   # Implementations of the OSGi Event Admin, Configuration Admin and MetaType services, needed by jetty
   #--------------------------------------------------------------------------------------------------
   core maven  "org.apache.felix"    "org.apache.felix.eventadmin"       "1.5.0"
-  core maven  "org.apache.felix"    "org.apache.felix.configadmin"      "1.9.2"
-  core maven  "org.apache.felix"    "org.apache.felix.metatype"         "1.2.0"
+  core maven  "org.apache.felix"    "org.apache.felix.configadmin"      "1.9.10"
+  core maven  "org.apache.felix"    "org.apache.felix.metatype"         "1.2.2"
 
   #--------------------------------------------------------------------------------------------------
   # Adds a web console for felix bundle management
   # http://localhost:8080/system/console/httpservice
   # https://localhost:8443/system/console/httpservice
   #--------------------------------------------------------------------------------------------------
-  core maven  "org.apache.felix"    "org.apache.felix.webconsole"       "4.3.4"
-  core maven  "org.apache.felix"    "org.apache.felix.log"              "1.0.1"
+  core maven  "org.apache.felix"    "org.apache.felix.webconsole"       "4.3.8"
+  core maven  "org.apache.felix"    "org.apache.felix.log"              "1.2.0"
   core maven  "commons-io"          "commons-io"                        "2.6"
   core maven  "commons-fileupload"  "commons-fileupload"                "1.3.3"
 
@@ -79,7 +82,7 @@ update() {
   #--------------------------------------------------------------------------------------------------
   # The Apache Felix main executable
   #--------------------------------------------------------------------------------------------------
-  core framework "org.apache.felix" "org.apache.felix.main"             "6.0.0"
+  core framework "org.apache.felix" "org.apache.felix.main"             "6.0.1"
 
   cp -rf "$EMONMUC_DIR/lib/device" "$LIB_DIR/"
   if [ -f "$EMONMUC_DIR/conf/bundles.conf" ]; then
