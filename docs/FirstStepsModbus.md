@@ -29,7 +29,7 @@ If the serial port is not connected to the Raspberry Pi via e.g. an USB interfac
 **Please be aware, that working with domestic energy supply cables in the wrong way can cause death by high voltage! The guide given here has to be used at your own risk.**
 
 For this simple demonstration, an EASTRON SDM230 Modbus RTU single phase energy meter was used, additional to a serial RS485 converter from Digitus.
-This guide tries to encourage to use any modbus device though, to get accustomed with 
+This guide tries to encourage to use any modbus device though, to get accustomed with. 
 
 <img src="img/modbus/modbus-prepare.png" height="350"> <img src="img/modbus/modbus-setup.jpg" height="350">
 

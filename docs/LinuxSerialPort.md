@@ -23,6 +23,7 @@ sudo apt-get install librxtx-java
 
 # 2 Raspberry Pi
 
+If the serial port is connected to the Raspberry Pi via e.g. an USB interface but the Raspberrys internal UART pins, you may skip this step.
 By default, the serial port is configured as a console port for interacting with the Linux OS shell. To use the serial port in a software program, it must be disabled for the OS to use.
 To do this, `sudo raspi-config` can be used under **Interfacing Options > Serial**. This will promt two questions, of which the first should be answered `<No>` to disable the shell interfacing, and `<Yes>` for the second one, to still allow serial connections in general.
 

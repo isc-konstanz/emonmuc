@@ -8,8 +8,7 @@
     "devices": [
         {
 		    "name": "serial<serialPort>",
-            "description": "Serial port",
-            "settings": "baudrate:9600"
+            "description": "Serial port"
         }
     ],
 
@@ -23,12 +22,29 @@
             "syntax": "deviceAddress"
         },
         {
-            "id": "address",
+            "id": "-a",
             "name": "Device address",
             "description": "The address to uniquely identify a device, representing an IEC62056-21 slave.<br>For many devices, this is a number that can be read off a label on the meter.<br><br><i>If left empty, a single meter can be addressed without an identifier.<i>",
             "type": "text",
             "mandatory": false,
-            "syntax": "deviceAddress"
+            "syntax": "deviceSettings"
+        },
+        {
+            "id": "-d",
+            "name": "Baud rate change delay",
+            "description": "The baud rate change delay sets the waiting time in milliseconds between a baud rate change. This may be necessary for optical interfaces.",
+            "type": "text",
+            "default": 250,
+            "mandatory": false,
+            "syntax": "deviceSettings"
+        },
+        {
+            "id": "-bd",
+            "name": "Baud rate",
+            "description": "The Baud rate is the number of distinct symbol changes made to the transmission medium per seconds. It is necessary to configure the same Baudrate for master and slave.",
+            "type": "text",
+            "mandatory": false,
+            "syntax": "deviceSettings"
         },
         {
             "id": "import",
@@ -120,5 +136,16 @@
             "engine": "Engine::PHPTIMESERIES",
             "unit": "W"
         }
-    ]
+    ],
+
+    "syntax": {
+        "deviceAddress": {
+            "keyValue": false
+        },
+        "deviceSettings": {
+            "keyValue": true,
+            "assignment": " ",
+            "separator": " "
+        }
+    }
 }
