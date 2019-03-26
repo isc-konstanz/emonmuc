@@ -85,7 +85,7 @@
     // Theme location (folder located under Theme/, and must have the same structure as the basic one)
     $theme = "seal";
     // Theme colour options: "standard", "blue", "sun"
-    $themecolor = "sun";
+    $themecolor = "blue";
 
     // Favicon filenme in Theme/$theme
     $favicon = "favicon.png";
