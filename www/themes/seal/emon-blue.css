@@ -21,7 +21,7 @@ html, body {
 }
 
 .body-login {
-    background-color: #1d8dbc;
+    background-color: #00509b;
 }
 
 #login-form input[type="text"], #login-form input[type="password"] {
@@ -41,7 +41,7 @@ html, body {
 }
 
 #footer a {
-    color: #77b4d9;
+    color: #339ce7;
     text-decoration: none;
 }
 
@@ -121,20 +121,20 @@ input[type=text][class=variable-name-edit] {
 }
 
 .navbar-inner {
-    background-color: #44b3e2 !important;
+    background-color: #0069b4 !important;
     background-image: none !important;
     border: none !important;
     padding: 0px !important;
 }
 
 .nav > .active > a {
-    background-color: #209ed3 !important;
+    background-color: #005999 !important;
     box-shadow: none !important;
 }
 
 .nav > li > a:hover,
 .nav > .open > a {
-    background-color: #2eaadf !important;
+    background-color: #0062a8 !important;
 }
 
 .nav > li > a {
@@ -305,13 +305,13 @@ input[type=text][class=variable-name-edit] {
 .app-header,
 .graph-header {
     color: #fff;
-    background-color: #44b3e2;
+    background-color: #0069b4;
 }
 .app-header .action:hover,
 .graph-header .action:hover {
-    background-color: #2eaadf;
+    background-color: #0062a8;
 }
 
 .graph-body {
-    background-color: #44b3e210;
+    background-color: #0069b410;
 }
