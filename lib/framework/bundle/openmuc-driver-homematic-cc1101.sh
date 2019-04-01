@@ -5,7 +5,7 @@ PROJECT="OpenHomeMatic"
 SERVICE="driver"
 ID="homematic-cc1101"
 
-VERSION="1.0.1"
+VERSION="1.0.2"
 
 install() {
   # Verify, if the specific version does exists already

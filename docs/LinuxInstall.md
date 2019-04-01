@@ -95,9 +95,9 @@ Further, the script allows the configuration of apps, drivers, or other bundles,
 To enable the comfortable configuration of e.g. metering devices for enabled protocol drivers via emoncms, the designated emoncms module needs to be linked to the emoncms modules dir
 
 ~~~
-sudo chown www-data:root -R /opt/emonmuc/www/Modules
-sudo -u www-data ln -s /opt/emonmuc/www/modules/muc /var/www/emoncms/Modules/
-sudo -u www-data ln -s /opt/emonmuc/www/modules/channel /var/www/emoncms/Modules/
+sudo chown www-data:root -R /opt/emonmuc/www/modules
+sudo ln -s /opt/emonmuc/www/modules/muc /var/www/emoncms/Modules/
+sudo ln -s /opt/emonmuc/www/modules/channel /var/www/emoncms/Modules/
 ~~~
 
 **Check for Database upates in the Administration pane, for the necessary tables to be created**
