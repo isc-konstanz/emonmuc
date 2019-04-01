@@ -171,7 +171,7 @@ class Controller {
             }
             catch(ControllerException $e) {
                 $ctrl['drivers'] = array();
-                $this->log->warn($e->getResult());
+                $this->log->warn($e->getMessage());
             }
             $ctrls[] = $ctrl;
         }
@@ -197,7 +197,7 @@ class Controller {
             }
             catch(ControllerException $e) {
                 $ctrl['drivers'] = array();
-                $this->log->warn($e->getResult());
+                $this->log->warn($e->getMessage());
             }
             $ctrls[] = $ctrl;
         }
