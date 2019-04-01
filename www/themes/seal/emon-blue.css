@@ -268,14 +268,14 @@ input[type=text][class=variable-name-edit] {
 }
 
 .group-actions.affix:before {
-    background: #209ed3;
+    background: #0077cc;
 }
 .controls {
     transition: all .2s ease-out
 }
 .controls.affix:before {
     content: '';
-    background: #209ed3;
+    background: #0077cc;
     opacity: 0.85;
     width: 100%;
     display: block;
