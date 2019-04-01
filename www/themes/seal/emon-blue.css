@@ -151,7 +151,7 @@ input[type=text][class=variable-name-edit] {
 }
 
 .node-actions.affix:before {
-    background: #209ed3;
+    background: #0077cc;
 }
 
 .app-header,
