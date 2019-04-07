@@ -6,6 +6,7 @@
 <link href="<?php echo $path; ?>Modules/muc/Views/muc.css" rel="stylesheet">
 <link href="<?php echo $path; ?>Modules/muc/Lib/tablejs/titatoggle-dist-min.css" rel="stylesheet">
 <link href="<?php echo $path; ?>Modules/channel/Views/channel.css" rel="stylesheet">
+<script type="text/javascript" src="<?php echo $path; ?>Lib/misc/cookies.js"></script>
 <script type="text/javascript" src="<?php echo $path; ?>Lib/nodejs/nodes.js"></script>
 <script type="text/javascript" src="<?php echo $path; ?>Modules/muc/Lib/configjs/config.js"></script>
 <script type="text/javascript" src="<?php echo $path; ?>Modules/muc/Views/channel/channel.js"></script>
@@ -25,7 +26,7 @@
             <?php echo _('You may want the next link as a guide for generating your request: '); ?><a href="api"><?php echo _('Channels API helper'); ?></a>
         </p>
     </div>
-    <div id="channels"></div>
+    <div id="channels" style="display:none;"></div>
     
     <div id="channel-footer" class="hide">
         <button id="device-new" class="btn btn-small"><span class="icon-plus-sign"></span>&nbsp;<?php echo _('New device connection'); ?></button>
@@ -171,6 +172,7 @@ nodes.body = {
     }
 };
 nodes.id = 'deviceid';
+nodes.cookie = 'channels_cache';
 nodes.empty = "No channels configured yet. <a class='device-add'>Add</a> or <a class='device-scan'>scan</a> for channels with the buttons on this connection block.";
 nodes.init($('#channels'));
 
@@ -197,20 +199,14 @@ function updateView() {
         device.list(function(result) {
             draw(result);
             redraw = false;
-            
-            channel.records(drawRecords);
         });
     }
     else if (!redraw) {
         if ((time - redrawTime) % INTERVAL_RECORDS < 1000) {
-            
             channel.records(drawRecords);
         }
-        else if (Object.keys(records).length > 0) {
-            for (var id in records) {
-                // TODO:
-//                 $('#'+id+'-time').html(drawRecordTime(id, time));
-            }
+        else {
+            nodes.update();
         }
     }
 }
@@ -235,9 +231,12 @@ function draw(result) {
     
     if (typeof result.success !== 'undefined' && !result.success) {
         //alert("Error:\n" + result.message);
+        if (nodes.itemSize == 0) {
+            alert("Error while loading page:\n" + result.message);
+        }
         return;
     }
-    else if (result.length == 0) {
+    if (result.length == 0) {
         $("#channel-header").hide();
         $("#channel-footer").show();
         $("#channel-none").show();
@@ -276,7 +275,7 @@ function drawRecords(result) {
         return;
     }
     for (var i in result) {
-        var id = 'channel-muc'+result[i].ctrlid+'-'+result[i].id.toLowerCase().replace(/[_.:/]/g, '-');
+        var id = nodes.formatId('item', result[i].id);
         
         if (typeof records[id] !== 'undefined' && typeof channels[id] !== 'undefined' && !redraw) {
             var record = records[id];
