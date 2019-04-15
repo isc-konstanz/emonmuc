@@ -64,7 +64,7 @@
 <script>
 
 const INTERVAL_RECORDS = 5000;
-const INTERVAL_REDRAW = 15000;
+const INTERVAL_REDRAW = 60000;
 var redrawTime = new Date().getTime();
 var redraw = false;
 var updater;
@@ -176,12 +176,10 @@ nodes.cookie = 'channels_cache';
 nodes.empty = "No channels configured yet. <a class='device-add'>Add</a> or <a class='device-scan'>scan</a> for channels with the buttons on this connection block.";
 nodes.init($('#channels'));
 
-var records = {};
-
 setTimeout(function() {
     device.list(function(result) {
         draw(result);
-        channel.records(drawRecords);
+        channel.list(drawRecords);
         updaterStart();
     });
 }, 100);
@@ -203,7 +201,7 @@ function updateView() {
     }
     else if (!redraw) {
         if ((time - redrawTime) % INTERVAL_RECORDS < 1000) {
-            channel.records(drawRecords);
+            channel.list(drawRecords);
         }
         else {
             nodes.update();
@@ -276,15 +274,18 @@ function drawRecords(result) {
     }
     for (var i in result) {
         var id = nodes.formatId('item', result[i].id);
-        
-        if (typeof records[id] !== 'undefined' && typeof channels[id] !== 'undefined' && !redraw) {
-            var record = records[id];
-            
-            records[id] = result[i];
-            if (record.flag != result[i].flag || record.value != result[i].value) {
-                $('#'+id+'-flag').html(drawRecordFlag(record));
-                $('#'+id+'-sample').html(drawRecordValue(record));
-            }
+        if (nodes.items.hasOwnProperty(result[i].deviceid) &&
+        		nodes.items[result[i].deviceid].hasOwnProperty(result[i].id)) {
+    		if (!redraw) {
+                var record = nodes.items[result[i].deviceid][result[i].id];
+                if (record.value != result[i].value) {
+                    $('#'+id+'-sample').html(drawRecordValue(record));
+                }
+                if (record.flag != result[i].flag) {
+                    $('#'+id+'-flag').html(drawRecordFlag(record));
+                }
+    		}
+    		nodes.items[result[i].deviceid][result[i].id] = result[i];
         }
     }
 }
@@ -386,12 +387,11 @@ function registerEvents() {
     $(".channel-sample").on('click', '.channel-slider', function(e) {
         e.stopPropagation();
 
-        var id = $(this).closest('.node-item').data('id');
+        var deviceid = $(this).closest('.node').data('id');
+        var channelid = $(this).closest('.node-item').data('id');
+        var id = nodes.formatId('item', channelid);
         
-        var value = null;
-        if (typeof records[id] !== 'undefined') {
-            value = records[id].value;
-        }
+        var value = nodes.items[deviceid][channelid];
         if (typeof value === 'string' || value instanceof String) {
             value = (value == 'true');
         }
@@ -419,14 +419,13 @@ function registerEvents() {
         timeout = setTimeout(function() {
             timeout = null;
             
-            var id = $(self).closest('.node-item').data('id');
-            
-            var value = null;
-            if (typeof records[id] !== 'undefined' && typeof records[id].value !== 'undefined') {
-                value = records[id].value;
-                if (value != null && !isNaN(value)) {
-                    value = value.toFixed(3);
-                }
+            var deviceid = $(this).closest('.node').data('id');
+            var channelid = $(this).closest('.node-item').data('id');
+            var id = nodes.formatId('item', channelid);
+
+            var value = nodes.items[deviceid][channelid];
+            if (value != null && !isNaN(value)) {
+                value = value.toFixed(3);
             }
             var newVal = $(self).val();
             if (newVal != "" && newVal !== value) {
@@ -455,6 +454,7 @@ function setChannelInputValue(id, type, value) {
         if (typeof value === 'string' || value instanceof String) {
             value = (value == 'true');
         }
+        $('#'+id+'-slider').prop('checked', value);
         $('#'+id+'-slider').prop('checked', value);
     }
     else {
@@ -508,88 +508,72 @@ $("#channels-delete-confirm").on('click', function () {
     $('#channels-delete-modal').modal('hide');
 });
 
-function onDeviceScan() {
-    // Get device of clicked row
-    var id = $(this).closest('.node-item').data('id');
-    var device = devices[id];
-    
+function onDeviceScan(device) {
     channel_dialog.loadScan(device);
 }
 
-function onDeviceAdd() {
-    // Get device of clicked row
-    var id = $(this).closest('.node-item').data('id');
-    var device = devices[id];
-    
+function onDeviceAdd(device) {
     channel_dialog.loadNew(device);
 }
 
-function onDeviceConfig() {
-    // Get device of clicked row
-    var id = $(this).closest('.node-item').data('id');
-    var device = devices[id];
-    
+function onDeviceConfig(device) {
     device_dialog.loadConfig(device);
 }
 
-function onChannelWrite() {
-    var id = $(this).closest('.node-item').data('id');
-    var ch = channels[id];
-    
-    var action = $(this).data('action');
-    if (action == 'edit') {
+function onChannelWrite(configs) {
+    var id = nodes.formatId('item', configs.id);
+	var item = $('#'+id+'-write');
+    var action = item.data('action');
+    if (action == 'cancel') {
+    	item.data('action', 'edit');
+    	item.find('span').removeClass('icon-remove').addClass('icon-pencil');
+        
+    	$('#'+id+'-input').hide();
+    	$('#'+id+'-value').fadeIn();
+        
+        updaterStart();
+    }
+    else if (action == 'write') {
+        item.data('action', 'edit');
+        item.find('span').removeClass('icon-share-alt').addClass('icon-pencil');
+        
+        var type = configs.configs.valueType;
+        var value = getChannelInputValue(id, type);
+        
+        channel.write(configs.ctrlid, configs.id, value, type, function(result) {
+            if (typeof result.success !== 'undefined' && !result.success) {
+                channel.list(drawRecords);
+                
+                alert("Error:\n" + result.message);
+            }
+            updaterStart();
+        });
+        configs.value = value;
+        configs.flag = 'LOADING';
+        nodes.items[configs.deviceid][configs.id] = configs;
+        
+        $('#'+id+'-input').hide();
+        $('#'+id+'-value').fadeIn();
+        $('#'+id+'-sample').html(drawRecordValue(configs));
+        $('#'+id+'-flag').html(drawRecordFlag(configs));
+    }
+    else {
         updaterStop();
         
-        $(this).data('action', 'cancel');
-        $(this).find('span').removeClass('icon-pencil').addClass('icon-remove');
+        item.data('action', 'cancel');
+        item.find('span').removeClass('icon-pencil').addClass('icon-remove');
         
-        var type = ch.configs.valueType;
-        var value = "";
-        if (typeof records[id].value !== 'undefined') {
-            value = records[id].value;
-        }
+        var type = configs.configs.valueType;
+        var value = nodes.items[configs.deviceid][configs.id].value;
         setChannelInputValue(id, type, value);
         
         $('#'+id+'-value').hide();
         $('#'+id+'-input').fadeIn();
     }
-    else if (action == 'write') {
-        $(this).data('action', 'edit');
-        $(this).find('span').removeClass('icon-share-alt').addClass('icon-pencil');
-        
-        var type = ch.configs.valueType;
-        var value = getChannelInputValue(id, type);
-        
-        channel.write(ch.ctrlid, ch.id, value, type, function(result) {
-            if (typeof result.success !== 'undefined' && !result.success) {
-                alert("Error:\n" + result.message);
-                return;
-            }
-            channel.records(drawRecords);
-        });
-        
-        $(".channel-input").hide();
-        $('.channel-value').fadeIn();
-
-        updaterStart();
-    }
-    else {
-        $(this).data('action', 'edit');
-        $(this).find('span').removeClass('icon-remove').addClass('icon-pencil');
-        
-        $(".channel-input").hide();
-        $('.channel-value').fadeIn();
-
-        updaterStart();
-    }
 }
 
-function onChannelConfig() {
-    // Get channel of clicked row
-    var id = $(this).closest('.node-item').data('id');
-    var channel = channels[id];
-    
-    channel_dialog.loadConfig(channel);
+function onChannelConfig(configs) {
+    channel_dialog.loadConfig(configs);
 }
 
 </script>
