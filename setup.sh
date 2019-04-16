@@ -70,6 +70,9 @@ install_emonmuc() {
   chown $EMONMUC_USER:root -R "$EMONMUC_DIR"
   chown $EMONCMS_USER:root -R "$EMONMUC_DIR"/www
 
+  cp -p "$EMONMUC_DIR"/conf/system.default.properties "$EMONMUC_DIR"/conf/system.properties
+  cp -p "$EMONMUC_DIR"/conf/config.default.properties "$EMONMUC_DIR"/conf/config.properties
+
   ln -sf "$EMONMUC_DIR"/bin/emonmuc /usr/local/bin/emonmuc
   ln -sf "$EMONMUC_DIR"/lib/systemd/emonmuc.service /lib/systemd/system/emonmuc.service
   echo "d /var/run/emonmuc 0755 $EMONMUC_USER root -" | sudo tee /usr/lib/tmpfiles.d/emonmuc.conf >/dev/null 2>&1
