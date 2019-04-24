@@ -393,9 +393,9 @@ abstract class ControllerChannel {
                 '400'=>'400 milliseconds',
                 '500'=>'500 milliseconds',
                 '1000'=>'1 second',
-                '2000'=>'2 second',
-                '3000'=>'3 second',
-                '4000'=>'4 second',
+                '2000'=>'2 seconds',
+                '3000'=>'3 seconds',
+                '4000'=>'4 seconds',
                 '5000'=>'5 seconds',
                 '10000'=>'10 seconds',
                 '15000'=>'15 seconds',
@@ -528,6 +528,9 @@ abstract class ControllerChannel {
         foreach ($settings as $key=>$value) {
             if (is_bool($value)) {
                 $value = ($value) ? 'true' : 'false';
+            }
+            else if (is_numeric($value)) {
+                $value = str_replace(',', '.', strval($value));
             }
             $arr[] = $key.':'.$value;
         }

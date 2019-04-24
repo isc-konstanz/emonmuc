@@ -25,6 +25,32 @@
             "scan": true,
             "mandatory": true,
             "syntax": "deviceAddress"
+        },
+        {
+            "id": "refresh",
+            "name": "Refresh interval",
+            "description": "Defines at which interval the pin state will be read.",
+            "type": "selection",
+            "select": [
+                { "name": "1 second", "value": 1000 },
+                { "name": "2 seconds", "value": 2000 },
+                { "name": "3 seconds", "value": 3000 },
+                { "name": "4 seconds", "value": 4000 },
+                { "name": "5 seconds", "value": 5000 },
+                { "name": "10 seconds", "value": 10000 },
+                { "name": "15 seconds", "value": 15000 },
+                { "name": "20 seconds", "value": 20000 },
+                { "name": "25 seconds", "value": 25000 },
+                { "name": "30 seconds", "value": 30000 },
+                { "name": "35 seconds", "value": 35000 },
+                { "name": "40 seconds", "value": 40000 },
+                { "name": "45 seconds", "value": 45000 },
+                { "name": "50 seconds", "value": 50000 },
+                { "name": "55 seconds", "value": 55000 },
+                { "name": "1 minute",  "value": 60000 }
+            ],
+            "default": 5000,
+            "mandatory": false
         }
     ],
 
@@ -46,8 +72,8 @@
         {
             "name": "<node>*state",
             "description": "Pin state",
-            "logging": {"loggingInterval": 5000, "loggingMaxInterval": 60000},
-            "configs": {"samplingInterval": 5000, "valueType":"BOOLEAN"},
+            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 60000},
+            "configs": {"samplingInterval": "<refresh>", "valueType":"BOOLEAN"},
             "processList": [
                 {
                     "process": "log_to_feed",

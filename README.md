@@ -112,7 +112,7 @@ With the system being prepared, some first steps can be taken to learn about the
 For this purpose, some guides were documented to be followed, 
 
   - [First Steps with emonmcms/muc](docs/FirstSteps.md)
-  - [Setup an electric household meter](docs/FirstStepsMetering.md)
+  - [Setup an electric household meter](https://github.com/isc-konstanz/OpenSmartMeter/blob/master/docs/FirstSteps.md)
 
 To get accustomed with some of the drivers or the general emonmuc framework, a set of specified guides were written:
 

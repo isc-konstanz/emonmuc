@@ -21,10 +21,21 @@ To disable the driver, use
 emonmuc remove modbus
 ~~~
 
+
+## 1.1 Install RXTX 
+
+RXTX is a Java native library providing serial and parallel communication for the Java virtual machine. It is a necessary dependency for many communication devices, using e.g. RS485.
+
+To install, download the binaries via debian repository:
+
+~~~
+sudo apt-get install librxtx-java
+~~~
+
 If the serial port is not connected to the Raspberry Pi via e.g. an USB interface but the Raspberrys internal UART pins, the [Serial Port should be prepared](https://github.com/isc-konstanz/emonmuc/blob/master/docs/LinuxSerialPort.md) accordingly.
 
 
-## 1.1 Assembling the hardware
+## 1.2 Assembling the hardware
 
 **Please be aware, that working with domestic energy supply cables in the wrong way can cause death by high voltage! The guide given here has to be used at your own risk.**
 
