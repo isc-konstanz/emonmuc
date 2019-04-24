@@ -12,7 +12,7 @@ To use any serial port with the emonmuc framework, e.g. to communicate via Modbu
 
 ## 1.1 Install RXTX 
 
-RXTX is a Java native library providing serial and parallel communication for the Java Development Toolkit (JDK). It is a necessary dependency for many communication devices, using e.g. RS485.
+RXTX is a Java native library providing serial and parallel communication for the Java virtual machine. It is a necessary dependency for many communication devices, using e.g. RS485.
 
 To install, download the binaries via debian repository:
 

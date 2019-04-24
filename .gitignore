@@ -10,8 +10,8 @@ cache/
 bundle/
 conf/*
 !conf/logback.xml
-!conf/system.properties
-!conf/config.properties
+!conf/system.default.properties
+!conf/config.default.properties
 !conf/emoncms.apache2.conf
 !conf/emoncms.default.conf
 !conf/emoncms.settings.php

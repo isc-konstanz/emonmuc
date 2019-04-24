@@ -22,6 +22,38 @@
             "scan": true,
             "mandatory": true,
             "syntax": "deviceAddress"
+        },
+        {
+            "id": "refresh",
+            "name": "Refresh interval",
+            "description": "Defines at which interval the sensor will be read.",
+            "type": "selection",
+            "select": [
+                { "name": "1 second", "value": 1000 },
+                { "name": "2 seconds", "value": 2000 },
+                { "name": "3 seconds", "value": 3000 },
+                { "name": "4 seconds", "value": 4000 },
+                { "name": "5 seconds", "value": 5000 },
+                { "name": "10 seconds", "value": 10000 },
+                { "name": "15 seconds", "value": 15000 },
+                { "name": "20 seconds", "value": 20000 },
+                { "name": "25 seconds", "value": 25000 },
+                { "name": "30 seconds", "value": 30000 },
+                { "name": "35 seconds", "value": 35000 },
+                { "name": "40 seconds", "value": 40000 },
+                { "name": "45 seconds", "value": 45000 },
+                { "name": "50 seconds", "value": 50000 },
+                { "name": "55 seconds", "value": 55000 },
+                { "name": "1 minute",  "value": 60000 },
+                { "name": "2 minutes", "value": 120000 },
+                { "name": "3 minutes", "value": 180000 },
+                { "name": "4 minutes", "value": 240000 },
+                { "name": "5 minutes", "value": 300000 },
+                { "name": "10 minutes", "value": 600000 },
+                { "name": "15 minutes", "value": 900000 }
+            ],
+            "default": 60000,
+            "mandatory": false
         }
     ],
 
@@ -41,8 +73,8 @@
             "name": "<node>*temperature",
             "description": "DS18B20 temperature",
             "settings": "unit:CELSIUS",
-            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 900000, "loggingTolerance": 0.25, "average": true},
-            "configs": {"samplingInterval": 60000, "unit": "°C", "valueType":"DOUBLE"},
+            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "loggingTolerance": 0.25, "average": true},
+            "configs": {"samplingInterval": "<refresh>", "unit": "°C", "valueType":"DOUBLE"},
             "processList": [
                 {
                     "process": "log_to_feed",

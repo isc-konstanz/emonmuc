@@ -9,7 +9,7 @@
         {
             "name": "serial<address>",
             "description": "Modbus RTU connection",
-            "settings": "RTU:SERIAL_ENCODING_RTU:<baudrate>:DATABITS_8:PARITY_NONE:STOPBITS_2:ECHO_FALSE:FLOWCONTROL_NONE:FLOWCONTROL_NONE"
+            "settings": "RTU:SERIAL_ENCODING_RTU:<baudRate>:DATABITS_8:PARITY_NONE:STOPBITS_2:ECHO_FALSE:FLOWCONTROL_NONE:FLOWCONTROL_NONE"
         }
     ],
 
@@ -30,18 +30,90 @@
             "mandatory": true
         },
         {
-            "id": "baudrate",
-            "name": "Baudrate",
-            "description": "The Baudrate is the number of distinct symbol changes made to the transmission medium per seconds. It is necessary to configure the same Baudrate for master and slave.",
-            "type": "text",
+            "id": "baudRate",
+            "name": "Baud rate",
+            "description": "The baud rate for the serial communication.",
+            "type": "selection",
+            "select": [
+                { "name": "300", "value": 300 },
+		        { "name": "300", "value": 300 },
+		        { "name": "1200", "value": 1200 },
+		        { "name": "2400", "value": 2400 },
+		        { "name": "4800", "value": 4800 },
+		        { "name": "9600", "value": 9600 },
+		        { "name": "19200", "value": 19200 },
+		        { "name": "38400", "value": 38400 },
+		        { "name": "57600", "value": 57600 },
+		        { "name": "115200", "value": 115200 },
+		        { "name": "230400", "value": 230400 },
+		        { "name": "460800", "value": 460800 },
+		        { "name": "921600", "value": 921600 }
+            ],
             "default": 2400,
             "mandatory": false
         },
         {
-            "id": "timeOffset",
-            "name": "Time offset",
-            "description": "The time waited in milliseconds, until the serial connection will be used. Necessary for multiple meters on the same line.",
-            "type": "text",
+            "id": "refresh",
+            "name": "Refresh interval",
+            "description": "Defines at which interval the values of the meter device will be read.",
+            "type": "selection",
+            "select": [
+                { "name": "1 second", "value": 1000 },
+                { "name": "2 seconds", "value": 2000 },
+                { "name": "3 seconds", "value": 3000 },
+                { "name": "4 seconds", "value": 4000 },
+                { "name": "5 seconds", "value": 5000 },
+                { "name": "10 seconds", "value": 10000 },
+                { "name": "15 seconds", "value": 15000 },
+                { "name": "20 seconds", "value": 20000 },
+                { "name": "25 seconds", "value": 25000 },
+                { "name": "30 seconds", "value": 30000 },
+                { "name": "35 seconds", "value": 35000 },
+                { "name": "40 seconds", "value": 40000 },
+                { "name": "45 seconds", "value": 45000 },
+                { "name": "50 seconds", "value": 50000 },
+                { "name": "55 seconds", "value": 55000 },
+                { "name": "1 minute",  "value": 60000 },
+                { "name": "2 minutes", "value": 120000 },
+                { "name": "3 minutes", "value": 180000 },
+                { "name": "4 minutes", "value": 240000 },
+                { "name": "5 minutes", "value": 300000 },
+                { "name": "10 minutes", "value": 600000 },
+                { "name": "15 minutes", "value": 900000 }
+            ],
+            "default": 60000,
+            "mandatory": false
+        },
+        {
+            "id": "offset",
+            "name": "Refresh offset",
+            "description": "Defines the time waited, until the values of the meter device will be read. Necessary for multiple meters on the same line.",
+            "type": "selection",
+            "select": [
+                { "name": "None", "value": 0 },
+                { "name": "1 second", "value": 1000 },
+                { "name": "2 seconds", "value": 2000 },
+                { "name": "3 seconds", "value": 3000 },
+                { "name": "4 seconds", "value": 4000 },
+                { "name": "5 seconds", "value": 5000 },
+                { "name": "10 seconds", "value": 10000 },
+                { "name": "15 seconds", "value": 15000 },
+                { "name": "20 seconds", "value": 20000 },
+                { "name": "25 seconds", "value": 25000 },
+                { "name": "30 seconds", "value": 30000 },
+                { "name": "35 seconds", "value": 35000 },
+                { "name": "40 seconds", "value": 40000 },
+                { "name": "45 seconds", "value": 45000 },
+                { "name": "50 seconds", "value": 50000 },
+                { "name": "55 seconds", "value": 55000 },
+                { "name": "1 minute",  "value": 60000 },
+                { "name": "2 minutes", "value": 120000 },
+                { "name": "3 minutes", "value": 180000 },
+                { "name": "4 minutes", "value": 240000 },
+                { "name": "5 minutes", "value": 300000 },
+                { "name": "10 minutes", "value": 600000 },
+                { "name": "15 minutes", "value": 900000 }
+            ],
             "default": 0,
             "mandatory": false
         }
@@ -52,8 +124,8 @@
             "name": "<node>*voltage",
             "description": "Voltage",
             "address": "<unitId>:INPUT_REGISTERS:0:FLOAT",
-            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 180000, "loggingTolerance": 1, "average": true},
-            "configs": {"samplingInterval": 60000, "samplingTimeOffset": "<timeOffset>", "valueType":"FLOAT", "unit": "V"},
+            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "loggingTolerance": 0.01, "average": true},
+            "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"FLOAT", "unit": "V"},
             "processList": [
                 {
                     "process": "log_to_feed",
@@ -65,8 +137,8 @@
             "name": "<node>*current",
             "description": "Current",
             "address": "<unitId>:INPUT_REGISTERS:6:FLOAT",
-            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 180000},
-            "configs": {"samplingInterval": 60000, "samplingTimeOffset": "<timeOffset>", "valueType":"FLOAT", "unit": "A"},
+            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000},
+            "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"FLOAT", "unit": "A"},
             "processList": [
                 {
                     "process": "log_to_feed",
@@ -78,8 +150,8 @@
             "name": "<node>*power",
             "description": "Power",
             "address": "<unitId>:INPUT_REGISTERS:12:FLOAT",
-            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 180000},
-            "configs": {"samplingInterval": 60000, "samplingTimeOffset": "<timeOffset>", "valueType":"FLOAT", "unit": "W"},
+            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000},
+            "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"FLOAT", "unit": "W"},
             "processList": [
                 {
                     "process": "log_to_feed",
@@ -91,8 +163,8 @@
             "name": "<node>*frequency",
             "description": "Frequency",
             "address": "<unitId>:INPUT_REGISTERS:70:FLOAT",
-            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 180000, "loggingTolerance": 0.1, "average": true},
-            "configs": {"samplingInterval": 60000, "samplingTimeOffset": "<timeOffset>", "valueType":"FLOAT", "unit": "Hz"},
+            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "loggingTolerance": 0.1, "average": true},
+            "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"FLOAT", "unit": "Hz"},
             "processList": [
                 {
                     "process": "log_to_feed",
@@ -104,8 +176,8 @@
             "name": "<node>*import",
             "description": "Energy import",
             "address": "<unitId>:INPUT_REGISTERS:72:FLOAT",
-            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 180000},
-            "configs": {"samplingInterval": 60000, "samplingTimeOffset": "<timeOffset>", "valueType":"FLOAT", "unit": "kWh"},
+            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000},
+            "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"FLOAT", "unit": "kWh"},
             "processList": [
                 {
                     "process": "log_to_feed",
@@ -121,8 +193,8 @@
             "name": "<node>*export",
             "description": "Energy export",
             "address": "<unitId>:INPUT_REGISTERS:74:FLOAT",
-            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 180000},
-            "configs": {"samplingInterval": 60000, "samplingTimeOffset": "<timeOffset>", "valueType":"FLOAT", "unit": "kWh"},
+            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000},
+            "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"FLOAT", "unit": "kWh"},
             "processList": [
                 {
                     "process": "log_to_feed",

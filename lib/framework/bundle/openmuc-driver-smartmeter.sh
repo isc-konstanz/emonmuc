@@ -1,11 +1,11 @@
 #!/bin/bash
 #Description: Setup script to install OpenHomeMatic Driver
 OWNER="isc-konstanz"
-PROJECT="OpenIEC62056-21"
+PROJECT="OpenSmartMeter"
 SERVICE="driver"
-ID="iec62056-21"
+ID="smartmeter"
 
-VERSION="1.0.2"
+VERSION="2.0.0"
 
 install() {
   # Verify, if the specific version does exists already
