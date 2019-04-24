@@ -80,11 +80,9 @@ Several drivers can be enabled at once, while each needs to be selected individu
 
   - **csv**: Read CSV files
   - **dlms**: [DLMS/COSEM](https://www.openmuc.org/openmuc/user-guide/#_dlmscosem)
-  - **ehz**: [eHz for SML and IEC 62056-21](https://www.openmuc.org/openmuc/user-guide/#_ehz)
   - **homematic-cc1101**: [HomeMatic (CC1101)](https://github.com/isc-konstanz/OpenHomeMatic)
   - **iec60870**: [IEC 60870-5-104](https://www.openmuc.org/openmuc/user-guide/#_iec_60870_5_104)
   - **iec61850**: [IEC 61850](https://www.openmuc.org/openmuc/user-guide/#_iec_61850)
-  - **iec62056p21**: [IEC 62056 part 21](https://www.openmuc.org/openmuc/user-guide/#_iec_62056_part_21)
   - **knx**: [KNX](https://www.openmuc.org/openmuc/user-guide/#_knx)
   - **mbus**: [M-Bus (Wired)](https://www.openmuc.org/openmuc/user-guide/#_m_bus_wired)
   - **wmbus**: [M-Bus (Wireless)](https://www.openmuc.org/openmuc/user-guide/#_m_bus_wireless)
@@ -92,6 +90,7 @@ Several drivers can be enabled at once, while each needs to be selected individu
   - **pcharge**: [P-CHARGE](https://github.com/isc-konstanz/OpenPCharge)
   - **rpi-gpio**: GPIO (Raspberry Pi)
   - **rpi-w1**: 1-Wire (Raspberry Pi)
+  - **smartmeter**: [SML and IEC 62056-21 mode A-D](https://github.com/isc-konstanz/OpenSmartMeter)
   - **snmp**: [SNMP](https://www.openmuc.org/openmuc/user-guide/#_snmp)
   - **solaredge**: [SolarEdge API](https://github.com/isc-konstanz/OpenSolarEdge)
 
