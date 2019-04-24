@@ -529,6 +529,9 @@ abstract class ControllerChannel {
             if (is_bool($value)) {
                 $value = ($value) ? 'true' : 'false';
             }
+            else if (is_numeric($value)) {
+                $value = str_replace(',', '.', strval($value));
+            }
             $arr[] = $key.':'.$value;
         }
         return implode(",", $arr);
