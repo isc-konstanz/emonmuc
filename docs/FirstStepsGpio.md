@@ -1,4 +1,4 @@
-![what you need](img/rpi-gpio/led-prepare.jpg)
+<img src="img/rpi-gpio/led-prepare.jpg" width="600">
 
 This document describes the configuration and control of a LED via Raspberry Pi GPIO pins with emonmuc (**E**nergy **mon**itoring **M**ulty **U**tility **C**ommunication controller).
 
@@ -21,38 +21,8 @@ To disable the driver, use
 emonmuc remove rpi-gpio
 ~~~
 
-The GPIO driver is based on the [Pi4J](https://www.pi4j.com/) library, that links to the [Wiring Pi](http://wiringpi.com/) debian package binaries. This has to be installed first
-
-~~~
-sudo apt-get install wiringpi
-~~~
-
-To allow drivers to have access to GPIO pins of the Raspberry Pi even when not root, non-privileged accessed can be enabled since the Raspberry Pi 3.  
-Non-privileged access for GPIO is not enabled by default due to the fact that some functions such as PWM are not yet supported in a non-privileged context.
-
-This can be done by simply appending a value to the users path variable in `~/.bashrc`:  
-*Beware that this change needs the user to logout to take effect*
-
->    export WIRINGPI_GPIOMEM=1
-
-To make sure, check that `ls -l /dev/gpiomem` returns the correct permissions
-
->    crw-rw---- 1 root gpio 248, 0 MM DD HH:mm /dev/gpiomem
-
-If it doesn't, set the correct permissions:
-
-~~~
-sudo chown root.gpio /dev/gpiomem
-sudo chmod g+rw /dev/gpiomem
-~~~
-
-**Caution**: Non-priviledged access only works since the Raspberry Pi 3 and onwards. Older platforms need to start the emonmuc framework with root permissions.  
-To do so, simply change the ownership of the runscript and restart the framework:
-
-~~~
-sudo chown root -R /opt/emonmuc
-sudo systemctl restart emonmuc
-~~~
+The GPIO driver is based on the [Pi4J](https://www.pi4j.com/) library, that links to the [Wiring Pi](http://wiringpi.com/) debian package.  
+To prepare it, the [Wiring Pi preparation guide](LinuxWiringPi.md) needs to be followed.
 
 
 ## 1.1 Assembling the hardware
@@ -61,7 +31,7 @@ Now, connect a LED via a GPIO pin: next to the Raspberry Pi you need a breadboar
 
 Next, connect one wire (black) from the ground-pin to the breadboard. Connect the resistor and the LED with the board in series. Last step is to link the second wire (orange) with any pin (here, it is pin 21, GPIO 13).
 
-![led assembled](img/rpi-gpio/led-assembled.jpg)
+<img src="img/rpi-gpio/led-assembled.jpg" width="600">
 
 *Note: The GPIO 13 was randomly chosen. Any GPIO-Pin is programmable.*
 
