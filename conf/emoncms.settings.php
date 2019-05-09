@@ -166,7 +166,7 @@
     // NOTE: don't make $csv_decimal_place_separator == $csv_field_separator
     // Adjust as appropriate for your location
     // number of decimal places
-    $csv_decimal_places = 2;
+    $csv_decimal_places = 3;
 
     // decimal place separator
     $csv_decimal_place_separator = ".";
@@ -185,7 +185,7 @@
     $updatelogin = false;
 
     // Applicaton name
-    $appname = "emoncms";
+    $appname = "seal";
 
     // Emonmuc module
     $muc_settings = array(
@@ -197,11 +197,11 @@
     $app_settings = array(
         // Blacklisted Apps. Uncommented apps will not be available for users to create.
         'hidden' => array(
-            //'myelectric',
-            //'mysolarpv',
+            'myelectric',
+            'mysolarpv',
             'mysolarpvdivert',
             'myenergy',
-            //'myelectric2',
+            'myelectric2',
             'timeofuse',
             'timeofuse2',
             'timeofusecl',
