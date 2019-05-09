@@ -238,9 +238,9 @@ find_emonmuc_user
 if [ "$CLEAN" ]; then
   EMONMUC_TMP="/var/tmp/emonmuc/backup"
   rm -r $EMONMUC_TMP /var/tmp/emonmuc/bundle >/dev/null 2>&1
-  mkdir -p $EMONMUC_TMP
+  mkdir -p $EMONMUC_TMP/lib
   rm -rf /var/lib/emonmuc/device
-  cp -r /var/lib/emonmuc/* $EMONMUC_TMP/lib
+  cp -r /var/lib/emonmuc/* $EMONMUC_TMP/lib/
   mv -f "$EMONMUC_DIR"/conf $EMONMUC_TMP/ >/dev/null 2>&1
   mv -f "$EMONCMS_DIR"/settings.php $EMONMUC_TMP/ >/dev/null 2>&1
   rm -rf "$EMONMUC_DIR"
