@@ -135,7 +135,7 @@ var muc_dialog = {
 	                    return false;
 	                }
 	                update();
-	                $('#ctrl-delete-modal').modal('hide');
+	                $('#ctrl-modal-delete').modal('hide');
             });
         });
     }

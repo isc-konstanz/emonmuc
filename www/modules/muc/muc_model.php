@@ -335,12 +335,16 @@ class Controller {
 
     private function delete_http($userid, $ctrl) {
         $http = $this->get_http($ctrl['type'], $ctrl['options']);
-        
-        $driver = $this->driver($ctrl);
-        foreach ($driver->get_list($userid) as $d) {
-            $driver->delete($d['id']);
+        try {
+            $driver = $this->driver($ctrl);
+            foreach ($driver->get_list($userid) as $d) {
+                $driver->delete($d['id']);
+            }
+            $http->delete('users', array('configs'=>array('id'=>'emoncms')));
+			
+        } catch(ControllerException $e) {
+			// Continue removing database and redis entry
         }
-        $http->delete('users', array('configs'=>array('id'=>'emoncms')));
     }
 
     private function get_http($type, &$options) {

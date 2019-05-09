@@ -77,31 +77,42 @@ install_emonmuc() {
   ln -sf "$EMONMUC_DIR"/lib/systemd/emonmuc.service /lib/systemd/system/emonmuc.service
   echo "d /var/run/emonmuc 0755 $EMONMUC_USER root -" | sudo tee /usr/lib/tmpfiles.d/emonmuc.conf >/dev/null 2>&1
 
-  bash "$EMONMUC_DIR"/bin/emonmuc update >/dev/null 2>&1
+  if [ "$CLEAN" ] && [ -e "$EMONMUC_TMP/conf" ]; then
+    cp -pf "$EMONMUC_TMP"/conf/bundles.conf "$EMONMUC_DIR"/conf/
+  fi
+
+  bash "$EMONMUC_DIR"/bin/emonmuc update
 
   systemctl enable emonmuc.service
-  systemctl restart emonmuc.service
-  wait=0
-  while ! nc -z localhost $EMONMUC_PORT && [ $wait -lt 200 ]; do
-    wait=$((wait + 1))
-    sleep 0.1
-  done
 
   if [ "$CLEAN" ] && [ -e "$EMONMUC_TMP/conf" ]; then
-    rm -rf "$EMONMUC_DIR"/conf
-    mv $EMONMUC_TMP/conf "$EMONMUC_DIR"/conf
+    rm "$EMONMUC_TMP"/conf/{*.default.*,emoncms.apache2.conf,emoncms.settings.php,logback.xml,shadow} >/dev/null 2>&1
+    cp -rfp "$EMONMUC_TMP"/conf/* "$EMONMUC_DIR"/conf/
   fi
   if [ -n "$EMONCMS_DIR" ]; then
     sudo -u $EMONCMS_USER ln -sf "$EMONMUC_DIR"/www/modules/channel "$EMONCMS_DIR"/Modules/
     sudo -u $EMONCMS_USER ln -sf "$EMONMUC_DIR"/www/modules/muc "$EMONCMS_DIR"/Modules/
     sudo -u $EMONCMS_USER ln -sf "$EMONMUC_DIR"/www/themes/seal "$EMONCMS_DIR"/Theme/
 
+    systemctl restart emonmuc.service
+
     # Wait a while for the server to be available.
     # TODO: Explore necessity. May be necessary for Raspberry Pi V1
-    printf "Finishing emonmuc setup\nPlease wait..."
-    sleep 10
+    printf "Finishing emonmuc setup\nPlease wait"
+    wait=0
+    while ! nc -z localhost $EMONMUC_PORT && [ $wait -lt 60 ]; do
+      wait=$((wait + 3))
+      sleep 3
+	  printf "."
+    done
+    while [ $wait -lt 15 ]; do
+      wait=$((wait + 3))
+      sleep 3
+	  printf "."
+    done
+	printf "\n"
 
-    php "$EMONMUC_DIR"/setup.php --dir "$EMONCMS_DIR" --apikey $API_KEY
+    php "$EMONMUC_DIR"/lib/www/setup.php --dir "$EMONCMS_DIR" --apikey $API_KEY
     chown $EMONMUC_USER -R "$EMONMUC_DIR"/conf
   fi
   rm /var/log/emoncms/emonmuc* >/dev/null 2>&1
@@ -135,7 +146,7 @@ install_emoncms() {
   fi
 
   if [ -f "/etc/apache2/sites-available/000-default.conf" ]; then
-    sed -i "s:.*DocumentRoot .*$:	DocumentRoot $(dirname ${EMONCMS_DIR}):" /etc/apache2/sites-available/000-default.conf
+    sed -i "12s/.*DocumentRoot .*$/	DocumentRoot \/var\/www\/emoncms/" /etc/apache2/sites-available/000-default.conf
   fi
   cp -f "$EMONMUC_DIR"/conf/emoncms.apache2.conf /etc/apache2/sites-available/emoncms.conf
   a2ensite emoncms
@@ -143,14 +154,20 @@ install_emoncms() {
 
   sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq mariadb-server mariadb-client redis-server
 
-  if ! mysql -uroot --execute="use emoncms"; then
-    mysql -uroot --execute="\
+  if ! [ -d /var/lib/mysql/emoncms ] ; then
+	SQL_QUERY="\
 CREATE DATABASE emoncms DEFAULT CHARACTER SET utf8;\
 CREATE USER 'emoncms'@'localhost' IDENTIFIED BY 'emoncms';\
 GRANT ALL ON emoncms.* TO 'emoncms'@'localhost';"
+    mysql -uroot --execute="$SQL_QUERY"
+    if [ $? -ne 0 ]; then
+      echo "Failed to create MySQL database. Please verify as root user."
+      mysql -u root -p --execute="$SQL_QUERY"
+    fi
   fi
   if [ "$CLEAN" ] && [ -f "$EMONMUC_TMP/settings.php" ]; then
-    mv -f $EMONMUC_TMP/settings.php "$EMONCMS_DIR"/settings.php >/dev/null 2>&1
+    head -8 "$EMONMUC_TMP"/settings.php > "$EMONCMS_DIR"/settings.php
+    tail -n +9 "$EMONMUC_DIR"/conf/emoncms.settings.php >> "$EMONCMS_DIR"/settings.php
   else
     cp -f "$EMONMUC_DIR"/conf/emoncms.settings.php "$EMONCMS_DIR"/settings.php
     install_passwords
@@ -169,11 +186,15 @@ install_passwords() {
   SQL_EMONMUC_USER=$(pwgen -s1 32)
   #SQL_EMONMUC_USER=$(echo "$SQL_EMONMUC_USER" | tr \\\´\`\'\"\$\@\( $(pwgen -1 1))
 
-  mysql -uroot --execute="\
+  SQL_QUERY="\
 SET PASSWORD FOR 'root'@'localhost' = PASSWORD('$SQL_ROOT');\
 SET PASSWORD FOR 'emoncms'@'localhost' = PASSWORD('$SQL_EMONMUC_USER');\
 FLUSH PRIVILEGES;"
-
+  mysql -uroot --execute="$SQL_QUERY"
+  if [ $? -ne 0 ]; then
+    echo "Failed to update MySQL database. Please verify as root user."
+    mysql -u root -p --execute="$SQL_QUERY"
+  fi
   sed -i "7s/.*password = .*$/    \$password = \"$SQL_EMONMUC_USER\";/" "$EMONCMS_DIR"/settings.php
 
   echo "[Database]" > "$EMONMUC_DIR"/setup.conf
@@ -215,16 +236,18 @@ fi
 find_emonmuc_user
 
 if [ "$CLEAN" ]; then
-  EMONMUC_TMP="/var/tmp/emonmuc/setup"
+  EMONMUC_TMP="/var/tmp/emonmuc/backup"
+  rm -r $EMONMUC_TMP /var/tmp/emonmuc/bundle >/dev/null 2>&1
   mkdir -p $EMONMUC_TMP
+  rm -rf /var/lib/emonmuc/device
+  cp -r /var/lib/emonmuc/* $EMONMUC_TMP/lib
   mv -f "$EMONMUC_DIR"/conf $EMONMUC_TMP/ >/dev/null 2>&1
   mv -f "$EMONCMS_DIR"/settings.php $EMONMUC_TMP/ >/dev/null 2>&1
-  rm -rf "$EMONMUC_DIR" >/dev/null 2>&1
-  rm -rf "$EMONCMS_DIR" >/dev/null 2>&1
-  rm -rf /srv/www/emoncms* >/dev/null 2>&1
-  rm -rf /var/www/emoncms* >/dev/null 2>&1
-  rm -rf /var/www/html/emoncms* >/dev/null 2>&1
-  rm -rf /var/lib/emonmuc/device >/dev/null 2>&1
+  rm -rf "$EMONMUC_DIR"
+  rm -rf "$EMONCMS_DIR"
+  rm -rf /srv/www/emoncms*
+  rm -rf /var/www/emoncms*
+  rm -rf /var/www/html/emoncms*
 fi
 
 if [ ! -d "$EMONMUC_DIR" ]; then

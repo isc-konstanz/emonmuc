@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__FILE__)."/lib/www/core.php";
+require_once dirname(__FILE__)."/core.php";
 require_once "Modules/muc/muc_model.php";
 require_once "Modules/user/user_model.php";
 require_once "Lib/dbschemasetup.php";
