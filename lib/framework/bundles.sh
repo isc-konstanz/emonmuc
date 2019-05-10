@@ -93,15 +93,12 @@ update() {
       install
     done
   fi
-  rm -rf "$TMP_DIR"
 }
 
 bundles() {
   for bundle in "${@:2}"; do
     bundle "$1" "$bundle"
   done
-  rm -rf "$TMP_DIR"
-
   php "$EMONMUC_DIR"/lib/www/reload.php
 }
 

@@ -383,14 +383,17 @@ class MucTemplate extends DeviceTemplate {
     protected function update_channels($ctrlid, $device, $update, $template) {
         $ctrl = $this->ctrl->get($ctrlid);
         foreach($template->channels as $c) {
-            $id = $this->prepare_str($device, $template, $c->name);
-            
-            if (!$this->ctrl->channel($ctrl)->exists($id)) {
-                continue;
-            }
             $channel = $this->prepare_json($update, $template, json_encode($c));
             $configs = $this->parse_channel($update['nodeid'], $channel, $template, $update['options']);
             $configs->id = $configs->name;
+            
+            $id = $this->prepare_str($device, $template, $c->name);
+            if (!$this->ctrl->channel($ctrl)->exists($id)) {
+                if (!$this->ctrl->channel($ctrl)->exists($configs->id)) {
+                    continue;
+                }
+                $id = $configs->id;
+            }
             try {
                 $this->ctrl->channel($ctrl)->update($id, $device['nodeid'], json_encode($configs));
             }
