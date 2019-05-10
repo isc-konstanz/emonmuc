@@ -7,7 +7,6 @@
     "driver": "mbus",
     "devices": [
         {
-            "name": "serial<serialPort>",
             "description": "Energy Meter",
             "settings": "<baudRate>"
         }
@@ -126,7 +125,7 @@
             "description": "Energy",
             "address": "06:fd61",
             "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000},
-            "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"DOUBLE", "unit": "kWh"},
+            "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "scalingFactor": 0.01, "valueType":"DOUBLE", "unit": "kWh"},
             "processList": [
                 {
                     "process": "log_to_feed",
