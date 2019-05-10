@@ -87,7 +87,7 @@ install_emonmuc() {
 
   if [ "$CLEAN" ] && [ -e "$EMONMUC_TMP/conf" ]; then
     rm "$EMONMUC_TMP"/conf/{*.default.*,emoncms.apache2.conf,emoncms.settings.php,logback.xml,shadow} >/dev/null 2>&1
-    cp -rfp "$EMONMUC_TMP"/conf/* "$EMONMUC_DIR"/conf/
+    cp -rpf "$EMONMUC_TMP"/conf/* "$EMONMUC_DIR"/conf/
   fi
   if [ -n "$EMONCMS_DIR" ]; then
     sudo -u $EMONCMS_USER ln -sf "$EMONMUC_DIR"/www/modules/channel "$EMONCMS_DIR"/Modules/
@@ -236,12 +236,11 @@ find_emonmuc_user
 
 if [ "$CLEAN" ]; then
   EMONMUC_TMP="/var/tmp/emonmuc/backup"
-  rm -r $EMONMUC_TMP /var/tmp/emonmuc/bundle >/dev/null 2>&1
   mkdir -p $EMONMUC_TMP/lib
-  rm -rf /var/lib/emonmuc/device
-  cp -r /var/lib/emonmuc/* $EMONMUC_TMP/lib/
-  mv -f "$EMONMUC_DIR"/conf $EMONMUC_TMP/ >/dev/null 2>&1
-  mv -f "$EMONCMS_DIR"/settings.php $EMONMUC_TMP/ >/dev/null 2>&1
+  rm -rf /var/tmp/emonmuc/bundle /var/lib/emonmuc/device
+  cp -rpf /var/lib/emonmuc/* $EMONMUC_TMP/lib/
+  cp -rpf "$EMONMUC_DIR"/conf $EMONMUC_TMP/
+  cp -pf "$EMONCMS_DIR"/settings.php $EMONMUC_TMP/
   rm -rf "$EMONMUC_DIR"
   rm -rf "$EMONCMS_DIR"
   rm -rf /srv/www/emoncms*
