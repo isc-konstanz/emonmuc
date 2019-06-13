@@ -4,7 +4,7 @@ OWNER="isc-konstanz"
 PROJECT="OpenPCharge"
 ID="pcharge"
 
-VERSION="0.2.3"
+VERSION="0.2.4"
 
 install() {
   # Verify, if the specific version does exists already
