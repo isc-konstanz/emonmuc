@@ -70,8 +70,12 @@ install_emonmuc() {
   chown $EMONMUC_USER:root -R "$EMONMUC_DIR"
   chown $EMONCMS_USER:root -R "$EMONMUC_DIR"/www
 
-  cp -p "$EMONMUC_DIR"/conf/system.default.properties "$EMONMUC_DIR"/conf/system.properties
-  cp -p "$EMONMUC_DIR"/conf/config.default.properties "$EMONMUC_DIR"/conf/config.properties
+  if [ ! -f "$EMONMUC_DIR"/conf/system.properties ]; then
+    cp -p "$EMONMUC_DIR"/conf/system.default.properties "$EMONMUC_DIR"/conf/system.properties
+  fi
+  if [ ! -f "$EMONMUC_DIR"/conf/config.properties ]; then
+    cp -p "$EMONMUC_DIR"/conf/config.default.properties "$EMONMUC_DIR"/conf/config.properties
+  fi
 
   ln -sf "$EMONMUC_DIR"/bin/emonmuc /usr/local/bin/emonmuc
   ln -sf "$EMONMUC_DIR"/lib/systemd/emonmuc.service /lib/systemd/system/emonmuc.service
@@ -167,8 +171,9 @@ GRANT ALL ON emoncms.* TO 'emoncms'@'localhost';"
   if [ "$CLEAN" ] && [ -f "$EMONMUC_TMP/settings.php" ]; then
     head -8 "$EMONMUC_TMP"/settings.php > "$EMONCMS_DIR"/settings.php
     tail -n +9 "$EMONMUC_DIR"/conf/emoncms.settings.php >> "$EMONCMS_DIR"/settings.php
-  else
-    cp -f "$EMONMUC_DIR"/conf/emoncms.settings.php "$EMONCMS_DIR"/settings.php
+
+  elif [ ! -f "$EMONCMS_DIR"/settings.php ]; then
+    cp "$EMONMUC_DIR"/conf/emoncms.settings.php "$EMONCMS_DIR"/settings.php
     install_passwords
   fi
   chown $EMONCMS_USER:root "$EMONCMS_DIR"/settings.php
