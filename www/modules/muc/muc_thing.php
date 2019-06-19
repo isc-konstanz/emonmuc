@@ -58,7 +58,8 @@ class MucThing extends DeviceThing {
                 }
             }
             if (isset($item['input'])) {
-                $inputid = $this->get_input_id($device['userid'], $device['nodeid'], $item['input'], $template->channels);
+                $nodeid = isset($item['node']) ? $item['node'] : $device['nodeid'];
+                $inputid = $this->get_input_id($device['userid'], $nodeid, $item['input'], $template->channels);
                 if ($inputid == false) {
                     $this->log->error("get_item_list() failed to find input of item '".$item['id']."' in template: ".$device['type']);
                     continue;
@@ -101,7 +102,7 @@ class MucThing extends DeviceThing {
                 $this->ctrl->channel($ctrl)->write($mapping['channelid'], $mapping['value'], $valueType);
             }
         } catch(ControllerException $e) {
-            return array('success'=>false, 'message'=>"Error while seting item value: ".$e->getMessage());
+            return array('success'=>false, 'message'=>"Error while setting item value: ".$e->getMessage());
         }
         return array('success'=>true, 'message'=>"Item value set");
     }

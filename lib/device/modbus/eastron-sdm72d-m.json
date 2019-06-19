@@ -23,6 +23,13 @@
             "syntax": "deviceAddress"
         },
         {
+            "id": "unitId",
+            "name": "Unid ID",
+            "description": "The device address of the Modbus slave.<br>The slave device address is assigned form 1 to 247.<br>Address 0 is used as broadcast address.</li></ul>",
+            "type": "text",
+            "mandatory": true
+        },
+        {
             "id": "baudRate",
             "name": "Baud rate",
             "description": "The baud rate for the serial communication.",
