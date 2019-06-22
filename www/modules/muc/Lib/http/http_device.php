@@ -85,7 +85,8 @@ class HttpDevice extends ControllerDevice {
             $this->redis->del("muc#$ctrlid:device:$id");
             $this->redis->srem("muc#$ctrlid:devices", $id);
         }
-        foreach ($this->get_http_list() as $device) {
+        $devices = $this->get_http_list();
+        foreach ($devices as &$device) {
             $channels = array();
             if (is_array($device['channels'])) {
                 foreach($device['channels'] as $channel) {
@@ -95,6 +96,7 @@ class HttpDevice extends ControllerDevice {
             $device['channels'] = $channels;
             $this->add_redis($device);
         }
+        return $devices;
     }
 
     public function get_list($depth=1) {
@@ -129,6 +131,15 @@ class HttpDevice extends ControllerDevice {
                 return $d1['ctrlid'] - $d2['ctrlid'];
             return strcmp($d1['id'], $d2['id']);
         });
+        return $devices;
+    }
+
+    protected function get_redis_list() {
+        $devices = parent::get_redis_list();
+        
+        if (empty($devices)) {
+            $devices = $this->load();
+        }
         return $devices;
     }
 

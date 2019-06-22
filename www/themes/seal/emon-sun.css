@@ -13,39 +13,22 @@ http://openenergymonitor.org
     background-color: #eaa400;
 }
 
+.caret,
+.arrow-up,
+.arrow-down {
+    border-top-color: #999 !important;
+}
+
+.text-larger {
+    font-size: larger
+}
+
+input[type=text][class=variable-name-edit] {
+    margin-bottom:0px;
+}
+
 #login-form input[type="text"], #login-form input[type="password"] {
     width: 94%;
-}
-
-#push, #footer {
-    height: 30px;
-}
-
-#footer {
-    background-color: #f5f5f5;
-    text-align: center;
-    font-size: 13px;
-    font-weight: bold;
-    padding-top: 10px;
-}
-
-#footer a {
-    color: #eac666;
-    text-decoration: none;
-}
-
-#footer span {
-    color: #999;
-}
-
-#submenu {
-    width:100%;
-    background-color:#ddd;
-    height:27px;
-}
-
-#topspacer {
-    padding-top: 40px;
 }
 
 div#account {
@@ -56,8 +39,17 @@ div#account {
     margin-bottom:10px;
 }
 
-input[type=text][class=variable-name-edit] {
-    margin-bottom:0px;
+/* -------------------------------------------------------------------
+   Top nav
+--------------------------------------------------------------------*/
+#submenu {
+    width:100%;
+    background-color:#ddd;
+    height:27px;
+}
+
+#topspacer {
+    padding-top: 40px;
 }
 
 @media (min-width: 768px) and (max-width: 979px) {
@@ -99,19 +91,9 @@ input[type=text][class=variable-name-edit] {
     overflow-y: auto;
 }
 
-.ajax-loader {
-    position: absolute;
-    top: 0; bottom:0; left: 0; right:0;
-    margin: auto;
-    background: rgba(255, 255, 255, .8)
-        url(ajax-loader.gif)
-        center
-        no-repeat;
-}
-
 .navbar-inner {
-    background-color: #ffbe14 !important;
     background-image: none !important;
+    background-color: #ffbe14 !important;
     border: none !important;
     padding: 0px !important;
 }
@@ -122,19 +104,13 @@ input[type=text][class=variable-name-edit] {
 }
 
 #emoncms-navbar .nav > li > a:hover,
-#emoncms-navbar .nav > li > a:focus,
 #emoncms-navbar .nav > .open > a {
     background-color: #ffcb47 !important;
-    outline: none;
 }
 
 #emoncms-navbar .nav > li > a {
     color: #fff !important;
     text-shadow: none !important;
-}
-
-.caret {
-    border-top-color: #fff !important;
 }
 
 .dropdown-menu > li > a:hover,
@@ -150,10 +126,82 @@ input[type=text][class=variable-name-edit] {
     background-image: none !important;
 }
 
-.text-larger {
-    font-size: larger
+/* -------------------------------------------------------------------
+   Side nav
+--------------------------------------------------------------------*/
+.sidebar-menu {
+    border-top: 1px solid #f0f0f0;
+}
+.sidebar-menu li.collapse.in,
+.include-container.collapse.in > li {
+    border-bottom: 1px solid #f0f0f0;
 }
 
+.sidebar {
+    background: #e3e3e3;
+    color: #666;
+}
+.sidebar .nav a {
+    color: #333;
+}
+.sidebar .nav.sidebar-menu li.active a,
+.sidebar .nav.sidebar-menu li a:focus {
+    background: #f5f5f5;
+    color: black;
+}
+/* When you mouse over the navigation items, change their color */
+.sidebar .nav.sidebar-menu a:hover {
+    background: #f0f0f0;
+}
+.sidebar .nav a:hover {
+    color: black;
+}
+
+.include-container h4 a {
+    color: #666;
+}
+
+#sidebar_user_toggle .expanded,
+#sidebar_user_toggle:hover {
+  background: #f0f0f0;
+}
+#edit_bookmarks {
+    padding: .7em;
+    color: #545454;
+    transition: color .3s ease-out;
+}
+#edit_bookmarks:hover,
+#edit_bookmarks:focus {
+    color: black;
+}
+
+/* -------------------------------------------------------------------
+   Footer
+--------------------------------------------------------------------*/
+#push, #footer {
+    height: 30px;
+}
+
+#footer {
+    background-color: #f5f5f5;
+    text-align: center;
+    font-size: 13px;
+    font-weight: bold;
+    padding-top: 12px;
+}
+
+#footer a {
+    color: #eac666;
+    text-decoration: none;
+}
+
+#footer span {
+    color: #999;
+}
+
+/* -------------------------------------------------------------------
+   Nodes
+--------------------------------------------------------------------*/
 .expand-all .icon-resize-small {
     display: none
 }
@@ -216,7 +264,7 @@ input[type=text][class=variable-name-edit] {
 }
 .node > * > * ,
 .node > * > * > * ,
-.node > * > * > .pull-right > * {
+.node > * > * > .pull-right > *{
     float: left;
     min-height: 1px;
 }
@@ -303,6 +351,9 @@ input[type=text][class=variable-name-edit] {
     body{font-size:16px}
 }
 
+/* -------------------------------------------------------------------
+   Apps
+--------------------------------------------------------------------*/
 .app-header,
 .graph-header {
     color: #fff;

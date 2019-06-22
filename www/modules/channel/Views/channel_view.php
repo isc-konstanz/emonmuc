@@ -30,7 +30,6 @@
     
     <div id="channel-footer" class="hide">
         <button id="device-new" class="btn btn-small"><span class="icon-plus-sign"></span>&nbsp;<?php echo _('New device connection'); ?></button>
-        <a id="ctrl-config" class="btn btn-small" href="<?php echo $path; ?>muc/view"><span class="icon-cog"></span>&nbsp;<?php echo _('Controllers'); ?></a>
     </div>
     <div id="channel-loader" class="ajax-loader"></div>
 </div>
