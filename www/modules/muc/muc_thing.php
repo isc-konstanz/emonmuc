@@ -61,7 +61,7 @@ class MucThing extends DeviceThing {
                 $nodeid = isset($item['node']) ? $item['node'] : $device['nodeid'];
                 $inputid = $this->get_input_id($device['userid'], $nodeid, $item['input'], $template->channels);
                 if ($inputid == false) {
-                    $this->log->error("get_item_list() failed to find input of item '".$item['id']."' in template: ".$device['type']);
+                    $this->log->error("get_item_list() failed to find input \"$nodeid:".$item['input']."\" of item '".$item['id']."' in template: ".$device['type']);
                     continue;
                 }
                 unset($item['input']);
