@@ -8,7 +8,6 @@ EMONMUC_DIR="/opt/emonmuc"
 EMONMUC_DATA="/var/opt/emonmuc"
 EMONCMS_DIR="/var/www/emoncms"
 EMONCMS_LOG="/var/log/emoncms"
-EMONCMS_USER="www-data"
 
 if [[ $EUID -ne 0 ]]; then
   echo "Please make sure to run the emonmuc setup as root user"
@@ -94,9 +93,9 @@ install_emonmuc() {
     cp -rpf "$EMONMUC_TMP"/conf/* "$EMONMUC_DIR"/conf/
   fi
   if [ -n "$EMONCMS_DIR" ]; then
-    sudo -u $EMONCMS_USER ln -sf "$EMONMUC_DIR"/www/modules/channel "$EMONCMS_DIR"/Modules/
-    sudo -u $EMONCMS_USER ln -sf "$EMONMUC_DIR"/www/modules/muc "$EMONCMS_DIR"/Modules/
-    sudo -u $EMONCMS_USER ln -sf "$EMONMUC_DIR"/www/themes/seal "$EMONCMS_DIR"/Theme/
+    sudo -u $EMONMUC_USER ln -sf "$EMONMUC_DIR"/www/modules/channel "$EMONCMS_DIR"/Modules/
+    sudo -u $EMONMUC_USER ln -sf "$EMONMUC_DIR"/www/modules/muc "$EMONCMS_DIR"/Modules/
+    sudo -u $EMONMUC_USER ln -sf "$EMONMUC_DIR"/www/themes/seal "$EMONCMS_DIR"/Theme/
 
     systemctl restart emonmuc.service
 

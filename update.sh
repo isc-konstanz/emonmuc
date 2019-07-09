@@ -3,7 +3,6 @@
 
 # Set the targeted location of the emonmuc framework and the emoncms webserver.
 # If a specified directory is empty, the component will be installed.
-EMONCMS_USER="www-data"
 
 if [[ $EUID -ne 0 ]]; then
   echo "Please make sure to run the emonmuc update as root user"
@@ -43,8 +42,7 @@ update_emonmuc() {
   sudo git -C "$EMONMUC_DIR" pull
   bash "$EMONMUC_DIR"/bin/emonmuc update >/dev/null 2>&1
 
-  sudo chown $EMONMUC_USER:root -R "$EMONMUC_DIR"
-  sudo chown $EMONCMS_USER:root -R "$EMONMUC_DIR"/www
+  sudo chown $EMONMUC_USER -R "$EMONMUC_DIR"
 
   systemctl daemon-reload
   systemctl restart emonmuc
