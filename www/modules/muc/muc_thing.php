@@ -15,7 +15,7 @@ require_once "Modules/device/device_thing.php";
 require_once "Modules/muc/muc_model.php";
 
 class MucThing extends DeviceThing {
-    const DIR_DEFAULT = "/var/lib/emonmuc/";
+    const DIR_DEFAULT = "/var/opt/emonmuc/";
 
     private $ctrl;
 
