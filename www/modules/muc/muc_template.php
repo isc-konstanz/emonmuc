@@ -15,7 +15,7 @@ require_once "Modules/device/device_template.php";
 require_once "Modules/muc/muc_model.php";
 
 class MucTemplate extends DeviceTemplate {
-    const DIR_DEFAULT = "/var/lib/emonmuc/";
+    const DIR_DEFAULT = "/var/opt/emonmuc/";
 
     private $ctrl;
 
@@ -73,7 +73,8 @@ class MucTemplate extends DeviceTemplate {
             );
         }
         
-        $ctrls = $this->ctrl->get_all();
+        global $session;
+        $ctrls = $this->ctrl->get_list($session['userid']);
         if (count($ctrls) > 0) {
             $select = array();
             foreach ($ctrls as $ctrl) {

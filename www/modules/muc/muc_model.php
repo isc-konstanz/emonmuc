@@ -273,19 +273,20 @@ class Controller {
             }
             $array[] = "`options` = '".json_encode($options)."'";
         }
-        
-        // Convert to a comma seperated string for the mysql query
-        $fieldstr = implode(",",$array);
-        $this->mysqli->query("UPDATE muc SET ".$fieldstr." WHERE `id` = '$id'");
-        
-        if ($this->mysqli->affected_rows<1) {
-            return array('success'=>false, 'message'=>'Fields could not be updated');
-        }
-        if ($this->redis) {
-            if (isset($fields['type'])) $this->redis->hset("muc:$id",'type',$type);
-            if (isset($fields['name'])) $this->redis->hset("muc:$id",'name',$name);
-            if (isset($fields['description'])) $this->redis->hset("muc:$id",'description',$fields['description']);
-            if (isset($fields['options'])) $this->redis->hset("muc:$id",'options',json_encode($fields['options']));
+        if (count($array) > 0) {
+            // Convert to a comma seperated string for the mysql query
+            $fieldstr = implode(",",$array);
+            $this->mysqli->query("UPDATE muc SET ".$fieldstr." WHERE `id` = '$id'");
+            
+            if ($this->mysqli->affected_rows<1) {
+                return array('success'=>false, 'message'=>'Fields could not be updated');
+            }
+            if ($this->redis) {
+                if (isset($fields['type'])) $this->redis->hset("muc:$id",'type',$type);
+                if (isset($fields['name'])) $this->redis->hset("muc:$id",'name',$name);
+                if (isset($fields['description'])) $this->redis->hset("muc:$id",'description',$fields['description']);
+                if (isset($fields['options'])) $this->redis->hset("muc:$id",'options',json_encode($options));
+            }
         }
         return array('success'=>true, 'message'=>'Fields updated');
     }
@@ -301,6 +302,7 @@ class Controller {
             );
             $http->put('users', array('configs' => $configs));
         }
+        return $this->get_http($type, $update);
     }
 
     public function delete($userid, $id) {
@@ -354,7 +356,7 @@ class Controller {
         $address = $options['address'];
         
         // Make sure, the defined address is valid
-        if(substr_compare($address, '/', strlen($address)-1, 1) === 0) {
+        while(substr($address, -1) == '/') {
             $address = substr($address, 0, strlen($address)-1);
         }
         if (substr($address, 0, 7) === 'http://') {
@@ -362,6 +364,9 @@ class Controller {
         }
         else if (substr($address, 0, 8) === 'https://') {
             $address = substr($address, 8, strlen($address));
+        }
+        if ($options['address'] != $address) {
+            $options['address'] = $address;
         }
         if (empty($options['port']) || !is_numeric($options['port'])) {
             throw new ControllerException("Server port invalid");
@@ -375,7 +380,7 @@ class Controller {
     }
 
     private function load_redis($userid) {
-        $this->redis->delete("user:muc:$userid");
+        $this->redis->del("user:muc:$userid");
         $result = $this->mysqli->query("SELECT id, userid, type, name, description, options FROM muc WHERE userid = '$userid'");
         while ($row = (array) $result->fetch_object()) {
             $this->redis->sAdd("user:muc:$userid", $row['id']);

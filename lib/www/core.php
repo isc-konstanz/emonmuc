@@ -3,10 +3,15 @@ define('EMONCMS_EXEC', 1);
 
 $root = dirname(dirname(dirname(__FILE__)));
 
-$options_short = "d:a:";
+$options_short = "d:";
+$options_short .= "a:";
+$options_short .= "m:";
+$options_short .= "i::";
 $options_long  = array(
     "dir:",
-    "apikey:"
+    "apikey:",
+    "mail:",
+    "init::"
 );
 $options = getopt($options_short, $options_long);
 
