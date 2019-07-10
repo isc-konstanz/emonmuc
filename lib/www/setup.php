@@ -7,9 +7,9 @@ db_schema_setup($mysqli,load_db_schema(),true);
 $ctrl = new Controller($mysqli,$redis);
 $user = new User($mysqli,$redis);
 
+// TODO: Do not hardcode type, address and port
 $type = 'http';
 $address = 'localhost';
-$path = '/emoncms/';
 $port = 8080;
 
 if (isset($options['a']) || isset($options['apikey'])) {
@@ -36,7 +36,8 @@ else if (isset($options['i']) || isset($options['init'])) {
         $userid = $result['userid'];
     }
     else {
-        $userid = 1;
+        $result = $mysqli->query("SELECT id FROM users ORDER BY id ASC LIMIT 1");
+        $userid = $result->fetch_object()->id;
         $apikey = $user->get_apikey_write($userid);
     }
 }
@@ -54,7 +55,7 @@ try {
         echo "Unable to edit emoncms configution file in ".$root."/conf\n"; die;
     }
     
-    $url = $type.'://'.$address.$path;
+    $url = $type.'://'.$address;
     $contents = file_get_contents($root.'/conf/emoncms.default.conf');
     $contents = str_replace(';address = http://localhost/emoncms/', 'address = '.$url, $contents);
     $contents = str_replace(';authorization = WRITE', 'authorization = WRITE', $contents);

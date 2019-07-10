@@ -73,7 +73,8 @@ class MucTemplate extends DeviceTemplate {
             );
         }
         
-        $ctrls = $this->ctrl->get_all();
+        global $session;
+        $ctrls = $this->ctrl->get_list($session['userid']);
         if (count($ctrls) > 0) {
             $select = array();
             foreach ($ctrls as $ctrl) {
