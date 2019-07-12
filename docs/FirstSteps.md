@@ -5,27 +5,12 @@ This document describes the first steps with emonmuc (**E**nergy **mon**itoring 
 
 ---------------
 
-# 1 Setup
-
-With both components installed and running, an OpenMUC framework controller was registered to the emoncms user. This can be verified in the **Controllers** page, accessible at the users **My Account** from the menu.
-
-![emonmuc user](img/emonmuc-user.jpg)
-
-Click *Multiy Utility Communication* **Configure** pencil icon and verify the default settings, if the framework is running on the same machine.
-
-![emonmuc controllers](img/emonmuc-controllers.jpg)
-
-Further, the following guide will expect the use of the Beta version, as well as the emoncms [device module](https://github.com/emoncms/device).  
-Energy meters and other utility devices connected to the local platform can now be configured in the **Channels** site.  
-Each emoncms user may have several emonmuc controllers registered, located e.g. in different locations of the building and aggregated into one platform.
-
-
-# 2 Overview
+# 1 Overview
 
 To get a first orientation in the framework, the following section provides a quick overview regarding the structure and terminology.
 
 
-## 2.1 Emoncms
+## 1.1 Emoncms
 
 [Emoncms](https://emoncms.org/) (**E**nergy **mon**itoring **C**ontent **M**anagement **S**ystem) is an open-source web-app for processing, logging and visualising energy, temperature and other environmental data and part of the [OpenEnergyMonitor](https://openenergymonitor.org/) project.
 
@@ -38,9 +23,10 @@ Additionally to this short summary, official [User Guides](https://emoncms.org/s
   - **Process list** (or input processing): A list of processes performed sequentially on each input value as it is received on that input.
   - **Process**: A function that can be attached to the process list of an input to change the value or to save the value to a feed.
 - **Devices**: As part of the emoncms [device module](https://github.com/emoncms/device), devices provide templates to automatically configure a set of feeds, inputs, channels or specific mappings to control e.g. household appliances.
+- **Things**: Corresponding to emoncms devices, prepared templates may provide mappings to e.g. a configured channel that represents a GPIO on a Raspberry Pi. Such a device will be shown as a **Thing**, allowing the user to e.g. comfortably switch connected LEDs High or Low.
 
 
-## 2.2 Emonmuc
+## 1.2 Emonmuc
 
 Emonmuc provides a GUI integration of the [OpenMUC](https://www.openmuc.org/) (**Open** **M**ulti **U**tility **C**ommunication) Controller project, which is being developed by the German Frauenhofer Institute for Solar Energy Systems ISE. MUC Controllers are the core of the German smart metering standardization process and serve as concentrators of energy or other environment meters. This concentrated data may then be processed or forwarded to energy suppliers. In Germany, the MUC-FNN and the Open Metering committees work on that subject and the OpenMUC project gets developed to provide an open and accessible implementation of those standards functionalities.  
 The project and knowledge gained in its development served as groundwork and the Institutes main contribution towards the [OGEMA](http://www.ogema.org/) project in 2011. Thus, it shares a lot of architecture aspects and is highly compatible with OGEMA modules. 
@@ -51,25 +37,13 @@ The project and knowledge gained in its development served as groundwork and the
   If configured to log sampled data, values will be written into inputs for the same key, to allow further processing.
 
 
-## 2.3 Navigation
+## 1.3 Navigation
 
 The header navigation bar provides the access to all important emoncms pages. Additionally to the **Channels**, **Devices** and **Feeds**, the dropdown menues contain the following noteworthy entries:
-
-
-### Setup
-
-![emonmuc setup](img/emonmuc-setup.png)
 
 - **My Account**: Here you get information about your Profile. You can edit your username, password, E-mail and access your [API Keys](https://cloud.google.com/endpoints/docs/openapi/when-why-api-key) (for *read* and *write* access).
 
 - **Administration**: See and edit users, update the database (Necessary to run after updating emoncms, after installing a new module or to check emoncms database status), Logger, Server-, and Client Information.
-
-
-### Extra
-
-![emonmuc-extra](img/emonmuc-extra.jpg)
-
-- **Things**: Corresponding to emoncms devices, prepared templates may provide mappings to e.g. a configured channel that represents a GPIO on a Raspberry Pi. Such a device will be shown as a **Thing**, allowing the user to e.g. comfortably switch connected LEDs High or Low.
 
 
 # 3 CSV driver example
