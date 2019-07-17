@@ -14,7 +14,7 @@
 <div class="view-container">
     <div id="channel-header" class="hide">
         <span id="api-help" style="float:right"><a href="api"><?php echo _('Channel API Help'); ?></a></span>
-        <h2><?php echo _('Channels'); ?></h2>
+        <h3><?php echo _('Channels'); ?></h3>
     </div>
     <div id="channel-none" class="alert alert-block hide" style="margin-top:12px">
         <h4 class="alert-heading"><?php echo _('No Channels configured'); ?></h4>
