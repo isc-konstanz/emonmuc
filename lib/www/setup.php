@@ -22,12 +22,7 @@ if (isset($options['a']) || isset($options['apikey'])) {
 }
 else if (isset($options['i']) || isset($options['init'])) {
     if ($user->get_number_of_users() == 0) {
-        if (isset($options['m']) || isset($options['mail'])) {
-            $email = isset($options['m']) ? $options['m'] : $options['mail'];
-        }
-        else {
-            $email = 'admin@'.gethostname().'.local';
-        }
+        $email = 'admin@'.gethostname().'.local';
         $result = $user->register('admin', 'admin', $email);
         if (isset($result['success']) && $result['success'] == false) {
             echo "Unable to register default user \"admin\": ".$result['message']."\n"; die;

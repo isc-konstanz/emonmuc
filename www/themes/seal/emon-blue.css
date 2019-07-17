@@ -115,6 +115,17 @@ div#account {
     text-shadow: none !important;
 }
 
+.no-gravitar a.grav-container {
+  background: #ffd500 !important;
+  border: 2px solid #fff2b3;
+}
+.no-gravitar a.grav-container .icon.user {
+  color: #fff2b3;
+}
+.no-gravitar a.grav-container .icon.user:hover {
+  color: #fff;
+}
+
 /* -------------------------------------------------------------------
    Side nav
 --------------------------------------------------------------------*/
