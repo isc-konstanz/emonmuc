@@ -110,20 +110,23 @@ div#account {
     outline: none;
 }
 
-#emoncms-navbar .nav > li > a {
+#emoncms-navbar .nav > li > a > .icon:hover,
+#emoncms-navbar .nav > li > a > .icon:focus,
+#emoncms-navbar .nav > .active > a > .icon,
+#emoncms-navbar .nav > .open > a > .icon,
+#emoncms-navbar .nav > li > a,
+.no-gravitar a.grav-container .icon.user:hover,
+.no-gravitar a.grav-container .icon.user:focus {
     color: #fff !important;
     text-shadow: none !important;
 }
 
 .no-gravitar a.grav-container {
-  background: #ffd500 !important;
-  border: 2px solid #fff2b3;
+    background: #ffd500 !important;
+    border: 2px solid #fff2b3;
 }
 .no-gravitar a.grav-container .icon.user {
-  color: #fff2b3;
-}
-.no-gravitar a.grav-container .icon.user:hover {
-  color: #fff;
+    color: #fff2b3;
 }
 
 /* -------------------------------------------------------------------
