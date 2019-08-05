@@ -20,7 +20,7 @@ if type -p java >/dev/null 2>&1; then
 elif [ -n "$JAVA_HOME" ] && [ -x "$JAVA_HOME/bin/java" ]; then
   JAVA_CMD="$JAVA_HOME/bin/java"
 else
-  apt-get install -y -qq openjdk-8-jre-headless
+  apt-get install -y default-jre-headless
 fi
 
 if [[ "$JAVA_CMD" ]]; then
