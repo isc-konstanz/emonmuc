@@ -22,13 +22,10 @@ elif [ -n "$JAVA_HOME" ] && [ -x "$JAVA_HOME/bin/java" ]; then
 else
   apt-get install -y default-jre-headless
 fi
-
-if [[ "$JAVA_CMD" ]]; then
-  JAVA_VERS=$("$JAVA_CMD" -version 2>&1 | awk -F '"' '/version/ {print $2}')
-  if [[ "$JAVA_VERS" < "1.8" ]]; then
-    echo "Installed java version is below 1.8 and not compatible with emonmuc"
-    exit 1
-  fi
+JAVA_VERS=$("$JAVA_CMD" -version 2>&1 | awk -F '"' '/version/ {print $2}')
+if [ "$JAVA_VERS" < 1.8 ]; then
+  echo "Installed java version is below 1.8 and not compatible with emonmuc"
+  exit 1
 fi
 
 find_emonmuc_dir() {
