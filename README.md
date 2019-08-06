@@ -24,7 +24,7 @@ This project is developed as an extension to [emoncms](https://emoncms.org/) and
 
 # Installation
 
-These setup instructions were documented for Debian Linux based platforms, specifically for a user *pi* on **Raspbian** stretch, but may work for other Linux systems with slight adjustments to the setup script. Further guides may follow in the future.
+These setup instructions were documented for Debian Linux based platforms, specifically for a user *pi* on **Raspbian** buster, but may work for other Linux systems with slight adjustments to the setup script. Further guides may follow in the future.
 
 The most comfortable installation solution provided by an installer, is currently developed by the [OpenEnergyMonitor](https://openenergymonitor.org/) project.  
 To install the whole system, including a LAMP server and related packages, redis, mqtt and the home emoncms framework, a more detailed readme can be viewed [here](https://github.com/openenergymonitor/EmonScripts/blob/master/install/readme.md)  

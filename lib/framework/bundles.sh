@@ -93,6 +93,7 @@ update() {
       install
     done
   fi
+  php "$EMONMUC_DIR"/lib/www/reload.php
 }
 
 bundles() {

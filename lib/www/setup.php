@@ -50,7 +50,7 @@ try {
         echo "Unable to edit emoncms configution file in ".$root."/conf\n"; die;
     }
     
-    $url = $type.'://'.$address;
+    $url = $type.'://'.$address.'/';
     $contents = file_get_contents($root.'/conf/emoncms.default.conf');
     $contents = str_replace(';address = http://localhost/emoncms/', 'address = '.$url, $contents);
     $contents = str_replace(';authorization = WRITE', 'authorization = WRITE', $contents);
