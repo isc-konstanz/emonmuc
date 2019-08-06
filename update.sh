@@ -1,9 +1,6 @@
 #!/bin/bash
 #Description: Setup script to update the EmonMUC framework
 
-# Set the targeted location of the emonmuc framework and the emoncms webserver.
-# If a specified directory is empty, the component will be installed.
-
 if [[ $EUID -ne 0 ]]; then
   echo "Please make sure to run the emonmuc update as root user"
   exit 1

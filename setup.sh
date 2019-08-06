@@ -1,8 +1,8 @@
 #!/bin/bash
 #Description: Setup script to install the EmonMUC framework
 
-# Set the targeted location of the emonmuc framework and the emoncms webserver.
-# If a specified directory is empty, the component will be installed.
+# Set the targeted directories of the emonmuc framework.
+# If a specified directory is empty, the component will be created.
 EMONMUC_PORT=8080
 EMONMUC_DIR="/opt/emonmuc"
 EMONMUC_DATA="/var/opt/emonmuc"
