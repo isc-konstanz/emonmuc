@@ -279,11 +279,11 @@
                 },
                 {
                     "process": "add_input",
-                    "arguments": {"type": "ProcessArg::INPUTID", "value": "Energy import", "tag": "<name> L1"}
+                    "arguments": {"type": "ProcessArg::INPUTID", "value": "<node>*l1*import"}
                 },
                 {
                     "process": "add_input",
-                    "arguments": {"type": "ProcessArg::INPUTID", "value": "Energy import", "tag": "<name> L2"}
+                    "arguments": {"type": "ProcessArg::INPUTID", "value": "<node>*l2*import"}
                 },
                 {
                     "process": "log_to_feed",
@@ -350,11 +350,11 @@
                 },
                 {
                     "process": "add_input",
-                    "arguments": {"type": "ProcessArg::INPUTID", "value": "Energy export", "tag": "<name> L1"}
+                    "arguments": {"type": "ProcessArg::INPUTID", "value": "<node>*l1*export"}
                 },
                 {
                     "process": "add_input",
-                    "arguments": {"type": "ProcessArg::INPUTID", "value": "Energy export", "tag": "<name> L2"}
+                    "arguments": {"type": "ProcessArg::INPUTID", "value": "<node>*l2*export"}
                 },
                 {
                     "process": "log_to_feed",

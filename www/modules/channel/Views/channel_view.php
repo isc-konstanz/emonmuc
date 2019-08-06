@@ -14,7 +14,7 @@
 <div class="view-container">
     <div id="channel-header" class="hide">
         <span id="api-help" style="float:right"><a href="api"><?php echo _('Channel API Help'); ?></a></span>
-        <h2><?php echo _('Channels'); ?></h2>
+        <h3><?php echo _('Channels'); ?></h3>
     </div>
     <div id="channel-none" class="alert alert-block hide" style="margin-top:12px">
         <h4 class="alert-heading"><?php echo _('No Channels configured'); ?></h4>
@@ -30,7 +30,6 @@
     
     <div id="channel-footer" class="hide">
         <button id="device-new" class="btn btn-small"><span class="icon-plus-sign"></span>&nbsp;<?php echo _('New device connection'); ?></button>
-        <a id="ctrl-config" class="btn btn-small" href="<?php echo $path; ?>muc/view"><span class="icon-cog"></span>&nbsp;<?php echo _('Controllers'); ?></a>
     </div>
     <div id="channel-loader" class="ajax-loader"></div>
 </div>

@@ -32,7 +32,7 @@
 
 <div class="view-container">
 	<div id="api-help-header" style="float:right;"><a href="api"><?php echo _('Channel API Help'); ?></a></div>
-    <div id="channel-header"><h2><?php echo _('Channels'); ?></h2></div>
+    <div id="channel-header"><h3><?php echo _('Channels'); ?></h3></div>
 
     <div id="table"></div>
 

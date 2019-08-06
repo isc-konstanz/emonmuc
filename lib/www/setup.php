@@ -7,9 +7,10 @@ db_schema_setup($mysqli,load_db_schema(),true);
 $ctrl = new Controller($mysqli,$redis);
 $user = new User($mysqli,$redis);
 
+// TODO: Do not hardcode type, address and port
 $type = 'http';
 $address = 'localhost';
-$path = '/';
+$port = 8080;
 
 if (isset($options['a']) || isset($options['apikey'])) {
     $apikey = isset($options['a']) ? $options['a'] : $options['apikey'];
@@ -19,43 +20,43 @@ if (isset($options['a']) || isset($options['apikey'])) {
     $session = $user->apikey_session($apikey);
     $userid = $session['userid'];
 }
-else if ($user->get_number_of_users() == 0) {
-    $email = 'admin@'.gethostname().'.local';
-    $result = $user->register('admin', 'admin', $email);
-    if (isset($result['success']) && $result['success'] == false) {
-        echo "Unable to register default user \"admin\": ".$result['message']."\n"; die;
+else if (isset($options['i']) || isset($options['init'])) {
+    if ($user->get_number_of_users() == 0) {
+        $email = 'admin@'.gethostname().'.local';
+        $result = $user->register('admin', 'admin', $email);
+        if (isset($result['success']) && $result['success'] == false) {
+            echo "Unable to register default user \"admin\": ".$result['message']."\n"; die;
+        }
+        $apikey = $result['apikey_write'];
+        $userid = $result['userid'];
     }
-    
-    $apikey = $result['apikey_write'];
-    $userid = $result['userid'];
+    else {
+        $result = $mysqli->query("SELECT id FROM users ORDER BY id ASC LIMIT 1");
+        $userid = $result->fetch_object()->id;
+        $apikey = $user->get_apikey_write($userid);
+    }
 }
 else {
-    $userid = 1;
-    $apikey = $user->get_apikey_write($userid);
+    // No user available
+    return;
 }
-
-// Enable deviceView by default
-$user->set_preferences($userid, array('deviceView' => true));
-
-if (count($ctrl->get_list($userid)) == 0) {
-    try {
-        $ctrl->create($userid, 'http', 'Local', '', '{"address":"'.$address.'","port":8080}');
-        
-        if (!is_file($root.'/conf/emoncms.default.conf')) {
-            echo "Unable to find default emoncms configuration ".$root."/conf/emoncms.default.conf\n"; die;
-        }
-        if (!is_writable($root.'/conf') || (is_file($root.'/conf/emoncms.conf') && !is_writable($root.'/conf/emoncms.conf'))) {
-            echo "Unable to edit emoncms configution file in ".$root."/conf\n"; die;
-        }
-        
-        $url = $type.'://'.$address.$path;
-        $contents = file_get_contents($root.'/conf/emoncms.default.conf');
-        $contents = str_replace(';address = http://localhost/emoncms/', 'address = '.$url, $contents);
-        $contents = str_replace(';authorization = WRITE', 'authorization = WRITE', $contents);
-        $contents = str_replace(';authentication = <apikey>', 'authentication = '.$apikey, $contents);
-        file_put_contents($root.'/conf/emoncms.conf', $contents);
+try {
+    $ctrl->create($userid, 'http', 'Local', '', '{"address":"'.$address.'","port":'.$port.'}');
+    
+    if (!is_file($root.'/conf/emoncms.default.conf')) {
+        echo "Unable to find default emoncms configuration ".$root."/conf/emoncms.default.conf\n"; die;
     }
-    catch(Exception $e) {
-        echo "Unable to register controller for user $userid: ".$e->getMessage()."\n";
+    if (!is_writable($root.'/conf') || (is_file($root.'/conf/emoncms.conf') && !is_writable($root.'/conf/emoncms.conf'))) {
+        echo "Unable to edit emoncms configution file in ".$root."/conf\n"; die;
     }
+    
+    $url = $type.'://'.$address;
+    $contents = file_get_contents($root.'/conf/emoncms.default.conf');
+    $contents = str_replace(';address = http://localhost/emoncms/', 'address = '.$url, $contents);
+    $contents = str_replace(';authorization = WRITE', 'authorization = WRITE', $contents);
+    $contents = str_replace(';authentication = <apikey>', 'authentication = '.$apikey, $contents);
+    file_put_contents($root.'/conf/emoncms.conf', $contents);
+}
+catch(Exception $e) {
+    echo "Unable to register controller for user $userid: ".$e->getMessage()."\n";
 }

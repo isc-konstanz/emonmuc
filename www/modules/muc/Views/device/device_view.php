@@ -36,7 +36,7 @@
 
 <div class="view-container">
 	<div id="api-help-header" style="float:right;"><a href="api"><?php echo _('Device API Help'); ?></a></div>
-    <div id="device-header"><h2><?php echo _('Device connections'); ?></h2></div>
+    <div id="device-header"><h3><?php echo _('Device connections'); ?></h3></div>
 
     <div id="table"></div>
 
