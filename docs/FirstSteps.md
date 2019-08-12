@@ -37,15 +37,6 @@ The project and knowledge gained in its development served as groundwork and the
   If configured to log sampled data, values will be written into inputs for the same key, to allow further processing.
 
 
-## 1.3 Navigation
-
-The header navigation bar provides the access to all important emoncms pages. Additionally to the **Channels**, **Devices** and **Feeds**, the dropdown menues contain the following noteworthy entries:
-
-- **My Account**: Here you get information about your Profile. You can edit your username, password, E-mail and access your [API Keys](https://cloud.google.com/endpoints/docs/openapi/when-why-api-key) (for *read* and *write* access).
-
-- **Administration**: See and edit users, update the database (Necessary to run after updating emoncms, after installing a new module or to check emoncms database status), Logger, Server-, and Client Information.
-
-
 # 3 CSV driver example
 
 To get a first impression of channels, inputs and feeds, the **CSV** driver provides a set of example files. The driver enables the read-in of logged CSV values, in this particular case the metered energy consumption of a household.  
@@ -57,19 +48,19 @@ First, the driver needs to be installed. This can be done with the simple shell 
 emonmuc install csv
 ~~~
 
-After restarting the framework, add a new Device Connection (representing a specified CSV file in this case) by opening the device view **Setup > Devices** and pressing the "New device" button.
+After restarting the framework, add a new Device Connection (representing a specified CSV file in this case) by opening the Device **Input** view and pressing the "New device" button.
 
-![input-none](img/csv/input-none.jpg)
+<img src="img/csv/input-none.jpg" style="width:1000;">
 
 
 ## 3.1 Configure Device
 
-First, select the prepared device template, selectable in the sidebar under **Demonstration > CSV > Home**.
+First, select the prepared device template, selectable in the sidebar under **General > Example > CSV**.
 
-After configuring a *Node* and a *Name*, the path to the CSV file is mandatory. There are two ways of choosing the file: Either to simply type it in, or some drivers allow the scanning of devices.  
-The scan button for the **Home** device allows the selection of the provided example CSV files.
+After configuring a *Key* and an optional *Name*, the path to the CSV file is mandatory. There are two ways of choosing the file: Either to simply type in the path, or some drivers allow the scanning of devices.  
+The scan button for the CSV driver allows the selection of the provided example CSV files.
 
-![device config](img/csv/device-config.jpg)
+<img src="img/csv/device-config.jpg" style="width:1000;">
 
 When clicking scan, you might get to choose between two file paths.  
 After selecting one of them by clicking its name, **Save** and **Initialize** the device.
@@ -79,14 +70,14 @@ The initialization will prepare each 5 channels and inputs, as well as 12 feeds 
 
 ## 3.2 Channels
 
-In this case of the CSV driver, each channel represents the column of the selected file. Both the device connection, as well as the single channels may be configured by clicking its corresponding wrench icon.
+In this case of the CSV driver, each channel represents the column of the selected file. Both the device connection, as well as the channels may be configured by clicking its corresponding wrench icon.
 
-![channel view](img/csv/channel-view.jpg)
+<img src="img/csv/channel-view.jpg" style="width:1000;">
 
 The channel configuration allows the specification of the channel according to its driver. In this case, only a **Channel address > Column header** is necessary, but other drivers require more detailed configurations depending on their complexity.  
 Additionally, the *Logging settings* configure the link between channels and emoncms inputs, like the **Logging(Posting) Interval**, after which a sampled value is posted to its corresponding input.
 
-![channel config](img/csv/channel-config.jpg)
+<img src="img/csv/channel-config.jpg" style="width:1000;">
 
 Additional information about each option can be aquired by clicking anywhere on its row.
 
@@ -96,7 +87,7 @@ Additional information about each option can be aquired by clicking anywhere on 
 In the input view, the automatically configured inputs and a set of processes can be explored. Each input corresponds to its channel with identical key.  
 The wrench icon on the right of each input allows the detailed configuration of processes.
 
-![input view](img/csv/input-view.jpg)
+<img src="img/csv/input-view.jpg" style="width:1000;">
 
 The processes in this example include e.g. for *home_pv*:
 
@@ -117,7 +108,7 @@ Clicking on a feed (or selecting several feeds and selecting the eye icon) shows
 
 After allowing the CSV driver to post values for some hours, the data can be explored in the graph view like shown here:
 
-![graph view](img/csv/graph-view.jpg)
+<img src="img/csv/graph-view.jpg" style="width:1000;">
 
 
 # 4 Next Step
