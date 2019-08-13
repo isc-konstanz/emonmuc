@@ -15,7 +15,7 @@ require_once "Modules/device/device_scan.php";
 require_once "Modules/muc/muc_model.php";
 
 class MucScan extends DeviceScan {
-    const DIR_DEFAULT = "/var/lib/emonmuc/";
+    const DIR_DEFAULT = "/var/opt/emonmuc/";
 
     const DEVICE_ADDRESS = "deviceAddress";
     const DEVICE_SETTINGS = "deviceSettings";

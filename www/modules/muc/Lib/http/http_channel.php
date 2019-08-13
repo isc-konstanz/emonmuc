@@ -118,9 +118,11 @@ class HttpChannel extends ControllerChannel {
             $this->redis->del("muc#$ctrlid:channel:$id");
             $this->redis->srem("muc#$ctrlid:channels", $id);
         }
-        foreach ($this->get_http_list() as $channel) {
+        $channels = $this->get_http_list();
+        foreach ($channels as $channel) {
             $this->add_redis($channel);
         }
+        return $channels;
     }
 
     public function get_list() {
@@ -134,6 +136,15 @@ class HttpChannel extends ControllerChannel {
                 return strcmp($c1['id'], $c2['id']);
                 return strcmp($c1['deviceid'], $c2['deviceid']);
         });
+        return $channels;
+    }
+
+    protected function get_redis_list() {
+        $channels = parent::get_redis_list();
+        
+        if (empty($channels)) {
+            $channels = $this->load();
+        }
         return $channels;
     }
 

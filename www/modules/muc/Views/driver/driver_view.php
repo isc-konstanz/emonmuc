@@ -29,7 +29,7 @@
 
 <div class="view-container">
 	<div id="api-help-header" style="float:right;"><a href="api"><?php echo _('Driver API Help'); ?></a></div>
-    <div id="driver-header"><h2><?php echo _('Drivers'); ?></h2></div>
+    <div id="driver-header"><h3><?php echo _('Drivers'); ?></h3></div>
 
     <div id="table"></div>
 

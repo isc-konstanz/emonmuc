@@ -36,7 +36,6 @@
     height: 40px;
     top: 40px;
     left: 0px;
-    background: #323232; /* #209ed3; */
     opacity: 0.85;
 }
 .group-actions.affix .group-select span {
@@ -54,7 +53,7 @@
 .group {
     display: table;
     width: 100%;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
 }
 
 .group-header {

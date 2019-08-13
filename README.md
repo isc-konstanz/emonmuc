@@ -24,37 +24,24 @@ This project is developed as an extension to [emoncms](https://emoncms.org/) and
 
 # Installation
 
-These setup instructions were documented for Debian Linux based platforms, specifically for a user *pi* on **Raspbian** stretch, but may work for other Linux systems with slight adjustments to the setup script. Further guides may follow in the future.
+These setup instructions were documented for Debian Linux based platforms, specifically for a user *pi* on **Raspbian** buster, but may work for other Linux systems with slight adjustments to the setup script. Further guides may follow in the future.
 
-First, the framework can be downloaded either via git or simply copied into a directory like `/opt/emonmuc`.  
-Git is a source code management and revision control system, but here it is used to download and update the emonmuc application.
+The most comfortable installation solution provided by an installer, is currently developed by the [OpenEnergyMonitor](https://openenergymonitor.org/) project.  
+To install the whole system, including a LAMP server and related packages, redis, mqtt and the home emoncms framework, a more detailed readme can be viewed [here](https://github.com/openenergymonitor/EmonScripts/blob/master/install/readme.md)  
 
-~~~
-sudo apt-get update
-sudo apt-get install git-core
-~~~
-
-After downloading, permissions should changed:
+To start the installation process, simply execute the initialization:
 
 ~~~
-sudo git clone -b stable https://github.com/isc-konstanz/emonmuc.git /opt/emonmuc
-sudo chown pi -R /opt/emonmuc
+wget -O - https://raw.githubusercontent.com/isc-konstanz/EmonScripts/isc/install/init.sh | bash
 ~~~
 
-If the webserver already got installed, the setup may be finished by passing the servers **directory** and a registered users **apikey**.
+With both components installed and running, the OpenMUC framework needs to be registered to the emoncms user. This can be done in the **Controllers** page, accessible from the **Setup** cogwheel menu item.
 
-~~~
-sudo /opt/emonmuc/setup.sh --emoncms /var/www/emoncms --apikey <apikey>
-~~~
+Select **New controller** and confirm the default settings, if the framework is running on the same machine.
 
-Both parameters are optional and the webserver may be installed to a specified directory. This will be done automatically, if the directory does not exist already.
+<img src="docs/img/emonmuc-ctrl.png" style="width:800;">
 
-~~~
-sudo /opt/emonmuc/setup.sh -e /var/www/emoncms
-~~~
-
-If no API key was specified, the first existing user will be used to register a controller. Empty installations will be initialized with a default user "*admin*", authenticated with a temporary password: *admin*, that should be replaced with a secure password immediately in the Account configurations.  
-*If the database was created automatically, a `setup.conf` file can be found at the emonmuc root directory, containing database user passwords. This file needs to be removed from the system, to avoid compromising security.*
+Energy meters and other utility devices connected to the platform can now be configured in the **Channels** site, or automatically generated with an existing template through the **Inputs** site.
 
 A more detailed installation guide, containing the separate steps that will be executed in the setup script, can be found here:
 

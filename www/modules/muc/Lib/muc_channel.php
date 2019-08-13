@@ -363,21 +363,53 @@ abstract class ControllerChannel {
     }
 
     protected function decode_infos($info) {
+		$times = array(
+			'0'=>'None',
+			'1000'=>'1 second',
+			'2000'=>'2 seconds',
+			'3000'=>'3 seconds',
+			'4000'=>'4 seconds',
+			'5000'=>'5 seconds',
+			'10000'=>'10 seconds',
+			'15000'=>'15 seconds',
+			'20000'=>'20 seconds',
+			'25000'=>'25 seconds',
+			'30000'=>'30 seconds',
+			'35000'=>'35 seconds',
+			'40000'=>'40 seconds',
+			'45000'=>'45 seconds',
+			'50000'=>'50 seconds',
+			'55000'=>'55 seconds',
+			'60000'=>'1 minute',
+			'120000'=>'2 minutes',
+			'180000'=>'3 minutes',
+			'240000'=>'4 minutes',
+			'300000'=>'5 minutes',
+			'600000'=>'10 minutes',
+			'900000'=>'15 minutes',
+			'1800000'=>'30 minutes',
+			'2700000'=>'45 minutes',
+			'3600000'=>'1 hour',
+			'86400000'=>'1 day'
+		);
         $configs = array('options'=>array());
         $logging = array('options'=>array());
         foreach($info['configs']['options'] as $option) {
-            if ($option['key'] == 'loggingInterval' ||
-                $option['key'] == 'loggingTimeOffset') {
-                    $option['name'] = str_replace('Logging', 'Post', $option['name']);
-                    if (isset($option['description'])) {
-                        $option['description'] = str_replace('logging', 'posting', $option['description']);
-                        $option['description'] = str_replace('logged', 'posted', $option['description']);
-                    }
-                    $logging['options'][] = $option;
-                }
-                else {
-                    $configs['options'][] = $option;
-                }
+            if ($option['key'] == 'loggingTimeOffset' ||
+                $option['key'] == 'loggingInterval') {
+				if ($option['key'] == 'loggingInterval') {
+					$option['valueSelection'] = $times;
+				}
+				$option['name'] = str_replace('Logging', 'Post', $option['name']);
+				if (isset($option['description'])) {
+					$option['description'] = str_replace('logging', 'posting', $option['description']);
+					$option['description'] = str_replace('logged', 'posted', $option['description']);
+				}
+				$logging['options'][] = $option;
+			}
+			else {
+				$configs['options'][] = $option;
+			}
         }
         $logging['options'][] = array(
             'key'=>'loggingMaxInterval',
@@ -385,39 +417,7 @@ abstract class ControllerChannel {
             'description'=>'Dynamically post records only on changed values, up until to a maximum amount of time.',
             'type'=>'INTEGER',
             'mandatory'=>false,
-            'valueSelection'=>array(
-                '0'=>'None',
-                '100'=>'100 milliseconds',
-                '200'=>'200 milliseconds',
-                '300'=>'300 milliseconds',
-                '400'=>'400 milliseconds',
-                '500'=>'500 milliseconds',
-                '1000'=>'1 second',
-                '2000'=>'2 seconds',
-                '3000'=>'3 seconds',
-                '4000'=>'4 seconds',
-                '5000'=>'5 seconds',
-                '10000'=>'10 seconds',
-                '15000'=>'15 seconds',
-                '20000'=>'20 seconds',
-                '25000'=>'25 seconds',
-                '30000'=>'30 seconds',
-                '35000'=>'35 seconds',
-                '40000'=>'40 seconds',
-                '45000'=>'45 seconds',
-                '50000'=>'50 seconds',
-                '55000'=>'55 seconds',
-                '60000'=>'1 minute',
-                '120000'=>'2 minutes',
-                '180000'=>'3 minutes',
-                '240000'=>'4 minutes',
-                '300000'=>'5 minutes',
-                '600000'=>'10 minutes',
-                '900000'=>'15 minutes',
-                '1800000'=>'30 minutes',
-                '2700000'=>'45 minutes',
-                '3600000'=>'1 hour',
-                '86400000'=>'1 day')
+            'valueSelection'=>$times
         );
         $logging['options'][] = array(
             'key'=>'loggingTolerance',

@@ -27,7 +27,7 @@
 
 <div>
     <div id="api-help-header" style="float:right;"><a href="api"><?php echo _('MUC API Help'); ?></a></div>
-    <div id="ctrl-header"><h2><?php echo _('Controller'); ?></h2></div>
+    <div id="ctrl-header"><h3><?php echo _('Controller'); ?></h3></div>
     
     <div id="table"><div align='center'></div></div>
     

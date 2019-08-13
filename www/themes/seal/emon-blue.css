@@ -8,55 +8,27 @@ Part of the OpenEnergyMonitor project:
 http://openenergymonitor.org
 
 */
-html, body {
-    height: 100%;
-}
-
-#wrap {
-    min-height: 100%;
-    height: auto !important;
-    height: 100%;
-    /* Negative indent footer by it's height */
-    margin: 0 auto -40px;
-}
 
 .body-login {
     background-color: #00509b;
 }
 
+.caret,
+.arrow-up,
+.arrow-down {
+    border-top-color: #999 !important;
+}
+
+.text-larger {
+    font-size: larger
+}
+
+input[type=text][class=variable-name-edit] {
+    margin-bottom:0px;
+}
+
 #login-form input[type="text"], #login-form input[type="password"] {
     width: 94%;
-}
-
-#push, #footer {
-    height: 30px;
-}
-
-#footer {
-    background-color: #f5f5f5;
-    text-align: center;
-    font-size: 13px;
-    font-weight: bold;
-    padding-top: 10px;
-}
-
-#footer a {
-    color: #339ce7;
-    text-decoration: none;
-}
-
-#footer span {
-    color: #999;
-}
-
-#submenu {
-    width:100%;
-    background-color:#ddd;
-    height:27px;
-}
-
-#topspacer {
-    padding-top: 40px;
 }
 
 div#account {
@@ -67,8 +39,17 @@ div#account {
     margin-bottom:10px;
 }
 
-input[type=text][class=variable-name-edit] {
-    margin-bottom:0px;
+/* -------------------------------------------------------------------
+   Top nav
+--------------------------------------------------------------------*/
+#submenu {
+    width:100%;
+    background-color:#ddd;
+    height:27px;
+}
+
+#topspacer {
+    padding-top: 40px;
 }
 
 @media (min-width: 768px) and (max-width: 979px) {
@@ -110,16 +91,6 @@ input[type=text][class=variable-name-edit] {
     overflow-y: auto;
 }
 
-.ajax-loader {
-    position: absolute;
-    top: 0; bottom:0; left: 0; right:0;
-    margin: auto;
-    background: rgba(255, 255, 255, .8)
-        url(ajax-loader.gif)
-        center
-        no-repeat;
-}
-
 .navbar-inner {
     background-color: #0069b4 !important;
     background-image: none !important;
@@ -127,29 +98,113 @@ input[type=text][class=variable-name-edit] {
     padding: 0px !important;
 }
 
-.nav > .active > a {
+#emoncms-navbar .nav > .active > a {
     background-color: #005999 !important;
     box-shadow: none !important;
 }
 
-.nav > li > a:hover,
-.nav > .open > a {
+#emoncms-navbar .nav > li > a:hover,
+#emoncms-navbar .nav > li > a:focus,
+#emoncms-navbar .nav > .open > a {
     background-color: #0062a8 !important;
+    outline: none;
 }
 
-.nav > li > a {
+#emoncms-navbar .nav > li > a > .icon:hover,
+#emoncms-navbar .nav > li > a > .icon:focus,
+#emoncms-navbar .nav > .active > a > .icon,
+#emoncms-navbar .nav > .open > a > .icon,
+#emoncms-navbar .nav > li > a,
+.no-gravitar a.grav-container .icon.user:hover,
+.no-gravitar a.grav-container .icon.user:focus {
     color: #fff !important;
     text-shadow: none !important;
 }
 
-.caret {
-    border-top-color: #fff !important;
+.no-gravitar a.grav-container {
+    background: #ffd500 !important;
+    border: 2px solid #fff2b3;
+}
+.no-gravitar a.grav-container .icon.user {
+    color: #fff2b3;
 }
 
-.text-larger {
-    font-size: larger
+/* -------------------------------------------------------------------
+   Side nav
+--------------------------------------------------------------------*/
+.sidebar-menu {
+    border-top: 1px solid #f0f0f0;
+}
+.sidebar-menu li.collapse.in,
+.include-container.collapse.in > li {
+    border-bottom: 1px solid #f0f0f0;
 }
 
+.sidebar {
+    background: #e3e3e3;
+    color: #666;
+}
+.sidebar .nav a {
+    color: #333;
+}
+.sidebar .nav.sidebar-menu li.active a,
+.sidebar .nav.sidebar-menu li a:focus {
+    background: #f5f5f5;
+    color: black;
+}
+/* When you mouse over the navigation items, change their color */
+.sidebar .nav.sidebar-menu a:hover {
+    background: #f0f0f0;
+}
+.sidebar .nav a:hover {
+    color: black;
+}
+
+.include-container h4 a {
+    color: #666;
+}
+
+#sidebar_user_toggle .expanded,
+#sidebar_user_toggle:hover {
+  background: #f0f0f0;
+}
+#edit_bookmarks {
+    padding: .7em;
+    color: #545454;
+    transition: color .3s ease-out;
+}
+#edit_bookmarks:hover,
+#edit_bookmarks:focus {
+    color: black;
+}
+
+/* -------------------------------------------------------------------
+   Footer
+--------------------------------------------------------------------*/
+#push, #footer {
+    height: 30px;
+}
+
+#footer {
+    background-color: #f5f5f5;
+    text-align: center;
+    font-size: 13px;
+    font-weight: bold;
+    padding-top: 12px;
+}
+
+#footer a {
+    color: #339ce7;
+    text-decoration: none;
+}
+
+#footer span {
+    color: #999;
+}
+
+/* -------------------------------------------------------------------
+   Nodes
+--------------------------------------------------------------------*/
 .expand-all .icon-resize-small {
     display: none
 }
@@ -267,38 +322,31 @@ input[type=text][class=variable-name-edit] {
     margin-bottom: .5em
 }
 
-.controls {
-    transition: all .2s ease-out
+.controls.affix:before,
+.group-actions.affix:before {
+    background: #0077cc;
 }
-.controls.affix:before {
-    content: '';
-    background: #209ed3;
-    opacity: 0.85;
-    width: 100%;
-    display: block;
-    position: fixed;
-    z-index: -1;
-    height: 2.5rem;
-    left: 0;
-    margin-top: -.3rem;
-}
-.controls.affix > * {
-    z-index: 2
-}
-.controls.affix {
-    z-index: 2;
-    top: 2.5rem;
-    padding: .3rem 0;
-}
-.controls.affix-top{position:absolute;}
 
-@media only screen and (max-width:979px) {
-    .controls.affix{top:0}
-}
 @media only screen and (min-width:870px) {
     body{font-size:16px}
 }
 
+/* -------------------------------------------------------------------
+   Graph module
+--------------------------------------------------------------------*/
+table#feeds.table thead th {
+    color: #666;
+}
+table#feeds.table thead th:hover{
+    color: #999;
+}
+table#feeds.table tbody tr > * {
+    border-color: #ebebeb;
+}
+
+/* -------------------------------------------------------------------
+   App module
+--------------------------------------------------------------------*/
 .app-header,
 .graph-header {
     color: #fff;

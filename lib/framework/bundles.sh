@@ -4,7 +4,7 @@ OPENMUC_VERSION="0.17.2"
 
 BUNDLES_DIR="$EMONMUC_DIR/bundle"
 CONF_DIR="$EMONMUC_DIR/conf"
-LIB_DIR="/var/lib/emonmuc"
+LIB_DIR="/var/opt/emonmuc"
 
 TMP_DIR="/var/tmp/emonmuc/bundle"
 
@@ -93,6 +93,7 @@ update() {
       install
     done
   fi
+  php "$EMONMUC_DIR"/lib/www/reload.php
 }
 
 bundles() {
@@ -166,13 +167,13 @@ installed() {
 }
 
 install_bundle() {
-  mv -f "$TMP_DIR/$1/libs/$2-$3.jar" "$BUNDLES_DIR/"
+  cp -f "$TMP_DIR/$1/libs/$2-$3.jar" "$BUNDLES_DIR/"
 }
 
 install_conf() {
   if [ ! -e "$CONF_DIR/$2" ]; then
     mkdir -p "$(dirname "$CONF_DIR/$2")"
-    mv -f "$TMP_DIR/$1/conf/$2" "$CONF_DIR/$2"
+    cp -rf "$TMP_DIR/$1/conf/$2" "$CONF_DIR/$2"
   fi
 }
 
@@ -184,7 +185,7 @@ install_lib() {
         cp -rf "$EMONMUC_DIR/lib/$2" "$LIB_DIR/$2"
 	    ;;
 	  *)
-        mv -f "$TMP_DIR/$1/libs/$2" "$LIB_DIR/$2"
+        cp -rf "$TMP_DIR/$1/libs/$2" "$LIB_DIR/$2"
 	    ;;
 	esac
   fi

@@ -18,11 +18,37 @@ The project provides detailed installation guides for several platforms. Recomme
 
 # 2 Install emonmuc
 
-First, create some necessary directories for the installation and data and set the right permissions
+First, the framework may be downloaded either via git or simply copied into a directory like `/opt/emonmuc`.  
+Git is a source code management and revision control system, but here it is used to download and update the emonmuc application.
 
 ~~~
-sudo mkdir -p /var/{lib,run}/emonmuc /var/log/emoncms
-sudo chown pi /var/{lib,run}/emonmuc /var/log/emoncms
+sudo apt-get update
+sudo apt-get install git-core
+~~~
+
+After downloading, permissions should be changed:
+
+~~~
+sudo git clone -b stable https://github.com/isc-konstanz/emonmuc.git /opt/emonmuc
+sudo chown pi -R /opt/emonmuc
+~~~
+
+The setup can be finished by passing the webservers **directory** and optionally, a registered users **apikey**. 
+
+~~~
+sudo /opt/emonmuc/setup.sh --emoncms /var/www/emoncms --apikey <apikey>
+~~~
+
+
+---------------
+
+# 3 Install manually
+
+**To manually install the framework**, create some necessary directories for the installation and data and set the right permissions first
+
+~~~
+sudo mkdir -p /var/{opt,run}/emonmuc
+sudo chown pi /var/{opt,run}/emonmuc
 ~~~
 
 Now, the framework can be downloaded either via git or simply copied into a directory like `/opt/emonmuc`.  
@@ -34,7 +60,7 @@ sudo chown pi -R /opt/emonmuc
 ~~~
 
 
-## 2.1 System service
+## 3.1 System service
 
 To provide the comfortable starting, stopping or automatic execution at boot, a systemd service is provided to install:
 
@@ -64,7 +90,7 @@ sudo systemctl start emonmuc
 as well as other systemctl commands *[start|restart|stop|status]*
 
 
-## 2.2 System script
+## 3.2 System script
 
 Emonmuc provides a run-script, allowing the framework to be configured, started and stopped comfortably via bash shell commands.
 
@@ -90,7 +116,7 @@ emonmuc start -fg
 Further, the script allows the configuration of apps, drivers, or other bundles, registered to the framework.
 
 
-## 2.3 Emoncms modules
+## 3.3 Emoncms modules
 
 To enable the comfortable configuration of e.g. metering devices for enabled protocol drivers via emoncms, the designated emoncms module needs to be linked to the emoncms modules dir
 
@@ -145,15 +171,12 @@ The [Serial Port preparation guide](LinuxSerialPort.md) may be followed to do so
 
 # 4 Setup
 
-With both components installed and running, the OpenMUC framework needs to be registered to the emoncms user. This can be done in the **Controllers** page, accessible at the users **My Account** from the menu.
+With both components installed and running, the OpenMUC framework needs to be registered to the emoncms user. This can be done in the **Controllers** page, accessible from the **Setup** cogwheel menu item.
 
-![emonmuc user](img/emonmuc-user.jpg)
+Select **New controller** and confirm the default settings, if the framework is running on the same machine.
 
-Further, it is recommended to use the Beta version, as well as the emoncms [device module](https://github.com/emoncms/device), to improve the usability of the platform.  
-Click **New controller** and confirm the default settings, if the framework is running on the same machine.
+<img src="img/emonmuc-ctrl.png" style="width:800;">
 
-![emonmuc controllers](img/emonmuc-controllers.jpg)
-
-Energy meters and other utility devices connected to the platform can now be configured in the **Channels** site.
+Energy meters and other utility devices connected to the platform can now be configured in the **Channels** site, or automatically generated with an existing template through the **Inputs** site.
 
 To learn about the features of EmonMUC, a [First Steps guide](FirstSteps.md) was documented and may be followed.
