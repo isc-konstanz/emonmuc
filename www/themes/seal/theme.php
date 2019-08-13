@@ -9,7 +9,7 @@
   Part of the OpenEnergyMonitor project:
   http://openenergymonitor.org
 */
-global $ltime,$route,$path,$fullwidth,$emoncms_version,$theme,$themecolor,$favicon,$menu,$menucollapses;
+global $route,$path,$fullwidth,$emoncms_version,$theme,$themecolor,$favicon,$menu;
 
 $v = 7;
 
@@ -85,6 +85,7 @@ if (!in_array($themecolor, ["blue", "sun", "standard"])) {
         <div id="sidebar" class="sidebar d-flex flex-column">
             <?php if(isset($sidebar) && !empty($sidebar)) echo $sidebar; ?>
         </div>
+
         <?php
         $container[] = 'content-container';
         if ($fullwidth && $route->controller=="dashboard") { 
