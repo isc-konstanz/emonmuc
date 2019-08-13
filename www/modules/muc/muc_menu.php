@@ -1,9 +1,11 @@
 <?php
 
-    $menu['setup'][] = array(
+    $menu['sidebar']['emoncms'][] = array(
         'text' => _("Controllers"),
         'path' => 'muc/view',
-        'icon' => 'muc'
+        'active' => 'admin',
+        'icon' => 'muc',
+        'order' => 'b6'
     );
 
     $menu['includes']['icons'][] = <<< icon
