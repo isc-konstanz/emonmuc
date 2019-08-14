@@ -48,6 +48,39 @@ A more detailed installation guide, containing the separate steps that will be e
 - [Ubuntu / Debian Linux via git](docs/LinuxInstall.md)
 
 
+## Configuration
+
+For the framework to be able to post values to emoncms, a few parameters are necessary to be configured. All settings can be found in the *emoncms.conf*.  
+Defaults for all parameters can be found in ``emoncms.default.conf``. 
+
+~~~
+cp /opt/emonmuc/conf/emoncms.default.conf /opt/emonmuc/conf/emoncms.conf
+nano /opt/emonmuc/conf/emoncms.conf
+~~~
+
+- The web servers location may be changed. By default, it is commented and points to an emoncms sever at http://localhost/emoncms/, e.g. VPN addresses or the remote [emoncms.org](https://emoncms.org) server can be a valid selection though.
+
+      # URL of emoncms web server, used to post data
+      address = http://localhost/
+
+- A default authentication for emoncms may be configured. While each data channel can be configured to have its own credentials, it may be preferable to group them with the same authentication, as this improves bulk posting and hence reduced traffic. To do this, uncomment the lines related to authorization and authentication, and enter the users **Write Api Key**
+
+      # API Key credentials to authorize communication with the emoncms webserver
+      authorization = WRITE
+      authentication = <apiKey>
+
+- The maximum allowed threads for the emoncms logger to post values simultaniously to the specified webserver may be configured, if the configured server and the platform supports or needs higher traffic
+
+      # Set the maximum amount of HTTP requests running asynchronously. Default is 1  
+      ;maxThreads = 1
+
+After changing any of the configurations, a restart of the framework is currently still necessary for the changes to take effect
+
+~~~
+sudo systemctl restart emonmuc
+~~~
+
+
 ## Drivers
 
 With a default installation, no drivers are enabled and need to be installed separately. As a first step, a set of protocol drivers ought to be used should be selected.  
@@ -82,6 +115,12 @@ Several drivers can be enabled at once, while each needs to be selected individu
   - **solaredge**: [SolarEdge API](https://github.com/isc-konstanz/OpenSolarEdge)
 
 Details about drivers and specific information about their usage and configuration may be found by clicking corresponding links or for most of them in the [OpenMUC User Guide](https://www.openmuc.org/openmuc/user-guide/).
+
+As prompted after installing one or several drivers, a restart of the framework is currently still necessary for the changes to take effect
+
+~~~
+sudo systemctl restart emonmuc
+~~~
 
 
 ## Serial Port
