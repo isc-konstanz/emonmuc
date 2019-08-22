@@ -5,7 +5,7 @@ PROJECT="OpenSmartMeter"
 SERVICE="driver"
 ID="smartmeter"
 
-VERSION="2.0.0"
+VERSION="2.1.0"
 
 install() {
   # Verify, if the specific version does exists already
