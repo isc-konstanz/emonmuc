@@ -87,7 +87,7 @@ var groups = {
     },
 
     'expandAllGroups':function(state) {
-        var collapses = $('.collapse'); //TODO: , groups.container);
+        var collapses = $('.group-container .collapse'); //TODO: , groups.container);
         collapses.each(function(i, collapse) {
             var group = $(collapse);
             if (state != group.hasClass('in')) {
