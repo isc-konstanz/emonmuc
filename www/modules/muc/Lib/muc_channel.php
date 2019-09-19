@@ -326,39 +326,36 @@ abstract class ControllerChannel {
     }
 
     protected function decode_logging($userid, $nodeid, $logging) {
-        $auth = isset($logging['authorization']) ? $logging['authorization'] : 'DEFAULT';
-        
-        $key = null;
-        if ($auth !== 'NONE') {
+        $engine = isset($logging['engine']) ? $logging['engine'] : 'HTTP';
+        $settings = array(
+            'engine' => $engine
+        );
+        if ($engine == 'HTTP') {
+            $settings['api'] = isset($logging['authorization']) ? $logging['authorization'] : 'DEFAULT';
             // TODO: check if device for authid exists and fetch devicekey
-            switch ($auth) {
+            switch ($settings['api']) {
                 case 'WRITE':
                     global $user;
                     
-                    $key = $user->get_apikey_write($userid);
+                    $settings['apikey'] = $user->get_apikey_write($userid);
                     break;
                 case 'READ':
                     global $user;
                     
-                    $key = $user->get_apikey_read($userid);
+                    $settings['apikey'] = $user->get_apikey_read($userid);
                     break;
                 default:
-                    $auth = 'DEFAULT';
                     break;
             }
         }
-        $settings = array(
-            'nodeid' => $nodeid
-        );
+        $settings['nodeid'] = $nodeid;
+        
+        if (isset($logging['inputid'])) $settings['inputid'] = $logging['inputid'];
+        if (isset($logging['feedid'])) $settings['feedid'] = $logging['feedid'];
         if (isset($logging['loggingMaxInterval'])) $settings['loggingMaxInterval'] = $logging['loggingMaxInterval'];
         if (isset($logging['loggingTolerance'])) $settings['loggingTolerance'] = $logging['loggingTolerance'];
         if (isset($logging['average'])) $settings['average'] = $logging['average'];
-        if (isset($logging['feedid'])) $settings['feedid'] = $logging['feedid'];
         
-        $settings['authorization'] = $auth;
-        if (isset($key)) {
-            $settings['key'] = $key;
-        }
         return $settings;
     }
 
@@ -439,7 +436,7 @@ abstract class ControllerChannel {
             'name'=>'Node',
             'description'=>'The node to post channel records to.',
             'type'=>'STRING',
-            'mandatory'=>true
+            'mandatory'=>false
         );
         $feeds = array();
         foreach ($this->feed()->get_user_feeds($this->ctrl['userid']) as $feed) {
