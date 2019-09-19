@@ -50,8 +50,6 @@ class HttpChannel extends ControllerChannel {
             $description = '';
         }
         
-        $logging = $this->decode_logging($this->ctrl['userid'], $nodeid, $logging);
-        
         $inputid = 0;
         $input = $this->get_input($this->ctrl['userid'], $logging['nodeid'], $id);
         if (isset($input)) {
@@ -63,10 +61,14 @@ class HttpChannel extends ControllerChannel {
                 return array('success'=>false, 'message'=>_("Unable to create input for channel: $id"));
             }
         }
-        if ($inputid > 0 && $description !== '') {
-            $this->input()->set_fields($inputid, '{"description":"'.$description.'"}');
-            if ($this->redis) $this->load_redis_input($inputid);
+        if ($inputid > 0) {
+            $logging['inputid'] = $inputid;
+            if ($description !== '') {
+                $this->input()->set_fields($inputid, '{"description":"'.$description.'"}');
+                if ($this->redis) $this->load_redis_input($inputid);
+            }
         }
+        $logging = $this->decode_logging($this->ctrl['userid'], $nodeid, $logging);
         
         $configs = $this->encode($id, $description, $logging, $channel);
         $data = array(
