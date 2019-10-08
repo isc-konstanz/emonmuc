@@ -96,9 +96,9 @@ class MucTemplate extends DeviceTemplate {
     }
 
     private function get_dir() {
-        global $muc_settings;
-        if (isset($muc_settings) && isset($muc_settings['libdir']) && $muc_settings['libdir'] !== "") {
-            $muc_template_dir = $muc_settings['libdir'];
+        global $settings;
+        if (isset($settings['muc']) && !empty($settings['muc']['lib_dir'])) {
+            $muc_template_dir = $settings['muc']['lib_dir'];
         }
         else {
             $muc_template_dir = self::DIR_DEFAULT;

@@ -40,9 +40,9 @@ abstract class ControllerChannel {
 
     protected function feed(): Feed {
         if (!$this->feed) {
-            global $feed_settings;
+            global $settings;
             require_once "Modules/feed/feed_model.php";
-            $this->feed = new Feed($this->mysqli, $this->redis, $feed_settings);
+            $this->feed = new Feed($this->mysqli, $this->redis, $settings["feed"]);
         }
         return $this->feed;
     }

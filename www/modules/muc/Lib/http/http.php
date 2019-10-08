@@ -132,9 +132,9 @@ class Http {
     }
 
     private function get_dir() {
-        global $muc_settings;
-        if (isset($muc_settings) && isset($muc_settings['rootdir']) && $muc_settings['rootdir'] !== "") {
-            $muc_dir = $muc_settings['rootdir'];
+        global $settings;
+        if (isset($settings['muc']) && !empty($settings['muc']['root_dir'])) {
+            $muc_dir = $settings['muc']['root_dir'];
         }
         else {
             $muc_dir = self::DIR_DEFAULT;
