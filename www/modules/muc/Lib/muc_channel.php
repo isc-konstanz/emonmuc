@@ -240,9 +240,6 @@ abstract class ControllerChannel {
                 unset($configs['loggingSettings']);
             }
         }
-        if (empty($logging)) {
-            $logging = new stdClass();
-        }
         
         $channel = array(
             'id'=>$details['id'],
@@ -276,6 +273,9 @@ abstract class ControllerChannel {
         }
         else {
             $channel['settings'] = '';
+        }
+        if (empty($logging)) {
+            $logging = new stdClass();
         }
         $channel['logging'] = $logging;
         
