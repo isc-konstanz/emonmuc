@@ -40,9 +40,9 @@ abstract class ControllerChannel {
 
     protected function feed(): Feed {
         if (!$this->feed) {
-            global $feed_settings;
+            global $settings;
             require_once "Modules/feed/feed_model.php";
-            $this->feed = new Feed($this->mysqli, $this->redis, $feed_settings);
+            $this->feed = new Feed($this->mysqli, $this->redis, $settings["feed"]);
         }
         return $this->feed;
     }
@@ -240,9 +240,6 @@ abstract class ControllerChannel {
                 unset($configs['loggingSettings']);
             }
         }
-        if (empty($logging)) {
-            $logging = new stdClass();
-        }
         
         $channel = array(
             'id'=>$details['id'],
@@ -276,6 +273,9 @@ abstract class ControllerChannel {
         }
         else {
             $channel['settings'] = '';
+        }
+        if (empty($logging)) {
+            $logging = new stdClass();
         }
         $channel['logging'] = $logging;
         
