@@ -2,8 +2,6 @@
 require_once dirname(__FILE__)."/core.php";
 require_once "Modules/muc/muc_model.php";
 require_once "Modules/user/user_model.php";
-require_once "Lib/dbschemasetup.php";
-db_schema_setup($mysqli,load_db_schema(),true);
 $ctrl = new Controller($mysqli,$redis);
 $user = new User($mysqli,$redis);
 
@@ -43,15 +41,21 @@ else {
 try {
     $ctrl->create($userid, 'http', 'Local', '', '{"address":"'.$address.'","port":'.$port.'}');
     
-    if (!is_file($root.'/conf/emoncms.default.conf')) {
-        echo "Unable to find default emoncms configuration ".$root."/conf/emoncms.default.conf\n"; die;
-    }
     if (!is_writable($root.'/conf') || (is_file($root.'/conf/emoncms.conf') && !is_writable($root.'/conf/emoncms.conf'))) {
         echo "Unable to edit emoncms configution file in ".$root."/conf\n"; die;
     }
+    if (isset($options['c']) || isset($options['config'])) {
+        $config = isset($options['c']) ? $options['c'] : $options['config'];
+    }
+    else {
+        $config = $root.'/conf/emoncms.default.conf';
+    }
+    if (!is_file($config)) {
+        echo "Unable to find default emoncms configuration $config\n"; die;
+    }
     
     $url = $type.'://'.$address.'/';
-    $contents = file_get_contents($root.'/conf/emoncms.default.conf');
+    $contents = file_get_contents($config);
     $contents = str_replace(';address = http://localhost/emoncms/', 'address = '.$url, $contents);
     $contents = str_replace(';authorization = WRITE', 'authorization = WRITE', $contents);
     $contents = str_replace(';authentication = <apikey>', 'authentication = '.$apikey, $contents);

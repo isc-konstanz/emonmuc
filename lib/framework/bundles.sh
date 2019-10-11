@@ -14,7 +14,7 @@ update() {
   core github "OpenMUC"             "openmuc-core-datamanager"          $OPENMUC_VERSION
   core github "OpenMUC"             "openmuc-server-restws"             $OPENMUC_VERSION
 
-  core github "emonjava"            "openmuc-datalogger-emoncms"        "1.2.1"
+  core github "emonjava"            "openmuc-datalogger-emoncms"        "1.3.0"
 
   #--------------------------------------------------------------------------------------------------
   # RXTX is a native interface to serial ports in java.

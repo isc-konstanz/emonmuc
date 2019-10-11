@@ -348,7 +348,7 @@ abstract class ControllerChannel {
                     break;
             }
         }
-        $settings['nodeid'] = $nodeid;
+        if (isset($nodeid)) $settings['nodeid'] = $nodeid;
         
         if (isset($logging['inputid'])) $settings['inputid'] = $logging['inputid'];
         if (isset($logging['feedid'])) $settings['feedid'] = $logging['feedid'];
