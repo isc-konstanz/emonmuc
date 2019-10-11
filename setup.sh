@@ -22,11 +22,11 @@ elif [ -n "$JAVA_HOME" ] && [ -x "$JAVA_HOME/bin/java" ]; then
 else
   apt-get install -y default-jre-headless
 fi
-JAVA_VERS=$("$JAVA_CMD" -version 2>&1 | awk -F '"' '/version/ {print $2}')
-if [ "$JAVA_VERS" < 1.8 ]; then
-  echo "Installed java version is below 1.8 and not compatible with emonmuc"
-  exit 1
-fi
+#JAVA_VERS=$("$JAVA_CMD" -version 2>&1 | awk -F '"' '/version/ {print $2}')
+#if [ "$JAVA_VERS" < "1.8" ]; then
+#  echo "Installed java version is below 1.8 and not compatible with emonmuc"
+#  exit 1
+#fi
 
 find_emonmuc_dir() {
   # Attempt to set EMONMUC_DIR
@@ -77,23 +77,21 @@ install_emonmuc() {
   ln -sf "$EMONMUC_DIR"/lib/systemd/emonmuc.service /lib/systemd/system/emonmuc.service
   echo "d /var/run/emonmuc 0755 $EMONMUC_USER root -" | sudo tee /usr/lib/tmpfiles.d/emonmuc.conf >/dev/null 2>&1
 
-  if [ "$CLEAN" ] && [ -e "$EMONMUC_TMP/conf" ]; then
-    cp -pf "$EMONMUC_TMP"/conf/bundles.conf "$EMONMUC_DIR"/conf/
-  fi
-
-  bash "$EMONMUC_DIR"/bin/emonmuc update
-
-  systemctl enable emonmuc.service
-
-  if [ "$CLEAN" ] && [ -e "$EMONMUC_TMP/conf" ]; then
-    rm "$EMONMUC_TMP"/conf/{*.default.*,logback.xml,shadow} >/dev/null 2>&1
-    cp -rpf "$EMONMUC_TMP"/conf/* "$EMONMUC_DIR"/conf/
-  fi
   if [ -n "$EMONCMS_DIR" ]; then
     sudo -u $EMONMUC_USER ln -sf "$EMONMUC_DIR"/www/modules/channel "$EMONCMS_DIR"/Modules/
     sudo -u $EMONMUC_USER ln -sf "$EMONMUC_DIR"/www/modules/muc "$EMONCMS_DIR"/Modules/
     sudo -u $EMONMUC_USER ln -sf "$EMONMUC_DIR"/www/themes/seal "$EMONCMS_DIR"/Theme/
 
+    php "$EMONMUC_DIR"/lib/www/upgrade.php
+  fi
+
+  if [ "$CLEAN" ] && [ -e "$EMONMUC_TMP/conf" ]; then
+    rm "$EMONMUC_TMP"/conf/{*.default.*,logback.xml,shadow} >/dev/null 2>&1
+    cp -rpf "$EMONMUC_TMP"/conf/* "$EMONMUC_DIR"/conf/
+  fi
+  bash "$EMONMUC_DIR"/bin/emonmuc update
+
+  if [ -n "$EMONCMS_DIR" ]; then
     systemctl restart emonmuc.service
 
     # Wait a while for the server to be available.
@@ -103,20 +101,21 @@ install_emonmuc() {
     while ! nc -z localhost $EMONMUC_PORT && [ $wait -lt 60 ]; do
       wait=$((wait + 3))
       sleep 3
-	  printf "."
+      printf "."
     done
     while [ $wait -lt 15 ]; do
       wait=$((wait + 3))
       sleep 3
-	  printf "."
+      printf "."
     done
-	printf "\n"
+    printf "\n"
 
     php "$EMONMUC_DIR"/lib/www/setup.php --dir "$EMONCMS_DIR" --apikey $API_KEY
     chown $EMONMUC_USER -R "$EMONMUC_DIR"/conf
   fi
   rm "$EMONCMS_LOG"/emonmuc* >/dev/null 2>&1
 
+  systemctl enable emonmuc.service
   systemctl restart emonmuc.service
 }
 

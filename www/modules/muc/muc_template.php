@@ -96,9 +96,9 @@ class MucTemplate extends DeviceTemplate {
     }
 
     private function get_dir() {
-        global $muc_settings;
-        if (isset($muc_settings) && isset($muc_settings['libdir']) && $muc_settings['libdir'] !== "") {
-            $muc_template_dir = $muc_settings['libdir'];
+        global $settings;
+        if (isset($settings['muc']) && !empty($settings['muc']['lib_dir'])) {
+            $muc_template_dir = $settings['muc']['lib_dir'];
         }
         else {
             $muc_template_dir = self::DIR_DEFAULT;
@@ -232,8 +232,16 @@ class MucTemplate extends DeviceTemplate {
                 return $response;
             }
             
+            if (isset($template->feeds)) {
+                $feeds = $template->feeds;
+                $this->create_feeds($userid, $feeds);
+            }
+            else {
+                $feeds = array();
+            }
+            
             if (isset($template->inputs)) {
-                $channels = $this->parse_channels($deviceid, $template->inputs, $result, $options);
+                $channels = $this->parse_channels($deviceid, $template->inputs, $result, $options, $feeds);
                 $response = $this->create_channels($ctrlid, $devices, $channels);
                 if (isset($response['success']) && $response['success'] == false) {
                     return $response;
@@ -242,14 +250,6 @@ class MucTemplate extends DeviceTemplate {
             }
             else {
                 $channels = array();
-            }
-            
-            if (isset($template->feeds)) {
-                $feeds = $template->feeds;
-                $this->create_feeds($userid, $feeds);
-            }
-            else {
-                $feeds = array();
             }
             
             if (!empty($feeds)) {
@@ -357,7 +357,7 @@ class MucTemplate extends DeviceTemplate {
     }
 
     public function set_fields($device, $fields) {
-        if (count($fields) < 1) {
+        if (count((array) $fields) < 1) {
             return array('success'=>true, 'message'=>"No fields to update passed");
         }
         $template = $this->get($device['type']);
@@ -475,15 +475,15 @@ class MucTemplate extends DeviceTemplate {
         return $device;
     }
 
-    private function parse_channels($deviceid, $channels, $template, $parameters) {
+    private function parse_channels($deviceid, $channels, $template, $parameters, $feeds) {
         $result = array();
         foreach ($channels as $channel) {
-            $result[] = $this->parse_channel($deviceid, $channel, $template, $parameters);
+            $result[] = $this->parse_channel($deviceid, $channel, $template, $parameters, $feeds);
         }
         return $result;
     }
 
-    private function parse_channel($deviceid, $channel, $template, $parameters) {
+    private function parse_channel($deviceid, $channel, $template, $parameters, $feeds=null) {
         if(!isset($channel->node)) {
             $channel->node = $deviceid;
         }
@@ -492,6 +492,14 @@ class MucTemplate extends DeviceTemplate {
         }
         else if (isset($channel->logging)) {
             $logging = (array) $channel->logging;
+            if (isset($logging['feed']) && isset($feeds)) {
+                $feed = $logging['feed'];
+                $result = $this->search_feed($feeds, $feed->tag, $feed->name);
+                if (isset($result->id) && $result->id > 0) {
+                    $logging['feedid'] = $result->id;
+                }
+                unset($logging['feed']);
+            }
         }
         $logging['nodeid'] = $channel->node;
         $channel->logging = $logging;

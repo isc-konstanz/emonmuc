@@ -50,8 +50,6 @@ class HttpChannel extends ControllerChannel {
             $description = '';
         }
         
-        $logging = $this->decode_logging($this->ctrl['userid'], $nodeid, $logging);
-        
         $inputid = 0;
         $input = $this->get_input($this->ctrl['userid'], $logging['nodeid'], $id);
         if (isset($input)) {
@@ -63,10 +61,14 @@ class HttpChannel extends ControllerChannel {
                 return array('success'=>false, 'message'=>_("Unable to create input for channel: $id"));
             }
         }
-        if ($inputid > 0 && $description !== '') {
-            $this->input()->set_fields($inputid, '{"description":"'.$description.'"}');
-            if ($this->redis) $this->load_redis_input($inputid);
+        if ($inputid > 0) {
+            $logging['inputid'] = $inputid;
+            if ($description !== '') {
+                $this->input()->set_fields($inputid, '{"description":"'.$description.'"}');
+                if ($this->redis) $this->load_redis_input($inputid);
+            }
         }
+        $logging = $this->decode_logging($this->ctrl['userid'], $nodeid, $logging);
         
         $configs = $this->encode($id, $description, $logging, $channel);
         $data = array(
@@ -255,17 +257,6 @@ class HttpChannel extends ControllerChannel {
     public function update($id, $nodeid, $channel) {
         $channel = (array) json_decode($channel, true);
         
-        if (isset($channel['logging'])) {
-            $logging = (array) $channel['logging'];
-        }
-        else {
-            $logging = array('nodeid' => $nodeid);
-        }
-        $newnode = $logging['nodeid'];
-        if (preg_replace('/[^\p{N}\p{L}\-\_\.\:\/]/u', '', $newnode) != $newnode) {
-            return array('success'=>false, 'message'=>"Channel node must only contain a-z A-Z 0-9 - _ . : and / characters");
-        }
-        
         if (isset($channel['id'])) {
             $newid = $channel['id'];
             if (preg_replace('/[^\p{N}\p{L}\-\_\.\:\/]/u', '', $newid) != $newid) {
@@ -283,21 +274,40 @@ class HttpChannel extends ControllerChannel {
             $description = '';
         }
         
-        $logging = $this->decode_logging($this->ctrl['userid'], $newnode, $logging);
-        $configs = $this->encode($newid, $description, $logging, $channel);
-        
-        $this->http->put('channels/'.urlencode($id).'/configs', array('configs' => $configs));
-        
-        $input = $this->get_input($this->ctrl['userid'], $nodeid, $id);
-        if (isset($input)) {
-            $inputid = $input['id'];
-            if ($id !== $newid || $nodeid !== $newnode) {
-                $this->mysqli->query("UPDATE input SET `name`='$newid',`description`='$description',`nodeid`='$newnode' WHERE `id` = '$inputid'");
+        if (isset($channel['logging'])) {
+            $logging = (array) $channel['logging'];
+            
+            if (empty($logging['nodeid'])) {
+                $newnode = null;
             }
             else {
-                $this->input()->set_fields($inputid, '{"description":"'.$description.'"}');
+                $newnode = $logging['nodeid'];
+                if (preg_replace('/[^\p{N}\p{L}\-\_\.\:\/]/u', '', $newnode) != $newnode) {
+                    return array('success'=>false, 'message'=>"Channel node must only contain a-z A-Z 0-9 - _ . : and / characters");
+                }
             }
-            if ($this->redis) $this->load_redis_input($inputid);
+        }
+        else {
+            $logging = array('nodeid' => $nodeid);
+            $newnode = null;
+        }
+        $logging = $this->decode_logging($this->ctrl['userid'], $newnode, $logging);
+        
+        $configs = $this->encode($newid, $description, $logging, $channel);
+        $this->http->put('channels/'.urlencode($id).'/configs', array('configs' => $configs));
+        
+        if (isset($nodeid)) {
+            $input = $this->get_input($this->ctrl['userid'], $nodeid, $id);
+            if (isset($input)) {
+                $inputid = $input['id'];
+                if ($id !== $newid || $nodeid !== $newnode) {
+                    $this->mysqli->query("UPDATE input SET `name`='$newid',`description`='$description',`nodeid`='$newnode' WHERE `id` = '$inputid'");
+                }
+                else {
+                    $this->input()->set_fields($inputid, '{"description":"'.$description.'"}');
+                }
+                if ($this->redis) $this->load_redis_input($inputid);
+            }
         }
         if ($this->redis) {
             $this->update_redis($id, $nodeid, $channel);

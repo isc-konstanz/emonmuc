@@ -7,7 +7,7 @@
     Part of the OpenEnergyMonitor project: http://openenergymonitor.org
 */
 
-global $path, $session, $menu, $user,$show_menu_titles;
+global $path, $session, $menu, $user, $settings;
 if (!isset($session['profile'])) {
     $session['profile'] = 0;
 }
@@ -25,18 +25,18 @@ if ($session['read']) {
 <ul id="left-nav" class="nav mr-0 d-flex">
 
 <?php
-// $menu['tabs'][] = array(
-//     'title'=> _("Open/Close Sidebar"),
-//     'id' => 'sidebar-toggle',
-//     'href' => '#',
-//     'icon' => 'icon-menu',
-//     'order' => -1,
-//     'li_style' => 'width:0; overflow:hidden; visibility:hidden',
-//     'data'=> array(
-//         'toggle' => 'slide-collapse',
-//         'target' => '#sidebar'
-//     )
-// );
+$menu['tabs'][] = array(
+    'title'=> _("Open/Close Sidebar"),
+    'id' => 'sidebar-toggle',
+    'href' => '#',
+    'icon' => 'icon-menu',
+    'order' => -1,
+    'li_style' => 'width:0; overflow:hidden; visibility:hidden',
+    'data'=> array(
+        'toggle' => 'slide-collapse',
+        'target' => '#sidebar'
+    )
+);
 
 // top level menu icons (MAIN MENU)
 if(!empty($menu['tabs'])) {
@@ -48,7 +48,7 @@ if(!empty($menu['tabs'])) {
         // render menu item
         $item['data']['hide-narrow'] = true;
 
-        if(!$show_menu_titles){
+        if(!$settings['interface']['show_menu_titles']){
             $item['text'] = '';
         }
 
