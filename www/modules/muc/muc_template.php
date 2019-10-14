@@ -290,12 +290,6 @@ class MucTemplate extends DeviceTemplate {
             $configs = (array) $c;
             $configs['id'] = $configs['name'];
             
-            if (empty($c->logging)) {
-                if (empty($c->logging->loggingInterval)) {
-                    // Remove the channel from list to avoid the unnecessary input creation
-                    unset($channels[$id]);
-                }
-            }
             if (isset($configs['device'])) {
                 $deviceid = $configs['device'];
                 
@@ -320,6 +314,15 @@ class MucTemplate extends DeviceTemplate {
                 if (stristr($e->getMessage(), 'already exists') === false) {
                     return $e->getResult();
                 }
+            }
+            //if (empty($c->node) ||
+            if (empty($c->logging) && empty($c->logging->loggingInterval)) {
+                // Remove the channel from list to avoid the unnecessary input creation
+                $c->action = 'none';
+            }
+            else {
+                $c->id = $this->input->exists_nodeid_name($ctrl['userid'], $c->node, $c->name);
+                $c->action = 'set';
             }
         }
         return array('success'=>true, 'message'=>'Channels successfully created');

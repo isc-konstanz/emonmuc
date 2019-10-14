@@ -465,6 +465,19 @@ abstract class ControllerChannel {
                 'NONE'=>'None'
             )
         );
+        $logging['options'][] = array(
+            'key'=>'engine',
+            'name'=>'Engine',
+            'description'=>'The engine used to post sampled values.',
+            'type'=>'STRING',
+            'mandatory'=>false,
+            'valueDefault'=>'HTTP',
+            'valueSelection'=>array(
+                'HTTP'=>'HTTP',
+                'MQTT'=>'MQTT',
+                'SQL'=>'SQL'
+            )
+        );
         $info['logging'] = $logging;
         $info['configs'] = $configs;
         
