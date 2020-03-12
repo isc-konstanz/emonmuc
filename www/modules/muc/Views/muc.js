@@ -5,7 +5,10 @@ var muc = {
             "&options="+JSON.stringify(options));
     },
 
-    list:function(callback) {
+    list:function(callback, child) {
+    	if (child) {
+            return muc.request(callback, "muc/list/"+child+".json");
+    	}
         return muc.request(callback, "muc/list.json");
     },
 

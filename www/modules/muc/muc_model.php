@@ -166,13 +166,6 @@ class Controller {
         foreach ($ctrlids as $id) {
             $ctrl = $this->redis->hGetAll("muc:$id");
             $ctrl['options'] = json_decode($ctrl['options'], true);
-            try {
-                $ctrl['drivers'] = $this->driver($ctrl)->get_list(0);
-            }
-            catch(ControllerException $e) {
-                $ctrl['drivers'] = array();
-                $this->log->warn($e->getMessage());
-            }
             $ctrls[] = $ctrl;
         }
         return $ctrls;
@@ -192,8 +185,16 @@ class Controller {
                 'description'=>$row['description'],
                 'options'=>json_decode($row['options'], true)
             );
+            $ctrls[] = $ctrl;
+        }
+        return $ctrls;
+    }
+
+    public function get_child_list($userid, $depth=0) {
+        $ctrls = array();
+        foreach ($this->get_list($userid) as $ctrl) {
             try {
-                $ctrl['drivers'] = $this->driver($ctrl)->get_list(0);
+                $ctrl['drivers'] = $this->driver($ctrl)->get_list($depth);
             }
             catch(ControllerException $e) {
                 $ctrl['drivers'] = array();

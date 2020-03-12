@@ -62,6 +62,20 @@ function muc_controller() {
                 $result = $ctrl->create($session['userid'], get('type'), get('name'), get('description'), get('options'));
             }
             elseif ($route->action == 'list') {
+                if ($route->subaction == "drivers") {
+                    $result = $ctrl->get_child_list($session['userid'], 0);
+                }
+                elseif ($route->subaction == "devices") {
+                    $result = $ctrl->get_child_list($session['userid'], 1);
+                }
+                elseif ($route->subaction == "channels") {
+                    $result = $ctrl->get_child_list($session['userid'], 2);
+                }
+                else {
+                    $result = $ctrl->get_list($session['userid']);
+                }
+            }
+            elseif ($route->action == 'driver') {
                 $result = $ctrl->get_list($session['userid']);
             }
             elseif ($route->action == "config") {

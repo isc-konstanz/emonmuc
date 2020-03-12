@@ -92,7 +92,7 @@ class MucThing extends DeviceThing {
         if (isset($mapping['valueType'])) {
             $valueType = $mapping['valueType'];
         }
-        else $valueType = null;
+        else $valueType = 'DOUBLE';
         
         try {
             if (isset($mapping['write']) && !$mapping['write']) {

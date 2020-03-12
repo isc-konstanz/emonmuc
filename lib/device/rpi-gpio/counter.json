@@ -29,7 +29,7 @@
         {
             "id": "impulses",
             "name": "imp./unit",
-            "description": "The amount of impulses corresponding to one unit.</a>",
+            "description": "The amount of impulses corresponding to one unit.",
             "type": "text",
             "mandatory": true,
             "syntax": "channelSettings"
