@@ -22,8 +22,7 @@ var channel = {
     },
 
     scan:function(ctrlid, driverid, deviceid, settings, callback) {
-        return channel.request(callback, "muc/channel/scan.json", "ctrlid="+ctrlid+"&driverid="+driverid+"&deviceid="+deviceid+
-        		"&settings="+JSON.stringify(settings));
+        return channel.request(callback, "muc/channel/scan.json", "ctrlid="+ctrlid+"&driverid="+driverid+"&deviceid="+deviceid+"&settings="+settings);
     },
 
     get:function(ctrlid, id, callback) {

@@ -222,7 +222,7 @@ abstract class ControllerChannel {
     }
 
     protected function decode($details) {
-        $configs = $details['configs'];
+        $configs = (array) $details['configs'];
         $logging = array();
         if (isset($configs)) {
             if (isset($configs['loggingInterval'])) $logging['loggingInterval'] = $configs['loggingInterval'];
@@ -392,9 +392,9 @@ abstract class ControllerChannel {
         $configs = array('options'=>array());
         $logging = array('options'=>array());
         foreach($info['configs']['options'] as $option) {
-            if ($option['key'] == 'loggingTimeOffset' ||
-                $option['key'] == 'loggingInterval') {
-				if ($option['key'] == 'loggingInterval') {
+            if ($option['id'] == 'loggingTimeOffset' ||
+                $option['id'] == 'loggingInterval') {
+				if ($option['id'] == 'loggingInterval') {
 					$option['valueSelection'] = $times;
 				}
 				$option['name'] = str_replace('Logging', 'Post', $option['name']);
@@ -409,7 +409,7 @@ abstract class ControllerChannel {
 			}
         }
         $logging['options'][] = array(
-            'key'=>'loggingMaxInterval',
+            'id'=>'loggingMaxInterval',
             'name'=>'Post interval maximum',
             'description'=>'Dynamically post records only on changed values, up until to a maximum amount of time.',
             'type'=>'INTEGER',
@@ -417,14 +417,14 @@ abstract class ControllerChannel {
             'valueSelection'=>$times
         );
         $logging['options'][] = array(
-            'key'=>'loggingTolerance',
+            'id'=>'loggingTolerance',
             'name'=>'Posting tolerance',
             'description'=>'Value change tolerance for dynamically logged records.',
             'type'=>'DOUBLE',
             'mandatory'=>false,
         );
         $logging['options'][] = array(
-            'key'=>'average',
+            'id'=>'average',
             'name'=>'Average',
             'description'=>'Average sampled values, if the logging interval is larger than its sampling interval.',
             'type'=>'BOOLEAN',
@@ -432,7 +432,7 @@ abstract class ControllerChannel {
             'valueDefault'=>false
         );
         $logging['options'][] = array(
-            'key'=>'nodeid',
+            'id'=>'nodeid',
             'name'=>'Node',
             'description'=>'The node to post channel records to.',
             'type'=>'STRING',
@@ -443,7 +443,7 @@ abstract class ControllerChannel {
             $feeds[$feed['id']] = $feed['tag'].": ".$feed['name'];
         }
         $logging['options'][] = array(
-            'key'=>'feedid',
+            'id'=>'feedid',
             'name'=>'Feed',
             'description'=>'The feed in which the channels values were persistently logged.',
             'type'=>'INTEGER',
@@ -451,7 +451,7 @@ abstract class ControllerChannel {
             'valueSelection'=>$feeds
         );
         $logging['options'][] = array(
-            'key'=>'authorization',
+            'id'=>'authorization',
             'name'=>'Authorization',
             'description'=>'The authorization of the channel to post or read values.',
             'type'=>'STRING',
@@ -466,7 +466,7 @@ abstract class ControllerChannel {
             )
         );
         $logging['options'][] = array(
-            'key'=>'engine',
+            'id'=>'engine',
             'name'=>'Engine',
             'description'=>'The engine used to post sampled values.',
             'type'=>'STRING',
