@@ -416,6 +416,9 @@ class Controller {
 
 class ControllerException extends Exception {
     public function getResult() {
-        return array('success'=>false, 'message'=>$this->getMessage());
+        return array(
+            'success'=>false,
+            'message'=>$this->getMessage(),
+            'trace'=>$this->getTrace());
     }
 }

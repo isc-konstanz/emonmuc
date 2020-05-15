@@ -24,16 +24,61 @@ class MucThing extends DeviceThing {
         parent::__construct($parent);
         $this->ctrl = new Controller($this->mysqli, $this->redis);
     }
+    
+    protected function parse_item($thing, &$item, $template) {
+        if (isset($item['mapping'])) {
+            foreach($item['mapping'] as &$mapping) {
+                $this->parse_item_mapping($thing, $item, $mapping, $template);
+            }
+        }
+        if (isset($item['channel'])) {
+            // TODO: implement channel parsing
+        }
+        if (isset($item['input'])) {
+            if (isset($template->channels)) {
+                $tmp = $template->channels;
+                unset($template->channels);
+                $template->inputs = $tmp;
+            }
+            $this->parse_item_input($thing, $item, $template);
+        }
+        if (isset($item['feed'])) {
+            $this->parse_item_feed($thing, $item, $template);
+        }
+        return $item;
+    }
 
-    public function get_item_list($device) {
-        $template = $this->get_template($device);
+    protected function parse_item_mapping($thing, &$item, &$mapping, $template) {
+        if (empty($thing['options']['ctrlid'])) {
+            throw new ThingException('Unspecified controller ID in thing configs.');
+        }
+        $ctrlid = intval($thing['options']['ctrlid']);
+        
+        if (isset($mapping->channel)) {
+            $channelid = $mapping->channel;
+            $configs = [];
+            foreach($template->channels as $c) {
+                if ($c->name == $mapping->channel) {
+                    if (isset($c->configs->valueType)) {
+                        $configs['valueType'] = $c->configs->valueType;
+                    }
+                }
+            }
+            unset($mapping->channel);
+            
+            $mapping = array_merge(array('ctrlid'=>$ctrlid, 'channelid'=>$channelid), $configs, (array) $mapping);
+        }
+    }
+
+    public function get_item_list($thing) {
+        $template = $this->get_template($thing);
         if (!is_object($template)) {
             return $template;
         }
-        if (empty($device['options']['ctrlid'])) {
+        if (empty($thing['options']['ctrlid'])) {
             return array('success'=>false, 'message'=>'Unspecified controller ID in device options.');
         }
-        $ctrlid = intval($device['options']['ctrlid']);
+        $ctrlid = intval($thing['options']['ctrlid']);
         
         $items = array();
         for ($i=0; $i<count($template->items); $i++) {
@@ -58,19 +103,19 @@ class MucThing extends DeviceThing {
                 }
             }
             if (isset($item['input'])) {
-                $nodeid = isset($item['node']) ? $item['node'] : $device['nodeid'];
-                $inputid = $this->get_input_id($device['userid'], $nodeid, $item['input'], $template->channels);
+                $nodeid = isset($item['node']) ? $item['node'] : $thing['nodeid'];
+                $inputid = $this->get_input_id($thing['userid'], $nodeid, $item['input'], $template->channels);
                 if ($inputid == false) {
-                    $this->log->error("get_item_list() failed to find input \"$nodeid:".$item['input']."\" of item '".$item['id']."' in template: ".$device['type']);
+                    $this->log->error("get_item_list() failed to find input \"$nodeid:".$item['input']."\" of item '".$item['id']."' in template: ".$thing['type']);
                     continue;
                 }
                 unset($item['input']);
                 $item = array_merge($item, array('inputid'=>$inputid));
             }
             if (isset($item['feed'])) {
-                $feedid = $this->get_feed_id($device['userid'], $item['feed']);
+                $feedid = $this->get_feed_id($thing['userid'], $item['feed']);
                 if ($feedid == false) {
-                    $this->log->error("get_item_list() failed to find feed of item '".$item['id']."' in template: ".$device['type']);
+                    $this->log->error("get_item_list() failed to find feed of item '".$item['id']."' in template: ".$thing['type']);
                     continue;
                 }
                 unset($item['feed']);
@@ -82,7 +127,7 @@ class MucThing extends DeviceThing {
         return $items;
     }
 
-    public function set_item($itemid, $mapping) {
+    protected function set_item($itemid, $mapping) {
         if (empty($mapping['ctrlid']) || empty($mapping['channelid']) || !isset($mapping['value'])) {
             return array('success'=>false, 'message'=>"Error while setting item value");
         }
@@ -107,57 +152,5 @@ class MucThing extends DeviceThing {
         return array('success'=>true, 'message'=>"Item value set");
     }
 
-    protected function get_template($device) {
-        $file = $this->get_template_dir().$device['type'].".json";
-        if (!file_exists($file)) {
-            return array('success'=>false, 'message'=>"Error reading template ".$device['type'].": $file does not exist");
-        }
-        $content = file_get_contents($file);
-        $template = json_decode($content);
-        if (json_last_error() != 0) {
-            return array('success'=>false, 'message'=>"Error reading template ".$device['type'].": ".json_last_error_msg());
-        }
-        $options = isset($device['options']) ? (array) $device['options'] : array();
-        
-        if (strpos($content, '*') !== false) {
-            $separator = isset($options['sep']) ? $options['sep'] : self::SEPARATOR;
-            $content = str_replace("*", $separator, $content);
-        }
-        if (strpos($content, '<node>') !== false) {
-            $content = str_replace("<node>", $device['nodeid'], $content);
-        }
-        if (isset($template->options)) {
-            foreach ($template->options as $option) {
-                if (strpos($content, "<$option->id>") !== false) {
-                    if (isset($options[$option->id])) {
-                        $content = str_replace("<$option->id>", $options[$option->id], $content);
-                    }
-                    else if (isset($option->default)) {
-                        $content = str_replace("<$option->id>", $option->default, $content);
-                    }
-                }
-            }
-        }
-        
-        $template = json_decode($content);
-        if (json_last_error() != 0) {
-            return array('success'=>false, 'message'=>"Error preparing type ".$device['type'].": ".json_last_error_msg());
-        }
-        return $template;
-    }
-
-    protected function get_template_dir() {
-        global $settings;
-        if (isset($settings['muc']) && !empty($settings['muc']['lib_dir'])) {
-            $muc_template_dir = $settings['muc']['lib_dir'];
-        }
-        else {
-            $muc_template_dir = self::DIR_DEFAULT;
-        }
-        if (substr($muc_template_dir, -1) !== "/") {
-            $muc_template_dir .= "/";
-        }
-        return $muc_template_dir."device/";
-    }
 }
 

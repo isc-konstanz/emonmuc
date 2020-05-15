@@ -17,6 +17,10 @@ require_once "Modules/muc/muc_model.php";
 class MucTemplate extends DeviceTemplate {
     const DIR_DEFAULT = "/var/opt/emonmuc/";
 
+    const DEVICE_ADDRESS = "deviceAddress";
+    const DEVICE_SETTINGS = "deviceSettings";
+    const DEVICE_SCAN_SETTINGS = "deviceScanSettings";
+
     private $ctrl;
 
     function __construct(&$parent) {
@@ -151,7 +155,7 @@ class MucTemplate extends DeviceTemplate {
         return array('success'=>true, 'feeds'=>$feeds, 'inputs'=>$channels);
     }
 
-    protected function prepare_template($device) {
+    public function prepare_template($device) {
         $file = $this->get_dir().$device['type'].".json";
         if (!file_exists($file)) {
             throw new ParseError("Error reading template ".$device['type'].": $file does not exist");
@@ -226,7 +230,7 @@ class MucTemplate extends DeviceTemplate {
             if (empty($result->devices)) {
                 return array('success'=>false, 'message'=>'Bad device template. Devices undefined.');
             }
-            $devices = $this->parse_devices($deviceid, $result, $options);
+            $devices = $this->decode_devices($deviceid, $result, $options);
             $response = $this->create_devices($ctrlid, $devices);
             if (isset($response['success']) && $response['success'] == false) {
                 return $response;
@@ -241,7 +245,7 @@ class MucTemplate extends DeviceTemplate {
             }
             
             if (isset($template->inputs)) {
-                $channels = $this->parse_channels($deviceid, $template->inputs, $result, $options, $feeds);
+                $channels = $this->decode_channels($deviceid, $template->inputs, $result, $options, $feeds);
                 $response = $this->create_channels($ctrlid, $devices, $channels);
                 if (isset($response['success']) && $response['success'] == false) {
                     return $response;
@@ -403,7 +407,7 @@ class MucTemplate extends DeviceTemplate {
             if (!$this->ctrl->device($ctrl)->exists($id)) {
                 continue;
             }
-            $configs = $this->parse_device($update['nodeid'], $this->prepare_json($update, $template, json_encode($d)),
+            $configs = $this->decode_device($update['nodeid'], $this->prepare_json($update, $template, json_encode($d)),
                 $template, $update['options']);
             
             try {
@@ -419,7 +423,7 @@ class MucTemplate extends DeviceTemplate {
         $ctrl = $this->ctrl->get($ctrlid);
         foreach($template->channels as $c) {
             $channel = $this->prepare_json($update, $template, json_encode($c));
-            $configs = $this->parse_channel($update['nodeid'], $channel, $template, $update['options']);
+            $configs = $this->decode_channel($update['nodeid'], $channel, $template, $update['options']);
             $configs->id = $configs->name;
             
             $id = $this->prepare_str($device, $template, $c->name);
@@ -454,15 +458,15 @@ class MucTemplate extends DeviceTemplate {
         }
     }
 
-    private function parse_devices($id, $template, $parameters) {
+    private function decode_devices($id, $template, $parameters) {
         $devices = array();
         foreach ($template->devices as $device) {
-            $devices[] = $this->parse_device($id, $device, $template, $parameters);
+            $devices[] = $this->decode_device($id, $device, $template, $parameters);
         }
         return $devices;
     }
 
-    private function parse_device($id, $device, $template, $parameters) {
+    private function decode_device($id, $device, $template, $parameters) {
         if (isset($device->name)) {
             $device->id = $device->name;
         }
@@ -473,20 +477,20 @@ class MucTemplate extends DeviceTemplate {
             $device->driver = isset($template->driver) ? $template->driver : null;
         }
         if (isset($template->options)) {
-            $device = $this->parse_configs('device', $device, $template, $parameters);
+            $device = $this->decode_configs('device', $device, $template, $parameters);
         }
         return $device;
     }
 
-    private function parse_channels($deviceid, $channels, $template, $parameters, $feeds) {
+    private function decode_channels($deviceid, $channels, $template, $parameters, $feeds) {
         $result = array();
         foreach ($channels as $channel) {
-            $result[] = $this->parse_channel($deviceid, $channel, $template, $parameters, $feeds);
+            $result[] = $this->decode_channel($deviceid, $channel, $template, $parameters, $feeds);
         }
         return $result;
     }
 
-    private function parse_channel($deviceid, $channel, $template, $parameters, $feeds=null) {
+    private function decode_channel($deviceid, $channel, $template, $parameters, $feeds=null) {
         if(!isset($channel->node)) {
             $channel->node = $deviceid;
         }
@@ -508,21 +512,67 @@ class MucTemplate extends DeviceTemplate {
         $channel->logging = $logging;
         
         if (isset($template->options)) {
-            $channel = $this->parse_configs('channel', $channel, $template, $parameters);
+            $channel = $this->decode_configs('channel', $channel, $template, $parameters);
         }
         return $channel;
     }
 
-    private function parse_configs($type, $configs, $template, $parameters) {
+    private function decode_configs($type, $configs, $template, $parameters) {
         foreach (array('address', 'settings') as $key) {
             if (empty($configs->$key)) {
-                $configs->$key = $this->parse_options($type.ucfirst($key), $template, $parameters);
+                $configs->$key = $this->encode_options($type.ucfirst($key), $template, $parameters);
             }
         }
         return $configs;
     }
 
-    private function parse_options($key, $template, $parameters) {
+    private function decode_options($ctrlid, $template, $address, $settings) {
+        $result = array('ctrlid'=>$ctrlid);
+        
+        // Iterate all options as configured in the template and decode them accordingly,
+        // if they exist in the passed settings string
+        foreach (array(self::DEVICE_ADDRESS, self::DEVICE_SETTINGS) as $type) {
+            $options = array();
+            foreach ($template->options as $option) {
+                if (empty($option->syntax)) {
+                    continue;
+                }
+                $types = explode(',', $option->syntax);
+                foreach($types as $t) {
+                    if ($t === $type) $options[] = $option;
+                }
+            }
+            if (isset($template->syntax) && isset($template->syntax->$type)) {
+                $syntax = $template->syntax->$type;
+            }
+            else {
+                $syntax = true;
+            }
+            
+            $separator = isset($syntax->separator) ? $syntax->separator : ',';
+            if ($type == self::DEVICE_ADDRESS) {
+                $arr = explode($separator, $address);
+            }
+            else if ($type == self::DEVICE_SETTINGS) {
+                $arr = explode($separator, $settings);
+            }
+            
+            for($i=0; $i<count($options); $i++) {
+                if (isset($syntax->keyValue) && !$syntax->keyValue) {
+                    $result[$options[$i]->id] = $arr[$i];
+                }
+                else {
+                    $assignment = isset($syntax->assignment) ? $syntax->assignment : ':';
+                    $pair = explode($assignment, $arr[$i]);
+                    
+                    $result[$pair[0]] = $pair[1];
+                }
+            }
+        }
+        return $result;
+    }
+
+    private function encode_options($key, $template, $parameters) {
         $result = "";
         
         // Iterate all options as configured in the template and parse them accordingly, 
@@ -587,6 +637,114 @@ class MucTemplate extends DeviceTemplate {
             }
         }
         return array('success'=>true, 'message'=>"No device to delete");
+    }
+
+    public function scan_start($userid, $type, $options) {
+        $template = $this->get($type);
+        if (is_array($template) && isset($template['success']) && $template['success'] == false) {
+            return $template;
+        }
+        if (empty($template->driver)) {
+            return array('success'=>false, 'message'=>'Unspecified driver in device template.');
+        }
+        $driverid = $template->driver;
+        
+        if (empty($options['ctrlid'])) {
+            return array('success'=>false, 'message'=>'Unspecified controller ID in device options.');
+        }
+        $ctrlid = intval($options['ctrlid']);
+        $ctrl = $this->ctrl->get($ctrlid);
+        
+        $settings = "";
+        if (isset($template->options)) {
+            if (isset($template->scan->settings)) {
+                $settings = $template->scan->settings;
+                
+                foreach ($template->options as $option) {
+                    if (strpos($settings, "<$option->id>") !== false) {
+                        if (isset($options[$option->id])) {
+                            $settings = str_replace("<$option->id>", $options[$option->id], $settings);
+                        }
+                        else if (isset($option->default)) {
+                            $settings = str_replace("<$option->id>", $option->default, $settings);
+                        }
+                    }
+                }
+            }
+            else {
+                $settings = $this->encode_options($template, $options);
+            }
+        }
+        
+        if ($this->redis) {
+            $this->redis->hMSet("user#$userid:device:$type", $options); // Temporary availability of auth for device ip address
+            $this->redis->expire("user#$userid:device:$type", 600);     // Expire after 10 minutes
+        }
+        try {
+            return $this->decode_progress($userid, $ctrlid, $type, $template,
+                $this->ctrl->device($ctrl)->scan_start($driverid, $settings));
+            
+        } catch(ControllerException $e) {
+            return $e->getResult();
+        }
+    }
+
+    public function scan_progress($userid, $type) {
+        $result = $this->get($type);
+        if (is_array($result) && isset($result['success']) && $result['success'] == false) {
+            return $result;
+        }
+        if (empty($result->driver)) {
+            return array('success'=>false, 'message'=>'Unspecified driver in device template.');
+        }
+        $driverid = $result->driver;
+        
+        $options = array();
+        if (!$this->redis) {
+            return array('success'=>false, 'message'=>'Unable to retrieve scan progress without redis enabled.');
+        }
+        if ($this->redis->exists("user#$userid:device:$type")) {
+            $options = (array) $this->redis->hGetAll("user#$userid:device:$type");
+        }
+        if (empty($options['ctrlid'])) {
+            return array('success'=>false, 'message'=>'Unspecified controller ID in device options.');
+        }
+        $ctrlid = intval($options['ctrlid']);
+        $ctrl = $this->ctrl->get($ctrlid);
+        try {
+            return $this->decode_progress($userid, $ctrlid, $type, $result,
+                $this->ctrl->device($ctrl)->scan_progress($driverid));
+            
+        } catch(ControllerException $e) {
+            return $e->getResult();
+        }
+    }
+
+    public function scan_cancel($userid, $type) {
+        $result = $this->get($type);
+        if (is_array($result) && isset($result['success']) && $result['success'] == false) {
+            return $result;
+        }
+        if (empty($result->driver)) {
+            return array('success'=>false, 'message'=>'Unspecified driver in device template.');
+        }
+        $driverid = $result->driver;
+        
+        $options = array();
+        if ($this->redis && $this->redis->exists("user#$userid:device:$type")) {
+            $options = (array) $this->redis->hGetAll("user#$userid:device:$type");
+        }
+        if (empty($options['ctrlid'])) {
+            return array('success'=>false, 'message'=>'Unspecified controller ID in device options.');
+        }
+        $ctrlid = intval($options['ctrlid']);
+        $ctrl = $this->ctrl->get($ctrlid);
+        try {
+            return $this->ctrl->device($ctrl)->scan_cancel($driverid);
+            
+        } catch(ControllerException $e) {
+            return $e->getResult();
+        }
     }
 
 }
