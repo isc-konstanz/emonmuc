@@ -113,17 +113,15 @@ class MucTemplate extends DeviceTemplate {
         return $muc_template_dir."device/";
     }
 
-    public function get_options($type) {
-        $template = $this->get($type);
-        if (!is_object($template)) {
-            return $template;
-        }
-        return $template->options;
-    }
-
     public function prepare($device) {
         $userid = intval($device['userid']);
         $nodeid = $device['nodeid'];
+        
+        $configs = $this->device->get_configs($device);
+        if (empty($configs['ctrlid'])) {
+            throw new DeviceException('Unspecified controller ID in device configs.');
+        }
+        $device['configs'] = $configs;
         try {
             $template = $this->prepare_template($device);
             
@@ -160,27 +158,26 @@ class MucTemplate extends DeviceTemplate {
         if (!file_exists($file)) {
             throw new ParseError("Error reading template ".$device['type'].": $file does not exist");
         }
+        $configs = $this->device->get_configs($device);
         $content = file_get_contents($file);
         $template = json_decode($content);
         if (json_last_error() != 0) {
             throw new ParseError("Error reading template ".$device['type'].": ".json_last_error_msg());
         }
-        return $this->prepare_json($device, $template, $content);
+        return $this->prepare_json($device, $template, $content, $configs);
     }
 
-    protected function prepare_json($device, $template, $content) {
-        $result = json_decode($this->prepare_str($device, $template, $content));
+    protected function prepare_json($device, $template, $content, $configs) {
+        $result = json_decode($this->prepare_str($device, $template, $content, $configs));
         if (json_last_error() != 0) {
             throw new ParseError("Error preparing type ".$device['type'].": ".json_last_error_msg());
         }
         return $result;
     }
 
-    protected function prepare_str($device, $template, $content) {
-        $options = isset($device['options']) ? (array) $device['options'] : array();
-        
+    protected function prepare_str($device, $template, $content, $configs) {
         if (strpos($content, '*') !== false) {
-            $separator = isset($options['sep']) ? $options['sep'] : self::SEPARATOR;
+            $separator = isset($configs['sep']) ? $configs['sep'] : self::SEPARATOR;
             $content = str_replace("*", $separator, $content);
         }
         if (strpos($content, '<node>') !== false) {
@@ -193,8 +190,8 @@ class MucTemplate extends DeviceTemplate {
         if (isset($template->options)) {
             foreach ($template->options as $option) {
                 if (strpos($content, "<$option->id>") !== false) {
-                    if (isset($options[$option->id])) {
-                        $content = str_replace("<$option->id>", $options[$option->id], $content);
+                    if (isset($configs[$option->id])) {
+                        $content = str_replace("<$option->id>", $configs[$option->id], $content);
                     }
                     else if (isset($option->default)) {
                         $content = str_replace("<$option->id>", $option->default, $content);
@@ -215,22 +212,22 @@ class MucTemplate extends DeviceTemplate {
             }
             $template = $result;
         }
+        if (is_string($template)) $template = json_decode($template);
         if (!is_object($template)) $template = (object) $template;
         
+        $configs = $this->device->get_configs($device);
+        if (empty($configs['ctrlid'])) {
+            throw new DeviceException('Unspecified controller ID in device configs.');
+        }
+        $device['configs'] = $configs;
         try {
             $result = $this->prepare_template($device);
-            
-            $options = $device['options'];
-            if (empty($options['ctrlid'])) {
-                return array('success'=>false, 'message'=>'Unspecified controller ID in device options.');
-            }
-            $ctrlid = intval($options['ctrlid']);
-            $deviceid = $device['nodeid'];
-            
             if (empty($result->devices)) {
                 return array('success'=>false, 'message'=>'Bad device template. Devices undefined.');
             }
-            $devices = $this->decode_devices($deviceid, $result, $options);
+            $ctrlid = intval($configs['ctrlid']);
+            $deviceid = $device['nodeid'];
+            $devices = $this->decode_devices($deviceid, $result, $configs);
             $response = $this->create_devices($ctrlid, $devices);
             if (isset($response['success']) && $response['success'] == false) {
                 return $response;
@@ -245,7 +242,7 @@ class MucTemplate extends DeviceTemplate {
             }
             
             if (isset($template->inputs)) {
-                $channels = $this->decode_channels($deviceid, $template->inputs, $result, $options, $feeds);
+                $channels = $this->decode_channels($deviceid, $template->inputs, $result, $configs, $feeds);
                 $response = $this->create_channels($ctrlid, $devices, $channels);
                 if (isset($response['success']) && $response['success'] == false) {
                     return $response;
@@ -373,13 +370,19 @@ class MucTemplate extends DeviceTemplate {
         }
         
         // TODO: check if the controller changed.
-        if (empty($device['options']) || empty($device['options']['ctrlid'])) {
-            return array('success'=>false, 'message'=>"Unable to update incorrectly configured device");
+        $configs = $this->device->get_configs($device);
+        if (empty($configs['ctrlid'])) {
+            throw new DeviceException('Unspecified controller ID in device configs.');
         }
-        $ctrlid = intval($device['options']['ctrlid']);
+        $ctrlid = intval($configs['ctrlid']);
         
         $update = $device;
-        if (isset($fields->options)) $update['options'] = (array) $fields->options;
+        if (isset($fields->options)) {
+            $update['configs'] = (array) $fields->options;
+        }
+        else {
+            $update['configs'] = $configs;
+        }
         if (isset($fields->nodeid)) $update['nodeid'] = $fields->nodeid;
         if (isset($fields->name)) $update['name'] = $fields->name;
         
@@ -399,7 +402,7 @@ class MucTemplate extends DeviceTemplate {
         $ctrl = $this->ctrl->get($ctrlid);
         foreach($template->devices as $d) {
             if (isset($d->name)) {
-                $id = $this->prepare_str($device, $template, $d->name);
+                $id = $this->prepare_str($device, $template, $d->name, $update['configs']);
             }
             else {
                 $id = $device['nodeid'];
@@ -407,9 +410,8 @@ class MucTemplate extends DeviceTemplate {
             if (!$this->ctrl->device($ctrl)->exists($id)) {
                 continue;
             }
-            $configs = $this->decode_device($update['nodeid'], $this->prepare_json($update, $template, json_encode($d)),
-                $template, $update['options']);
-            
+            $device = $this->prepare_json($update, $template, json_encode($d), $update['configs']);
+            $configs = $this->decode_device($update['nodeid'], $device, $template, $update['configs']);
             try {
                 $this->ctrl->device($ctrl)->update($id, json_encode($configs));
             }
@@ -422,19 +424,21 @@ class MucTemplate extends DeviceTemplate {
     protected function update_channels($ctrlid, $device, $update, $template) {
         $ctrl = $this->ctrl->get($ctrlid);
         foreach($template->channels as $c) {
-            $channel = $this->prepare_json($update, $template, json_encode($c));
-            $configs = $this->decode_channel($update['nodeid'], $channel, $template, $update['options']);
-            $configs->id = $configs->name;
+            $configs = isset($device['configs']) ? $device['configs'] : $update['configs'];
+            $configs = $this->prepare_json($update, $template, json_encode($c), $configs);
+            $channel = $this->decode_channel($update['nodeid'], $configs, $template, $update['configs']);
+            $channel->id = $this->prepare_str($device, $template, $c->name, $update['configs']);
             
-            $id = $this->prepare_str($device, $template, $c->name);
+            $id = $channel->id;
             if (!$this->ctrl->channel($ctrl)->exists($id)) {
-                if (!$this->ctrl->channel($ctrl)->exists($configs->id)) {
+                if (!$this->ctrl->channel($ctrl)->exists($configs->name)) {
                     continue;
                 }
-                $id = $configs->id;
+                $id = $configs->name;
             }
+            unset($channel->name);
             try {
-                $this->ctrl->channel($ctrl)->update($id, $device['nodeid'], json_encode($configs));
+                $this->ctrl->channel($ctrl)->update($id, $device['nodeid'], json_encode($channel));
             }
             catch(ControllerException $e) {
                 // Do nothing
@@ -444,12 +448,12 @@ class MucTemplate extends DeviceTemplate {
 
     protected function update_feeds($device, $update, $template) {
         foreach($template->feeds as $f) {
-            $feed = $this->prepare_json($device, $template, json_encode($f));
+            $feed = $this->prepare_json($device, $template, json_encode($f), $update['configs']);
             $id = $this->feed->exists_tag_name(intval($device['userid']), isset($feed->tag) ? $feed->tag : $device['nodeid'], 
-                $this->prepare_str($device, $template, $feed->name));
+                $this->prepare_str($device, $template, $feed->name, $update['configs']));
             
             if ($id > 0) {
-                $feed = $this->prepare_json($update, $template, json_encode($f));
+                $feed = $this->prepare_json($update, $template, json_encode($f), $update['configs']);
                 if (!isset($feed->tag)) {
                     $feed->tag = $update['nodeid'];
                 }
@@ -621,16 +625,15 @@ class MucTemplate extends DeviceTemplate {
     }
 
     public function delete($device) {
-        $nodeid = $device['nodeid'];
-        $options = $device['options'];
-        if (isset($options['ctrlid'])) {
-            $ctrlid = intval($options['ctrlid']);
+        $configs = $this->device->get_configs($device);
+        if (isset($configs['ctrlid'])) {
+            $ctrlid = intval($configs['ctrlid']);
             $ctrl = $this->ctrl->get($ctrlid);
             
             try {
-                $this->ctrl->device($ctrl)->delete($nodeid);
+                $this->ctrl->device($ctrl)->delete($device['nodeid']);
             }
-            catch(ControllerException $e) {
+            catch (ControllerException $e) {
                 if (stristr($e->getMessage(), 'does not exist') === false) {
                     return $e->getResult();
                 }
@@ -639,7 +642,10 @@ class MucTemplate extends DeviceTemplate {
         return array('success'=>true, 'message'=>"No device to delete");
     }
 
-    public function scan_start($userid, $type, $options) {
+    public function scan_start($type, $options) {
+        global $session;
+        $userid = $session['userid'];
+        
         $template = $this->get($type);
         if (is_array($template) && isset($template['success']) && $template['success'] == false) {
             return $template;
@@ -689,7 +695,10 @@ class MucTemplate extends DeviceTemplate {
         }
     }
 
-    public function scan_progress($userid, $type) {
+    public function scan_progress($type) {
+        global $session;
+        $userid = $session['userid'];
+        
         $result = $this->get($type);
         if (is_array($result) && isset($result['success']) && $result['success'] == false) {
             return $result;
@@ -720,7 +729,10 @@ class MucTemplate extends DeviceTemplate {
         }
     }
 
-    public function scan_cancel($userid, $type) {
+    public function scan_cancel($type) {
+        global $session;
+        $userid = $session['userid'];
+        
         $result = $this->get($type);
         if (is_array($result) && isset($result['success']) && $result['success'] == false) {
             return $result;

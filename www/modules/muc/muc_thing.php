@@ -24,7 +24,7 @@ class MucThing extends DeviceThing {
         parent::__construct($parent);
         $this->ctrl = new Controller($this->mysqli, $this->redis);
     }
-    
+
     protected function parse_item($thing, &$item, $template) {
         if (isset($item['mapping'])) {
             foreach($item['mapping'] as &$mapping) {
@@ -49,10 +49,11 @@ class MucThing extends DeviceThing {
     }
 
     protected function parse_item_mapping($thing, &$item, &$mapping, $template) {
-        if (empty($thing['options']['ctrlid'])) {
-            throw new ThingException('Unspecified controller ID in thing configs.');
+        $configs = $this->device->get_configs($thing);
+        if (empty($configs['ctrlid'])) {
+            throw new DeviceException('Unspecified controller ID in thing configs.');
         }
-        $ctrlid = intval($thing['options']['ctrlid']);
+        $ctrlid = intval($configs['ctrlid']);
         
         if (isset($mapping->channel)) {
             $channelid = $mapping->channel;
@@ -68,63 +69,6 @@ class MucThing extends DeviceThing {
             
             $mapping = array_merge(array('ctrlid'=>$ctrlid, 'channelid'=>$channelid), $configs, (array) $mapping);
         }
-    }
-
-    public function get_item_list($thing) {
-        $template = $this->get_template($thing);
-        if (!is_object($template)) {
-            return $template;
-        }
-        if (empty($thing['options']['ctrlid'])) {
-            return array('success'=>false, 'message'=>'Unspecified controller ID in device options.');
-        }
-        $ctrlid = intval($thing['options']['ctrlid']);
-        
-        $items = array();
-        for ($i=0; $i<count($template->items); $i++) {
-            $item = (array) $template->items[$i];
-            
-            if (isset($item['mapping'])) {
-                foreach($item['mapping'] as &$mapping) {
-                    if (isset($mapping->channel)) {
-                        $channelid = $mapping->channel;
-                        $configs = [];
-                        foreach($template->channels as $c) {
-                            if ($c->name == $mapping->channel) {
-                                if (isset($c->configs->valueType)) {
-                                    $configs['valueType'] = $c->configs->valueType;
-                                }
-                            }
-                        }
-                        unset($mapping->channel);
-                        
-                        $mapping = array_merge(array('ctrlid'=>$ctrlid, 'channelid'=>$channelid), $configs, (array) $mapping);
-                    }
-                }
-            }
-            if (isset($item['input'])) {
-                $nodeid = isset($item['node']) ? $item['node'] : $thing['nodeid'];
-                $inputid = $this->get_input_id($thing['userid'], $nodeid, $item['input'], $template->channels);
-                if ($inputid == false) {
-                    $this->log->error("get_item_list() failed to find input \"$nodeid:".$item['input']."\" of item '".$item['id']."' in template: ".$thing['type']);
-                    continue;
-                }
-                unset($item['input']);
-                $item = array_merge($item, array('inputid'=>$inputid));
-            }
-            if (isset($item['feed'])) {
-                $feedid = $this->get_feed_id($thing['userid'], $item['feed']);
-                if ($feedid == false) {
-                    $this->log->error("get_item_list() failed to find feed of item '".$item['id']."' in template: ".$thing['type']);
-                    continue;
-                }
-                unset($item['feed']);
-                $item = array_merge($item, array('feedid'=>$feedid));
-            }
-            
-            $items[] = $item;
-        }
-        return $items;
     }
 
     protected function set_item($itemid, $mapping) {
