@@ -37,7 +37,7 @@ update_emonmuc() {
   sudo git -C "$EMONMUC_DIR" branch
   sudo git -C "$EMONMUC_DIR" status
   sudo git -C "$EMONMUC_DIR" pull
-  bash "$EMONMUC_DIR"/bin/emonmuc update >/dev/null 2>&1
+  bash "$EMONMUC_DIR"/bin/emonmuc update
 
   sudo chown $EMONMUC_USER -R "$EMONMUC_DIR"
 

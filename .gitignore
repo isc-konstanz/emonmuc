@@ -5,11 +5,18 @@
 *.settings/
 *.md.html
 
+#Gradle
+*.gradletasknamecache
+*.gradle/
+build/
+/build/
+
 # Framework
 log/
 cache/
-bundle/
 conf/*
+bundle/
+!lib/bundle/
 !conf/logback.xml
 !conf/system.default.properties
 !conf/config.default.properties

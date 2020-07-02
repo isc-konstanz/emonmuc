@@ -1,0 +1,10 @@
+dependencies {
+    bundle group: "org.openmuc.framework", name: "openmuc-webui-spi",                 version: openmucVersion
+    bundle group: "org.openmuc.framework", name: "openmuc-webui-base",                version: openmucVersion
+    bundle group: "org.openmuc.framework", name: "openmuc-webui-channelconfigurator", version: openmucVersion
+    bundle group: "org.openmuc.framework", name: "openmuc-webui-channelaccesstool",   version: openmucVersion
+    bundle group: "org.openmuc.framework", name: "openmuc-webui-userconfigurator",    version: openmucVersion
+    bundle group: "org.openmuc.framework", name: "openmuc-webui-dataexporter",        version: openmucVersion
+    bundle group: "org.openmuc.framework", name: "openmuc-webui-dataplotter",         version: openmucVersion
+    bundle group: "org.openmuc.framework", name: "openmuc-webui-mediaviewer",         version: openmucVersion
+}
