@@ -1,0 +1,272 @@
+{
+    "name": "AS1440",
+    "category": "Meter",
+    "group": "Elster Solutions GmbH",
+    "description": "Requires the <b><a href='https://github.com/isc-konstanz/OpenSmartMeter/'>SmartMeter</a></b> driver to be installed.<br><br>Energy Meter AS1440",
+
+    "driver": "smartmeter",
+    "devices": [
+        {
+            "description": "AS1440 Energy Meter",
+            "settings": "mode:ABC,baudRate:<baudRate>,baudRateChangeDelay:<baudRateChangeDelay>",
+            "address": "serialPort:<serialPort>,address:<address>"
+        }
+    ],
+
+    "scan": {
+        "settings": "mode:ABC,baudRate:<baudRate>"
+    },
+
+    "options": [
+        {
+            "id": "serialPort",
+            "name": "Serial port",
+            "description": "The physical device address to uniquely identify a physical smart meter.<br><br><b>Example:</b><ol><li><b>Linux</b>: /dev/ttyS0 or /dev/ttyUSB0</li><li><b>Windows</b>: COM1</li></ol>",
+            "type": "text",
+            "scan": true,
+            "mandatory": true
+        },
+        {
+            "id": "address",
+            "name": "Device address",
+            "description": "The address to uniquely identify a device, representing an IEC62056-21 slave.<br>For many devices, this is a number that can be read off a label on the meter.<br><br><i>If left empty, a single meter can be addressed without an identifier.<i>",
+            "type": "text",
+            "mandatory": false
+        },
+        {
+            "id": "baudRate",
+            "name": "Baud rate",
+            "description": "The baud rate for the serial communication.",
+            "type": "selection",
+            "select": [
+                { "name": "Default", "value": -1 },
+                { "name": "300", "value": 300 },
+                { "name": "1200", "value": 1200 },
+                { "name": "2400", "value": 2400 },
+                { "name": "4800", "value": 4800 },
+                { "name": "9600", "value": 9600 },
+                { "name": "19200", "value": 19200 },
+                { "name": "38400", "value": 38400 },
+                { "name": "57600", "value": 57600 },
+                { "name": "115200", "value": 115200 },
+                { "name": "230400", "value": 230400 },
+                { "name": "460800", "value": 460800 },
+                { "name": "921600", "value": 921600 }
+            ],
+            "default": -1,
+            "mandatory": false
+        },
+        {
+            "id": "baudRateChangeDelay",
+            "name": "Baud rate change delay",
+            "description": "The baud rate change delay sets the waiting time in milliseconds between a baud rate change.<br>USB to serial converters often require a delay of up to 250ms.",
+            "type": "text",
+            "default": 0,
+            "mandatory": false
+        },
+        {
+            "id": "refresh",
+            "name": "Refresh interval",
+            "description": "Defines at which interval the values of the meter device will be read.",
+            "type": "selection",
+            "select": [
+                { "name": "1 second", "value": 1000 },
+                { "name": "2 seconds", "value": 2000 },
+                { "name": "3 seconds", "value": 3000 },
+                { "name": "4 seconds", "value": 4000 },
+                { "name": "5 seconds", "value": 5000 },
+                { "name": "10 seconds", "value": 10000 },
+                { "name": "15 seconds", "value": 15000 },
+                { "name": "20 seconds", "value": 20000 },
+                { "name": "25 seconds", "value": 25000 },
+                { "name": "30 seconds", "value": 30000 },
+                { "name": "35 seconds", "value": 35000 },
+                { "name": "40 seconds", "value": 40000 },
+                { "name": "45 seconds", "value": 45000 },
+                { "name": "50 seconds", "value": 50000 },
+                { "name": "55 seconds", "value": 55000 },
+                { "name": "1 minute",  "value": 60000 },
+                { "name": "2 minutes", "value": 120000 },
+                { "name": "3 minutes", "value": 180000 },
+                { "name": "4 minutes", "value": 240000 },
+                { "name": "5 minutes", "value": 300000 },
+                { "name": "10 minutes", "value": 600000 },
+                { "name": "15 minutes", "value": 900000 }
+            ],
+            "default": 60000,
+            "mandatory": false
+        },
+        {
+            "id": "offset",
+            "name": "Refresh offset",
+            "description": "Defines the time waited, until the values of the meter device will be read. Necessary for multiple meters on the same line.",
+            "type": "selection",
+            "select": [
+                { "name": "None", "value": 0 },
+                { "name": "1 second", "value": 1000 },
+                { "name": "2 seconds", "value": 2000 },
+                { "name": "3 seconds", "value": 3000 },
+                { "name": "4 seconds", "value": 4000 },
+                { "name": "5 seconds", "value": 5000 },
+                { "name": "10 seconds", "value": 10000 },
+                { "name": "15 seconds", "value": 15000 },
+                { "name": "20 seconds", "value": 20000 },
+                { "name": "25 seconds", "value": 25000 },
+                { "name": "30 seconds", "value": 30000 },
+                { "name": "35 seconds", "value": 35000 },
+                { "name": "40 seconds", "value": 40000 },
+                { "name": "45 seconds", "value": 45000 },
+                { "name": "50 seconds", "value": 50000 },
+                { "name": "55 seconds", "value": 55000 },
+                { "name": "1 minute",  "value": 60000 },
+                { "name": "2 minutes", "value": 120000 },
+                { "name": "3 minutes", "value": 180000 },
+                { "name": "4 minutes", "value": 240000 },
+                { "name": "5 minutes", "value": 300000 },
+                { "name": "10 minutes", "value": 600000 },
+                { "name": "15 minutes", "value": 900000 }
+            ],
+            "default": 0,
+            "mandatory": false
+        }
+    ],
+
+    "channels": [
+        {
+            "name": "<node>*power*import",
+            "address": "1.7.0",
+            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000 },
+            "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "scalingFactor": 1000, "valueType":"DOUBLE", "unit": "W"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Power import", "tag": "<name>"}
+                }
+            ]
+        },
+        {
+            "name": "<node>*power*export",
+            "address": "2.7.0",
+            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000 },
+            "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "scalingFactor": 1000, "valueType":"DOUBLE", "unit": "W"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Power export", "tag": "<name>"}
+                }
+            ]
+        },
+        {
+            "name": "<node>*energy*import",
+            "address": "1.8.0",
+            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000 },
+            "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"DOUBLE", "unit": "kWh"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Energy import", "tag": "<name>"}
+                }
+            ]
+        },
+        {
+            "name": "<node>*energy*export",
+            "address": "2.8.0",
+            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000 },
+            "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"DOUBLE", "unit": "kWh"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Energy export", "tag": "<name>"}
+                }
+            ]
+        },
+        {
+            "name": "<node>*voltage*l1",
+            "address": "32.7.0",
+            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "loggingTolerance": 0.01, "average": true },
+            "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"DOUBLE", "unit": "V"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Voltage L1", "tag": "<name>"}
+                }
+            ]
+        },
+        {
+            "name": "<node>*voltage*l2",
+            "address": "52.7.0",
+            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "loggingTolerance": 0.01, "average": true },
+            "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"DOUBLE", "unit": "V"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Voltage L2", "tag": "<name>"}
+                }
+            ]
+        },
+        {
+            "name": "<node>*voltage*l3",
+            "address": "72.7.0",
+            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "loggingTolerance": 0.01, "average": true },
+            "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"DOUBLE", "unit": "V"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Voltage L3", "tag": "<name>"}
+                }
+            ]
+        }
+    ],
+
+    "feeds": [
+        {
+            "name": "Power import",
+            "tag": "<name>",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "W"
+        },
+        {
+            "name": "Energy import",
+            "tag": "<name>",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "kWh"
+        },
+        {
+            "name": "Power export",
+            "tag": "<name>",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "W"
+        },
+        {
+            "name": "Energy export",
+            "tag": "<name>",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "kWh"
+        },
+        {
+            "name": "Voltage L1",
+            "tag": "<name>",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "V"
+        },
+        {
+            "name": "Voltage L2",
+            "tag": "<name>",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "V"
+        },
+        {
+            "name": "Voltage L3",
+            "tag": "<name>",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "V"
+        }
+    ]
+}

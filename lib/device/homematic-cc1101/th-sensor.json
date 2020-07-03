@@ -1,0 +1,140 @@
+{
+    "name": "Temperature/Humidity",
+    "category": "Sensor",
+    "group": "eQ-3 HomeMatic",
+    "description": "Requires the <b><a href='https://github.com/isc-konstanz/OpenHomeMatic/'>HomeMatic CC1101</a></b> driver to be installed.<br><br>eQ-3 HomeMatic Wireless Temperature/Humidity Sensor",
+
+    "driver": "homematic-cc1101",
+    "devices": [
+        {
+            "description": "eQ-3 HomeMatic Sensor",
+            "settings": "type:<type>",
+            "address": "<address>"
+        }
+    ],
+    "scan": true,
+
+    "options": [
+        {
+            "id": "address",
+            "name": "Address",
+            "description": "Address of the HomeMatic Device",
+            "type": "text",
+            "scan": true,
+            "mandatory": true
+        },
+        {
+            "id": "type",
+            "name": "Type",
+            "description": "Type of the HomeMatic Device",
+            "type": "selection",
+            "select": [
+                { "name": "ASH550", "value": "000D" },
+                { "name": "ASH550I", "value": "000E" },
+                { "name": "HM-WDC7000", "value": "0041" },
+                { "name": "HM-WDS10-TH-O", "value": "003D" },
+                { "name": "HM-WDS20-TH-O", "value": "003C" },
+                { "name": "HM-WDS30-OT2-SM", "value": "00A8" },
+                { "name": "HM-WDS40-TH-I", "value": "003F" },
+                { "name": "HM-WDS40-TH-I-2", "value": "00BC" },
+                { "name": "HM-WDS100-C6-O", "value": "0040" },
+                { "name": "HM-WS550", "value": "000B" },
+                { "name": "HM-WS550LCW", "value": "0032" },
+                { "name": "HM-WS550LCB", "value": "0031" },
+                { "name": "HM-WS550Tech", "value": "002B" },
+                { "name": "IS-WDS-TH-OD-S-R3", "value": "0048" },
+                { "name": "IS-WDS-TH-OD-S-R3", "value": "0094" },
+                { "name": "KS550", "value": "0007" },
+                { "name": "KS888", "value": "001F" },
+                { "name": "KS550LC", "value": "0033" },
+                { "name": "KS550TECH", "value": "002C" },
+                { "name": "PS-Th-Sens", "value": "8002" },
+                { "name": "S550IA", "value": "000F" },
+                { "name": "Schueco_263-158", "value": "0093" }
+            ],
+            "scan": true,
+            "mandatory": true
+        }
+    ],
+
+    "items": [
+        {
+            "id": "temperature",
+            "type": "Text",
+            "label": "Temperature",
+            "header": true,
+            "format": "%.1f °C",
+            "input": "<node>*temperature"
+        },
+        {
+            "id": "humidity",
+            "type": "Text",
+            "label": "Humidity",
+            "format": "%i %",
+            "input": "<node>*humidity"
+        },
+        {
+            "id": "battery",
+            "type": "Text",
+            "label": "Battery",
+            "format": "%i %",
+            "input": "<node>*battery"
+        }
+    ],
+
+    "channels": [
+        {
+            "name": "<node>*temperature",
+            "description": "Temperature",
+            "address": "0001",
+            "settings": "type:ATTRIBUTE",
+            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 900000, "loggingTolerance": 0.25, "average": true},
+            "configs": {"samplingInterval": 60000, "valueType":"FLOAT", "unit":"°C"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Temperature", "tag": "<name>"}
+                }
+            ]
+        },
+        {
+            "name": "<node>*humidity",
+            "description": "Humidity",
+            "address": "0002",
+            "settings": "type:ATTRIBUTE",
+            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 900000},
+            "configs": {"samplingInterval": 60000, "valueType":"FLOAT", "unit":"%"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Humidity", "tag": "<name>"}
+                }
+            ]
+        },
+        {
+            "name": "<node>*battery",
+            "description": "Battery state",
+            "address": "0003",
+            "settings": "type:ATTRIBUTE",
+            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 900000},
+            "configs": {"samplingInterval": 60000, "valueType":"FLOAT", "unit":"%"}
+        }
+    ],
+
+    "feeds": [
+        {
+            "name": "Temperature",
+            "tag": "<name>",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "°C"
+        },
+        {
+            "name": "Humidity",
+            "tag": "<name>",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "%"
+        }
+    ]
+}

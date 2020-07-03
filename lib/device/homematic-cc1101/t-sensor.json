@@ -1,0 +1,91 @@
+{
+    "name": "Temperature",
+    "category": "Sensor",
+    "group": "eQ-3 HomeMatic",
+    "description": "Requires the <b><a href='https://github.com/isc-konstanz/OpenHomeMatic/'>HomeMatic CC1101</a></b> driver to be installed.<br><br>eQ-3 HomeMatic Wireless Temperature Sensor",
+
+    "driver": "homematic-cc1101",
+    "devices": [
+        {
+            "description": "eQ-3 HomeMatic Sensor",
+            "settings": "type:<type>",
+            "address": "<address>"
+        }
+    ],
+    "scan": true,
+
+    "options": [
+        {
+            "id": "address",
+            "name": "Address",
+            "description": "Address of the HomeMatic Device",
+            "type": "text",
+            "scan": true,
+            "mandatory": true
+        },
+        {
+            "id": "type",
+            "name": "Type",
+            "description": "Type of the HomeMatic Device",
+            "type": "selection",
+            "select": [
+                { "name": "HM-WDS30-T-O", "value": "003E" }
+            ],
+            "scan": true,
+            "mandatory": true
+        }
+    ],
+
+    "items": [
+        {
+            "id": "temperature",
+            "type": "Text",
+            "label": "Temperature",
+            "header": true,
+            "format": "%.1f °C",
+            "input": "<node>*temperature"
+        },
+        {
+            "id": "battery",
+            "type": "Text",
+            "label": "Battery",
+            "format": "%i %",
+            "input": "<node>*battery*state"
+        }
+    ],
+
+    "channels": [
+        {
+            "name": "<node>*temperature",
+            "description": "Temperature",
+            "address": "0001",
+            "settings": "type:ATTRIBUTE",
+            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 900000, "loggingTolerance": 0.25, "average": true},
+            "configs": {"samplingInterval": 60000, "valueType":"FLOAT", "unit":"°C"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Temperature", "tag": "<name>"}
+                }
+            ]
+        },
+        {
+            "name": "<node>*battery*state",
+            "description": "Battery state",
+            "address": "0003",
+            "settings": "type:ATTRIBUTE",
+            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 900000},
+            "configs": {"samplingInterval": 60000, "valueType":"FLOAT", "unit":"%"}
+        }
+    ],
+
+    "feeds": [
+        {
+            "name": "Temperature",
+            "tag": "<name>",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "°C"
+        }
+    ]
+}
