@@ -17,10 +17,6 @@ require_once "Modules/muc/muc_model.php";
 class MucTemplate extends DeviceTemplate {
     const DIR_DEFAULT = "/var/opt/emonmuc/";
 
-    const DEVICE_ADDRESS = "deviceAddress";
-    const DEVICE_SETTINGS = "deviceSettings";
-    const DEVICE_SCAN_SETTINGS = "deviceScanSettings";
-
     private $ctrl;
 
     function __construct(&$parent) {
@@ -524,65 +520,39 @@ class MucTemplate extends DeviceTemplate {
     private function decode_configs($type, $configs, $template, $parameters) {
         foreach (array('address', 'settings') as $key) {
             if (empty($configs->$key)) {
-                $configs->$key = $this->encode_options($type.ucfirst($key), $template, $parameters);
+                $configs->$key = $this->decode_options($type.ucfirst($key), $template, $parameters);
             }
         }
         return $configs;
     }
 
-    private function decode_options($ctrlid, $template, $address, $settings) {
-        $result = array('ctrlid'=>$ctrlid);
-        
-        // Iterate all options as configured in the template and decode them accordingly,
-        // if they exist in the passed settings string
-        foreach (array(self::DEVICE_ADDRESS, self::DEVICE_SETTINGS) as $type) {
-            $options = array();
-            foreach ($template->options as $option) {
-                if (empty($option->syntax)) {
-                    continue;
-                }
-                $types = explode(',', $option->syntax);
-                foreach($types as $t) {
-                    if ($t === $type) $options[] = $option;
-                }
-            }
-            if (isset($template->syntax) && isset($template->syntax->$type)) {
-                $syntax = $template->syntax->$type;
-            }
-            else {
-                $syntax = true;
-            }
-            
-            $separator = isset($syntax->separator) ? $syntax->separator : ',';
-            if ($type == self::DEVICE_ADDRESS) {
-                $arr = explode($separator, $address);
-            }
-            else if ($type == self::DEVICE_SETTINGS) {
-                $arr = explode($separator, $settings);
-            }
-            
-            for($i=0; $i<count($options); $i++) {
-                if (isset($syntax->keyValue) && !$syntax->keyValue) {
-                    $result[$options[$i]->id] = $arr[$i];
-                }
-                else {
-                    $assignment = isset($syntax->assignment) ? $syntax->assignment : ':';
-                    $pair = explode($assignment, $arr[$i]);
-                    
-                    $result[$pair[0]] = $pair[1];
-                }
-            }
-        }
-        return $result;
-    }
-
-    private function encode_options($key, $template, $parameters) {
+    private function decode_options($type, $template, $parameters) {
         $result = "";
+        
+        if (isset($template->syntax) && isset($template->syntax->$type)) {
+            $syntax = $template->syntax->$type;
+        }
+        else if (substr($haystack, -strlen('Address')) === 'Address') {
+            $syntax = (object) array(
+                'keyValue' => false,
+                'separator' => ':'
+            );
+        }
+        else if (substr($haystack, -strlen('Settings')) === 'Settings') {
+            $syntax = (object) array(
+                'keyValue' => true,
+                'separator' => ',',
+                'assignment' => ':'
+            );
+        }
         
         // Iterate all options as configured in the template and parse them accordingly, 
         // if they exist in the passed key value options array
         foreach ($template->options as $option) {
             if (empty($option->syntax)) {
+                continue;
+            }
+            if ($option->syntax !== $type) {
                 continue;
             }
             if (isset($parameters[$option->id])) {
@@ -595,30 +565,14 @@ class MucTemplate extends DeviceTemplate {
                 continue;
             }
             
-            $types = explode(',', $option->syntax);
-            foreach($types as $type) {
-                if ($option->syntax !== $key) {
-                    continue;
-                }
-                if (isset($template->syntax) && isset($template->syntax->$type)) {
-                    $syntax = $template->syntax->$type;
-                }
-                else {
-                    $syntax = true;
-                }
-                
-                // Default syntax is <key1>:<value1>,<key2>:<value2>,...
-                if (!empty($result)) {
-                    $result .= isset($syntax->separator) ? $syntax->separator : ',';
-                }
-                
-                if (isset($syntax->keyValue) && !$syntax->keyValue) {
-                    $result .= $value;
-                }
-                else {
-                    $assignment = isset($syntax->assignment) ? $syntax->assignment : ':';
-                    $result .= $option->id.$assignment.$value;
-                }
+            if (!empty($result)) {
+                $result .= $syntax->separator;
+            }
+            if (!$syntax->keyValue) {
+                $result .= $value;
+            }
+            else {
+                $result .= $option->id.$syntax->assignment.$value;
             }
         }
         return $result;

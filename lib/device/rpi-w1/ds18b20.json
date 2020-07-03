@@ -9,7 +9,8 @@
     "devices": [
         {
             "description": "DS18B20 temperature sensor",
-            "settings": "type:SENSOR_TEMPERATURE"
+            "settings": "type:SENSOR_TEMPERATURE",
+            "address": "<id>"
         }
     ],
 
@@ -20,8 +21,7 @@
             "description": "The device ID, retrievable through scanning.",
             "type": "text",
             "scan": true,
-            "mandatory": true,
-            "syntax": "deviceAddress"
+            "mandatory": true
         },
         {
             "id": "refresh",
@@ -90,7 +90,7 @@
             "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
-			"unit": "°C"
+            "unit": "°C"
         }
     ]
 }

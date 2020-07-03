@@ -8,7 +8,8 @@
     "devices": [
         {
             "description": "Raspberry Pi Output",
-            "settings": "mode:DIGITAL_OUTPUT"
+            "settings": "mode:DIGITAL_OUTPUT",
+            "address": "pin:<pin>"
         }
     ],
 
@@ -23,8 +24,7 @@
             "description": "The Pin number, according to the <a href='http://pi4j.com/pin-numbering-scheme.html'>WiringPi Pin Numbering Scheme</a>",
             "type": "text",
             "scan": true,
-            "mandatory": true,
-            "syntax": "deviceAddress"
+            "mandatory": true
         },
         {
             "id": "refresh",
