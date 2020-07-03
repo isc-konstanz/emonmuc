@@ -4,12 +4,12 @@
     "group": "Pulses (Raspberry Pi)",
     "description": "Requires the <b>GPIO</b> driver to be installed.<br><br>Configuration for a Raspberry Pi pin as an generic pulse counter.",
 
-    "driver": "rpi-gpio",
     "devices": [
         {
             "description": "Raspberry Pi Input",
-            "settings": "mode:DIGITAL_INPUT,pullResistance:PULL_DOWN,counter:true",
-            "address": "pin:<pin>"
+            "driver": "rpi-gpio",
+            "address": "pin:<pin>",
+            "settings": "mode:DIGITAL_INPUT,pullResistance:PULL_DOWN,counter:true"
         }
     ],
 

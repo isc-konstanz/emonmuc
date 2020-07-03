@@ -4,12 +4,12 @@
     "group": "IME Messger&auml;te GmbH",
     "description": "Requires the <b>M-Bus</b> (Wired) driver to be installed.<br><br><b>Energy Meter CONTO D4-S</b>:<br>Current: 10(63)A<br>Voltage : 230(400) - 240(415)V",
 
-    "driver": "mbus",
     "devices": [
         {
             "description": "Energy Meter",
-            "settings": "<baudRate>",
-            "address": "<serialPort>:<mBusAddress>"
+            "driver": "mbus",
+            "address": "<serialPort>:<mBusAddress>",
+            "settings": "<baudRate>"
         }
     ],
 
@@ -19,16 +19,14 @@
             "name": "Serial port",
             "description": "The serial port should be given that connects to the M-Bus converter. (e.g. /dev/ttyS0, /dev/ttyUSB0 on Linux).",
             "type": "text",
-            "mandatory": true,
-            "syntax": "deviceAddress"
+            "mandatory": true
         },
         {
             "id": "mBusAddress",
             "name": "M-Bus address",
             "description": "The M-Bus adress can either be the the primary address or secondary address of the meter.<br>A primary address is specified as integer (e.g. 1 for primary address 1) whereas the secondary address consits of 8 bytes that should be specified in hexadecimal form. (e.g. e30456a6b72e3e4e).<br><br>The <a href='https://www.openmuc.org/m-bus/user-guide/#_wired_m_bus'>jMBus User Guide</a> can be accessed for more detailed description.",
             "type": "text",
-            "mandatory": true,
-            "syntax": "deviceAddress"
+            "mandatory": true
         },
         {
             "id": "baudRate",

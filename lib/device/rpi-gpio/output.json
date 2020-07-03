@@ -4,12 +4,12 @@
     "group": "GPIO (Raspberry Pi)",
     "description": "Requires the <b>GPIO</b> driver to be installed.<br><br>Configuration for a Raspberry Pi pin as an output.",
 
-    "driver": "rpi-gpio",
     "devices": [
         {
             "description": "Raspberry Pi Output",
-            "settings": "mode:DIGITAL_OUTPUT",
-            "address": "pin:<pin>"
+            "driver": "rpi-gpio",
+            "address": "pin:<pin>",
+            "settings": "mode:DIGITAL_OUTPUT"
         }
     ],
 

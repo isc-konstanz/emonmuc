@@ -4,12 +4,12 @@
     "group": "Example",
     "description": "Requires the <b>CSV</b> driver to be installed.<br><br>Configuration for an emonmuc demonstration, creating the device channels, inputs and feeds for a virtual household.",
 
-    "driver": "csv",
     "devices": [
         {
             "description": "Household energy consumption",
-            "settings": "samplingmode=hhmmss;rewind=true",
-            "address": "<file>"
+            "driver": "csv",
+            "address": "<file>",
+            "settings": "samplingmode=hhmmss;rewind=true"
         }
     ],
 

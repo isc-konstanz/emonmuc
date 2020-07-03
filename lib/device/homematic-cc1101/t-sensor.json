@@ -4,16 +4,16 @@
     "group": "eQ-3 HomeMatic",
     "description": "Requires the <b><a href='https://github.com/isc-konstanz/OpenHomeMatic/'>HomeMatic CC1101</a></b> driver to be installed.<br><br>eQ-3 HomeMatic Wireless Temperature Sensor",
 
-    "driver": "homematic-cc1101",
     "devices": [
         {
             "description": "eQ-3 HomeMatic Sensor",
-            "settings": "type:<type>",
-            "address": "<address>"
+            "driver": "homematic-cc1101",
+            "address": "<address>",
+            "settings": "type:<type>"
         }
     ],
-    "scan": true,
 
+    "scan": true,
     "options": [
         {
             "id": "address",
