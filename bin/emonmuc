@@ -168,7 +168,7 @@ terminate() {
     return 2
   fi
 
-  local i=0    
+  local i=0
     while kill -0 "${TMP_PID}" 2> /dev/null;  do
       if [ $i = '5' ]; then
         return 2
@@ -203,7 +203,8 @@ case "$1" in
       source "$EMONMUC_DIR"/lib/bundle.sh
       bundles $@
     fi
-    exec gradle -b "$EMONMUC_DIR"/build.gradle
+    gradle -b "$EMONMUC_DIR"/build.gradle bundles
+
     echo "For the changes to take effect, please restart the framework:
   systemctl restart emonmuc"
     ;;

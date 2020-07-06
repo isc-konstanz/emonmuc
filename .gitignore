@@ -17,6 +17,7 @@ cache/
 conf/*
 bundle/
 !lib/bundle/
+!conf/bundle.gradle
 !conf/logback.xml
 !conf/system.default.properties
 !conf/config.default.properties

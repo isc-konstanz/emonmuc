@@ -6,14 +6,14 @@ repositories {
     mavenLocal()
     mavenCentral()
 
-    ivy {
-        name "GitHub"
-        url "https://github.com/"
-        
-        patternLayout {
-            artifact "/[organisation]/[module]/releases/download/v[revision]/[module]-[revision].tar.gz"
-        }
-    }
+    //ivy {
+    //    name "GitHub"
+    //    url "https://github.com/"
+    //    
+    //    patternLayout {
+    //        artifact "/[organisation]/[module]/releases/download/v[revision]/[module]-[revision].tar.gz"
+    //    }
+    //}
 }
 ext.tempDir = "tmp"
 ext.tempDownload = true
