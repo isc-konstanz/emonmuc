@@ -35,10 +35,8 @@ class MucThing extends DeviceThing {
             // TODO: implement channel parsing
         }
         if (isset($item['input'])) {
-            if (isset($template->channels)) {
-                $tmp = $template->channels;
-                unset($template->channels);
-                $template->inputs = $tmp;
+            if (empty($template->inputs) && !empty($template->channels)) {
+                $template->inputs = $template->channels;
             }
             $this->parse_item_input($thing, $item, $template);
         }
