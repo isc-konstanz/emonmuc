@@ -62,8 +62,8 @@ download_emonmuc() {
 install_emonmuc() {
   echo "Installing emonmuc framework"
 
-  mkdir -p /var/run/emonmuc "$EMONMUC_DATA" "$EMONCMS_LOG"
-  chown $EMONMUC_USER /var/run/emonmuc "$EMONMUC_DATA" "$EMONCMS_LOG"
+  mkdir -p /var/run/emonmuc /var/log/emonmuc "$EMONMUC_DATA" "$EMONCMS_LOG"
+  chown $EMONMUC_USER /var/run/emonmuc /var/log/emonmuc "$EMONMUC_DATA" "$EMONCMS_LOG"
   chown $EMONMUC_USER -R "$EMONMUC_DIR"
 
   if [ ! -f "$EMONMUC_DIR"/conf/system.properties ]; then
