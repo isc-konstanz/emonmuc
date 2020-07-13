@@ -49,6 +49,7 @@ update_emonmuc() {
     for x in "$EMONMUC_DATA"/device/*; do if [ -L "$x" ] && ! [ -e "$x" ]; then sudo rm -- "$x"; fi; done
     sudo -u $EMONMUC_USER ln -sf "$EMONMUC_DIR"/lib/device/* "$EMONMUC_DATA"/device/
     
+    php "$EMONMUC_DIR"/lib/www/reload.php
   fi
 
   systemctl daemon-reload
