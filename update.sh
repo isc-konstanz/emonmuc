@@ -1,6 +1,10 @@
 #!/bin/bash
 #Description: Setup script to update the EmonMUC framework
 
+# Set the targeted directories of the emonmuc framework.
+EMONMUC_DIR="/opt/emonmuc"
+EMONMUC_DATA="/var/opt/emonmuc"
+
 if [[ $EUID -ne 0 ]]; then
   echo "Please make sure to run the emonmuc update as root user"
   exit 1
@@ -40,6 +44,12 @@ update_emonmuc() {
   bash "$EMONMUC_DIR"/bin/emonmuc update
 
   sudo chown $EMONMUC_USER -R "$EMONMUC_DIR"
+
+  if [ -d "$EMONMUC_DATA"/device ]; then
+    for x in "$EMONMUC_DATA"/device/*; do if [ -L "$x" ] && ! [ -e "$x" ]; then sudo rm -- "$x"; fi; done
+    sudo -u $EMONMUC_USER ln -sf "$EMONMUC_DIR"/lib/device/* "$EMONMUC_DATA"/device/
+    
+  fi
 
   systemctl daemon-reload
   systemctl restart emonmuc
