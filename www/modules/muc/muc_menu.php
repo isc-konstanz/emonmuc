@@ -1,9 +1,9 @@
 <?php
 
     $menu['sidebar']['emoncms'][] = array(
+        'active' => 'admin',
         'text' => _("Controllers"),
         'path' => 'muc/view',
-        'active' => 'admin',
         'icon' => 'muc',
         'order' => 'b6'
     );
