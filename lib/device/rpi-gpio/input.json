@@ -4,10 +4,11 @@
     "group": "GPIO (Raspberry Pi)",
     "description": "Requires the <b>GPIO</b> driver to be installed.<br><br>Configuration for a Raspberry Pi pin as an input.",
 
-    "driver": "rpi-gpio",
     "devices": [
         {
             "description": "Raspberry Pi Input",
+            "driver": "rpi-gpio",
+            "address": "pin:<pin>",
             "settings": "mode:DIGITAL_INPUT"
         }
     ],
@@ -23,8 +24,7 @@
             "description": "The Pin number, according to the <a href='http://pi4j.com/pin-numbering-scheme.html'>WiringPi Pin Numbering Scheme</a>",
             "type": "text",
             "scan": true,
-            "mandatory": true,
-            "syntax": "deviceAddress"
+            "mandatory": true
         },
         {
             "id": "refresh",

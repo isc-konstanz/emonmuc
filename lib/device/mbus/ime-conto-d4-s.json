@@ -4,10 +4,11 @@
     "group": "IME Messger&auml;te GmbH",
     "description": "Requires the <b>M-Bus</b> (Wired) driver to be installed.<br><br><b>Energy Meter CONTO D4-S</b>:<br>Current: 10(63)A<br>Voltage : 230(400) - 240(415)V",
 
-    "driver": "mbus",
     "devices": [
         {
             "description": "Energy Meter",
+            "driver": "mbus",
+            "address": "<serialPort>:<mBusAddress>",
             "settings": "<baudRate>"
         }
     ],
@@ -18,16 +19,14 @@
             "name": "Serial port",
             "description": "The serial port should be given that connects to the M-Bus converter. (e.g. /dev/ttyS0, /dev/ttyUSB0 on Linux).",
             "type": "text",
-            "mandatory": true,
-            "syntax": "deviceAddress"
+            "mandatory": true
         },
         {
             "id": "mBusAddress",
             "name": "M-Bus address",
             "description": "The M-Bus adress can either be the the primary address or secondary address of the meter.<br>A primary address is specified as integer (e.g. 1 for primary address 1) whereas the secondary address consits of 8 bytes that should be specified in hexadecimal form. (e.g. e30456a6b72e3e4e).<br><br>The <a href='https://www.openmuc.org/m-bus/user-guide/#_wired_m_bus'>jMBus User Guide</a> can be accessed for more detailed description.",
             "type": "text",
-            "mandatory": true,
-            "syntax": "deviceAddress"
+            "mandatory": true
         },
         {
             "id": "baudRate",
@@ -36,18 +35,18 @@
             "type": "selection",
             "select": [
                 { "name": "300", "value": 300 },
-		        { "name": "300", "value": 300 },
-		        { "name": "1200", "value": 1200 },
-		        { "name": "2400", "value": 2400 },
-		        { "name": "4800", "value": 4800 },
-		        { "name": "9600", "value": 9600 },
-		        { "name": "19200", "value": 19200 },
-		        { "name": "38400", "value": 38400 },
-		        { "name": "57600", "value": 57600 },
-		        { "name": "115200", "value": 115200 },
-		        { "name": "230400", "value": 230400 },
-		        { "name": "460800", "value": 460800 },
-		        { "name": "921600", "value": 921600 }
+                { "name": "300", "value": 300 },
+                { "name": "1200", "value": 1200 },
+                { "name": "2400", "value": 2400 },
+                { "name": "4800", "value": 4800 },
+                { "name": "9600", "value": 9600 },
+                { "name": "19200", "value": 19200 },
+                { "name": "38400", "value": 38400 },
+                { "name": "57600", "value": 57600 },
+                { "name": "115200", "value": 115200 },
+                { "name": "230400", "value": 230400 },
+                { "name": "460800", "value": 460800 },
+                { "name": "921600", "value": 921600 }
             ],
             "default": 9600,
             "mandatory": false
@@ -145,21 +144,14 @@
             "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
-			"unit": "kWh"
+            "unit": "kWh"
         },
         {
             "name": "Power",
             "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
-			"unit": "W"
+            "unit": "W"
         }
-    ],
-
-    "syntax": {
-        "deviceAddress": {
-            "keyValue": false,
-            "separator": ":"
-        }
-    }
+    ]
 }

@@ -2,13 +2,14 @@
     "name": "SDM230-M",
     "category": "Meter",
     "group": "EASTRON",
-    "description": "Requires the <b>Modbus</b> (RTU and TCP/IP) driver to be installed.<br><br><b>Energy Meter SDM230-M</b>:<br>Current: 10(100)A<br>Voltage : 230V<br>50(60)Hz",
+    "description": "Requires the <b>Modbus</b> (RTU) driver to be installed.<br><br><b>Energy Meter SDM230-M</b>:<br>Current: 10(100)A<br>Voltage : 230V<br>50(60)Hz",
 
-    "driver": "modbus",
     "devices": [
         {
             "name": "serial<address>",
             "description": "Modbus RTU connection",
+            "driver": "modbus",
+            "address": "<address>",
             "settings": "RTU:SERIAL_ENCODING_RTU:<baudRate>:DATABITS_8:PARITY_NONE:STOPBITS_2:ECHO_FALSE:FLOWCONTROL_NONE:FLOWCONTROL_NONE"
         }
     ],
@@ -19,8 +20,7 @@
             "name": "Address",
             "description": "The physical device address to uniquely identify a physical smart meter.<br><br><b>Example:</b><ol><li><b>Linux</b>: /dev/ttyS0 or /dev/ttyUSB0</li><li><b>Windows</b>: COM1</li></ol>",
             "type": "text",
-            "mandatory": true,
-            "syntax": "deviceAddress"
+            "mandatory": true
         },
         {
             "id": "unitId",
@@ -36,18 +36,17 @@
             "type": "selection",
             "select": [
                 { "name": "300", "value": 300 },
-		        { "name": "300", "value": 300 },
-		        { "name": "1200", "value": 1200 },
-		        { "name": "2400", "value": 2400 },
-		        { "name": "4800", "value": 4800 },
-		        { "name": "9600", "value": 9600 },
-		        { "name": "19200", "value": 19200 },
-		        { "name": "38400", "value": 38400 },
-		        { "name": "57600", "value": 57600 },
-		        { "name": "115200", "value": 115200 },
-		        { "name": "230400", "value": 230400 },
-		        { "name": "460800", "value": 460800 },
-		        { "name": "921600", "value": 921600 }
+                { "name": "1200", "value": 1200 },
+                { "name": "2400", "value": 2400 },
+                { "name": "4800", "value": 4800 },
+                { "name": "9600", "value": 9600 },
+                { "name": "19200", "value": 19200 },
+                { "name": "38400", "value": 38400 },
+                { "name": "57600", "value": 57600 },
+                { "name": "115200", "value": 115200 },
+                { "name": "230400", "value": 230400 },
+                { "name": "460800", "value": 460800 },
+                { "name": "921600", "value": 921600 }
             ],
             "default": 2400,
             "mandatory": false
@@ -265,12 +264,5 @@
             "engine": "Engine::PHPTIMESERIES",
             "unit": "kWh"
         }
-    ],
-
-    "syntax": {
-        "deviceAddress": {
-            "keyValue": false,
-            "separator": ":"
-        }
-    }
+    ]
 }

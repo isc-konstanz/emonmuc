@@ -1,0 +1,123 @@
+{
+    "name": "Radiator Thermostat",
+    "category": "Thermostat",
+    "group": "eQ-3 HomeMatic",
+    "description": "Requires the <b><a href='https://github.com/isc-konstanz/OpenHomeMatic/'>HomeMatic CC1101</a></b> driver to be installed.<br><br>eQ-3 HomeMatic Wireless Radiator Thermostat",
+
+    "devices": [
+        {
+            "description": "eQ-3 HomeMatic Thermostat",
+            "driver": "homematic-cc1101",
+            "address": "<address>",
+            "settings": "type:<type>"
+        }
+    ],
+
+    "scan": true,
+    "options": [
+        {
+            "id": "address",
+            "name": "Address",
+            "description": "Address of the HomeMatic Device",
+            "type": "text",
+            "scan": true,
+            "mandatory": true
+        },
+        {
+            "id": "type",
+            "name": "Type",
+            "description": "Type of the HomeMatic Device",
+            "type": "selection",
+            "select": [
+                { "name": "HM-CC-RT-DN", "value": "0095" },
+                { "name": "HM-CC-RT-DN-BoM", "value": "00BD" },
+                { "name": "HM-CC-TC", "value": "0039" },
+                { "name": "HM-CC-VD", "value": "003A" },
+                { "name": "HM-TC-IT-WM-W-EU", "value": "00AD" },
+                { "name": "ROTO_ZEL-STG-RM-FSA", "value": "007A" },
+                { "name": "ROTO_ZEL-STG-RM-FWT", "value": "0079" }
+            ],
+            "scan": true,
+            "mandatory": true
+        }
+    ],
+
+    "items": [
+        {
+            "id": "setpoint",
+            "type": "Slider",
+            "label": "Setpoint",
+            "format": "%.1f °C",
+            "max": 30,
+            "min": 5,
+            "step": 0.5,
+            "mapping": {
+                "SET": { "channel": "<node>*control" }
+            },
+            "input": "<node>*setpoint"
+        },
+        {
+            "id": "temperature",
+            "type": "Text",
+            "label": "Temperature",
+            "header": true,
+            "format": "%.1f °C",
+            "input": "<node>*temperature"
+        }
+    ],
+
+    "channels": [
+        {
+            "name": "<node>*control",
+            "description": "Control",
+            "address": "01",
+            "settings": "type:COMMAND",
+            "configs": {"valueType":"FLOAT", "unit":"°C"}
+        },
+        {
+            "name": "<node>*setpoint",
+            "description": "Setpoint",
+            "address": "0001",
+            "settings": "type:ATTRIBUTE",
+            "logging": {"loggingInterval": 5000, "loggingMaxInterval": 900000},
+            "configs": {"samplingInterval": 5000, "valueType":"FLOAT", "unit":"°C"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Setpoint", "tag": "<name>"}
+                }
+            ]
+        },
+        {
+            "name": "<node>*temperature",
+            "description": "Temperature",
+            "address": "0002",
+            "settings": "type:ATTRIBUTE",
+            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 900000, "loggingTolerance": 0.25, "average": true},
+            "configs": {"samplingInterval": 60000, "valueType":"FLOAT", "unit":"°C"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Temperature", "tag": "<name>"}
+                }
+            ]
+        }
+    ],
+
+    "feeds": [
+        {
+            "name": "Setpoint",
+            "tag": "<name>",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "°C"
+        },
+        {
+            "name": "Temperature",
+            "tag": "<name>",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "°C"
+        }
+    ]
+}

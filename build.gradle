@@ -1,0 +1,77 @@
+plugins {
+    id "de.undercouch.download" version "4.0.4"
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+
+    //ivy {
+    //    name "GitHub"
+    //    url "https://github.com/"
+    //    
+    //    patternLayout {
+    //        artifact "/[organisation]/[module]/releases/download/v[revision]/[module]-[revision].tar.gz"
+    //    }
+    //}
+}
+ext.tempDir = "tmp"
+ext.tempDownload = true
+ext.github = []
+
+configurations.create("bundle")
+configurations.create("main")
+configurations.bundle.transitive = false;
+configurations.main.transitive = false;
+
+task bundles
+
+apply from: rootDir.getPath() + "/conf/bundle.gradle"
+fileTree(rootDir.getPath() + "/conf/bundle.d").matching { include "**/*.gradle" }.each {
+    apply from: it
+}
+
+task downloadGitHub {
+    if (!tempDownload) {
+        return
+    }
+    mkdir tempDir
+    
+    for (project in github) {
+        def projectName = project.name
+        def projectDir = project.name + "-" + project.version
+        def projectTar = projectDir + ".tar.gz"
+        def projectUrl = "https://github.com/"+project.group+"/"+project.name+
+                         "/releases/download/v"+project.version+"/"+projectTar
+        
+        fileTree(tempDir).visit { FileVisitDetails details -> 
+            if (details.file.path.contains(projectName) && !details.file.path.contains(projectTar)) {
+                details.file.delete()
+            }
+        }
+        download {
+            src projectUrl
+            dest tempDir
+            overwrite false
+        }
+        copy {
+            from tarTree(resources.gzip(new File(tempDir, projectTar)))
+            into tempDir
+        }
+    }
+}
+
+task copyBundles(type: Sync) {
+    from configurations.bundle;
+    into rootDir.getPath() + "/bundle"
+}
+
+task copyMain(type: Copy) {
+    from configurations.main;
+    into rootDir.getPath() + "/bin"
+    rename (/org.apache.felix.main-.*jar/, "felix.jar")
+}
+
+bundles.dependsOn downloadGitHub
+bundles.dependsOn copyBundles
+bundles.dependsOn copyMain

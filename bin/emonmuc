@@ -84,7 +84,7 @@ start() {
     fi
   fi
 
-  echo -e "\e[96m\e[1m$(cat $EMONMUC_DIR/lib/framework/welcome.txt)\e[0m"
+  #echo -e "\e[96m\e[1m$(cat $EMONMUC_DIR/lib/welcome.txt)\e[0m"
 
   if [ "$2" != "-fg" ]
   then
@@ -168,7 +168,7 @@ terminate() {
     return 2
   fi
 
-  local i=0    
+  local i=0
     while kill -0 "${TMP_PID}" 2> /dev/null;  do
       if [ $i = '5' ]; then
         return 2
@@ -198,17 +198,13 @@ case "$1" in
     echo "Reaload configuration"
     { echo "emonmuc:reload"; sleep 1; } | nc 127.0.0.1 6666
     ;;
-  update | install | remove)
-    source "$EMONMUC_DIR"/lib/framework/bundles.sh
-    if [ "$1" == "update" ]; then
-      update
-
-    elif [ $# -gt 1 ]; then
+  bundles | update | install | remove)
+    if [ $# -gt 1 ]; then
+      source "$EMONMUC_DIR"/lib/bundle.sh
       bundles $@
-    else
-      echo "Specify one or more bundles to be installed"
-      exit 1
     fi
+    gradle -b "$EMONMUC_DIR"/build.gradle bundles
+
     echo "For the changes to take effect, please restart the framework:
   systemctl restart emonmuc"
     ;;

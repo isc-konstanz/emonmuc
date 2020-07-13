@@ -1,0 +1,16 @@
+def projectName = "OpenSmartMeter"
+def projectVersion = "2.2.0"
+
+repositories {
+    flatDir {
+        dirs tempDir + "/" + projectName + "/libs"
+        dirs tempDir + "/" + projectName + "/build/libs"
+    }
+}
+
+github.add([group: "isc-konstanz", name: projectName, version: projectVersion])
+
+dependencies {
+    bundle group: "org.openmuc", name: "openmuc-driver-smartmeter", version: projectVersion
+    bundle group: "org.openmuc", name: "jrxtx",                     version: "1.0.1"
+}

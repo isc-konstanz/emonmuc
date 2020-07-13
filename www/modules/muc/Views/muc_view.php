@@ -101,7 +101,7 @@
                 $("#ctrl-none").hide();
             }
             $('#ctrl-loader').hide();
-        });
+        }, 'drivers');
     }
 
     var updater;

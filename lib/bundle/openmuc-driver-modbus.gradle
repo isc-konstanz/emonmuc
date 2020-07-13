@@ -1,0 +1,4 @@
+dependencies {
+    bundle group: "org.openmuc", name: "openmuc-driver-modbus", version: openmucVersion
+    bundle group: "org.openmuc", name: "jrxtx",                 version: "1.0.1"
+}

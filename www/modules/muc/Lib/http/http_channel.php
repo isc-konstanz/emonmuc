@@ -222,6 +222,7 @@ class HttpChannel extends ControllerChannel {
             if (isset($scan['channelAddress'])) $channel['address'] = $scan['channelAddress'];
             if (isset($scan['channelSettings'])) $channel['settings'] = $scan['channelSettings'];
             if (isset($scan['valueType'])) $channel['configs'] = array('valueType' => $scan['valueType']);
+            if (isset($scan['valueTypeLength'])) $channel['configs']['valueTypeLength'] = $scan['valueTypeLength'];
             if (isset($scan['metadata'])) $channel['metadata'] = $scan['metadata'];
             
             $channels[] = $channel;

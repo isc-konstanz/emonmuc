@@ -4,10 +4,11 @@
     "group": "Example",
     "description": "Requires the <b>CSV</b> driver to be installed.<br><br>Configuration for an emonmuc demonstration, creating the device channels, inputs and feeds for a virtual household.",
 
-    "driver": "csv",
     "devices": [
         {
             "description": "Household energy consumption",
+            "driver": "csv",
+            "address": "<file>",
             "settings": "samplingmode=hhmmss;rewind=true"
         }
     ],
@@ -23,8 +24,7 @@
             "description": "The location of the provided demonstration CSV file.<br><b>Default:</b><ul><li>lib/driver/csv/home1.csv</li><li>lib/driver/csv/home2.csv</li></ul>",
             "type": "text",
             "scan": true,
-            "mandatory": true,
-            "syntax": "deviceAddress"
+            "mandatory": true
         }
     ],
 
@@ -175,7 +175,7 @@
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
-			"unit": "W"
+            "unit": "W"
         },
         {
             "name": "Energy",
@@ -183,7 +183,7 @@
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
-			"unit": "kWh"
+            "unit": "kWh"
         },
         {
             "name": "Power import",
@@ -191,7 +191,7 @@
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
-			"unit": "W"
+            "unit": "W"
         },
         {
             "name": "Energy import",
@@ -199,7 +199,7 @@
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
-			"unit": "kWh"
+            "unit": "kWh"
         },
         {
             "name": "Power export",
@@ -207,7 +207,7 @@
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
-			"unit": "W"
+            "unit": "W"
         },
         {
             "name": "Energy export",
@@ -215,7 +215,7 @@
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
-			"unit": "kWh"
+            "unit": "kWh"
         },
         {
             "name": "Power",
@@ -223,7 +223,7 @@
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
-			"unit": "W"
+            "unit": "W"
         },
         {
             "name": "Energy",
@@ -231,7 +231,7 @@
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
-			"unit": "kWh"
+            "unit": "kWh"
         },
         {
             "name": "Power",
@@ -239,7 +239,7 @@
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
-			"unit": "W"
+            "unit": "W"
         },
         {
             "name": "Energy",
@@ -247,7 +247,7 @@
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
-			"unit": "kWh"
+            "unit": "kWh"
         },
         {
             "name": "Power",
@@ -255,7 +255,7 @@
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
-			"unit": "W"
+            "unit": "W"
         },
         {
             "name": "Energy",
@@ -263,7 +263,7 @@
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
-			"unit": "kWh"
+            "unit": "kWh"
         }
     ],
 
