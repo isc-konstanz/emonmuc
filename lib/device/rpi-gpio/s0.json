@@ -4,10 +4,11 @@
     "group": "Pulses (Raspberry Pi)",
     "description": "Requires the <b>GPIO</b> driver to be installed.<br><br>Configuration for a Raspberry Pi pin as an S0 pulse counter.",
 
-    "driver": "rpi-gpio",
     "devices": [
         {
             "description": "Raspberry Pi Input",
+            "driver": "rpi-gpio",
+            "address": "pin:<pin>",
             "settings": "mode:DIGITAL_INPUT,pullResistance:PULL_DOWN,counter:true"
         }
     ],
@@ -23,16 +24,14 @@
             "description": "The Pin number, according to the <a href='http://pi4j.com/pin-numbering-scheme.html'>WiringPi Pin Numbering Scheme</a>",
             "type": "text",
             "scan": true,
-            "mandatory": true,
-            "syntax": "deviceAddress"
+            "mandatory": true
         },
         {
             "id": "impulses",
             "name": "imp./kWh",
             "description": "The amount of impulses corresponding to one kWh.</a>",
             "type": "text",
-            "mandatory": true,
-            "syntax": "channelSettings"
+            "mandatory": true
         },
         {
             "id": "refresh",
@@ -72,6 +71,7 @@
         {
             "name": "<node>*energy",
             "description": "S0 pulse counter",
+            "settings": "<impulses>",
             "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000},
             "configs": {"samplingInterval": "<refresh>", "valueType":"DOUBLE"},
             "processList": [

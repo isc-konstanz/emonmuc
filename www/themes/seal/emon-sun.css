@@ -61,8 +61,6 @@ div#account {
 /* Lastly, apply responsive CSS fixes as necessary */
 @media (max-width: 767px) {
     #submenu, #footer {
-        margin-left: -20px;
-        margin-right: -20px;
         padding-left: 20px;
         padding-right: 20px;
     }
@@ -130,11 +128,15 @@ div#account {
    Side nav
 --------------------------------------------------------------------*/
 .sidebar-menu {
-    border-top: 1px solid #f0f0f0;
+    border-top: 1px solid #ebebeb;
 }
 .sidebar-menu li.collapse.in,
 .include-container.collapse.in > li {
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid #ebebeb;
+}
+
+.sidebar-inner .divider {
+	background: #e3e3e3;
 }
 
 #sidebar {
@@ -147,7 +149,7 @@ div#account {
 #sidebar .nav.sidebar-menu li.active a,
 #sidebar .nav.sidebar-menu li a:focus {
     background: #f5f5f5;
-    color: black;
+    color: #000;
 }
 /* When you mouse over the navigation items, change their color */
 #sidebar .nav.sidebar-menu a:hover {
@@ -164,7 +166,7 @@ div#account {
 
 #sidebar_user_toggle .expanded,
 #sidebar_user_toggle:hover {
-  background: #f0f0f0;
+    background: #f0f0f0;
 }
 #edit_bookmarks {
     color: #545454;

@@ -1,0 +1,16 @@
+def projectName = "emonjava"
+def projectVersion = "1.4.0"
+
+repositories {
+    flatDir {
+        dirs tempDir + "/" + projectName + "/libs"
+        dirs tempDir + "/" + projectName + "/build/libs"
+    }
+}
+
+github.add([group: "isc-konstanz", name: projectName, version: projectVersion])
+
+dependencies {
+    bundle group: "org.openmuc",          name: "openmuc-datalogger-emoncms", version: projectVersion
+    bundle group: "mysql",                name: "mysql-connector-java",       version: "8.0.17"
+}

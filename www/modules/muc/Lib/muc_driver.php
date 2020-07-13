@@ -67,7 +67,7 @@ abstract class ControllerDriver {
             'ctrl'=>$this->ctrl['name'],
             'id'=>$details['id']
         );
-        $driver['name'] = isset($details['name']) ? $details['name'] : '';
+        $driver['name'] = isset($details['name']) ? $details['name'] : ucfirst($details['id']);
         $driver['description'] = isset($details['description']) ? $details['description'] : '';
         
         $running = true;

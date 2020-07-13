@@ -54,7 +54,7 @@ find_emonmuc_user() {
 
 download_emonmuc() {
   echo "Downloading emonmuc framework"
-  apt-get install -y -qq git-core
+  apt-get install -y -qq git-core gradle
 
   git clone -b seal "https://github.com/isc-konstanz/emonmuc.git" "$EMONMUC_DIR"
 }
@@ -62,8 +62,8 @@ download_emonmuc() {
 install_emonmuc() {
   echo "Installing emonmuc framework"
 
-  mkdir -p /var/run/emonmuc "$EMONMUC_DATA" "$EMONCMS_LOG"
-  chown $EMONMUC_USER /var/run/emonmuc "$EMONMUC_DATA" "$EMONCMS_LOG"
+  mkdir -p /var/run/emonmuc /var/log/emonmuc "$EMONMUC_DATA" "$EMONCMS_LOG"
+  chown $EMONMUC_USER /var/run/emonmuc /var/log/emonmuc "$EMONMUC_DATA" "$EMONCMS_LOG"
   chown $EMONMUC_USER -R "$EMONMUC_DIR"
 
   if [ ! -f "$EMONMUC_DIR"/conf/system.properties ]; then
@@ -89,11 +89,9 @@ install_emonmuc() {
     rm "$EMONMUC_TMP"/conf/{*.default.*,logback.xml,shadow} >/dev/null 2>&1
     cp -rpf "$EMONMUC_TMP"/conf/* "$EMONMUC_DIR"/conf/
   fi
-  bash "$EMONMUC_DIR"/bin/emonmuc update
+  bash "$EMONMUC_DIR"/bin/emonmuc install --datalogger emoncms --server restws
 
   if [ -n "$EMONCMS_DIR" ]; then
-    systemctl restart emonmuc.service
-
     # Wait a while for the server to be available.
     # TODO: Explore necessity. May be necessary for Raspberry Pi V1
     printf "Restarting emonmuc service\nPlease wait"

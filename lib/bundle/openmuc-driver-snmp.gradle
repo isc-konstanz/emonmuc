@@ -1,0 +1,3 @@
+dependencies {
+    bundle group: "org.openmuc", name: "openmuc-driver-snmp", version: openmucVersion
+}

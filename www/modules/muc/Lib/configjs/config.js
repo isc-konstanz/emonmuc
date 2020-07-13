@@ -115,13 +115,13 @@ var config = {
         var infos = config.infos[group]['options'];
         for (var i = 0; i < infos.length; i++) {
             var info = infos[i];
-            if (info.mandatory || typeof config.options[group][info.key] !== 'undefined') {
+            if (info.mandatory || typeof config.options[group][info.id] !== 'undefined') {
                 show = true;
                 
                 config.drawOptionInput(group, info);
             }
             else {
-                options += "<option value='"+info.key+"' data-group='"+group+"' style='color:black'>"+info.name+"</option>";
+                options += "<option value='"+info.id+"' data-group='"+group+"' style='color:black'>"+info.name+"</option>";
             }
         }
         if (options.length > 0) {
@@ -145,19 +145,19 @@ var config = {
     },
 
     drawOptionInput: function(group, info) {
-        var key = info['key'];
+        var id = info['id'];
         var name = info['name'];
         if (typeof name === 'undefined') {
-            name = key;
+            name = id;
         }
         var description = info['description'];
         
-        var row = "<tr id='option-"+group+"-"+key+"-row' class='option' data-key='"+key+"' data-group='"+group+"'>" +
+        var row = "<tr id='option-"+group+"-"+id+"-row' class='option' data-id='"+id+"' data-group='"+group+"'>" +
                 "<td>"+name+"</td>" +
             "</tr>";
         
         if (typeof description !== 'undefined' && description != '') {
-            row  += "<tr id='option-"+group+"-"+key+"-info' class='option' data-key='"+key+"' data-group='"+group+"' " +
+            row  += "<tr id='option-"+group+"-"+id+"-info' class='option' data-id='"+id+"' data-group='"+group+"' " +
                     "data-show='false' style='display:none'>" +
                 "<td colspan='4'>" +
                     "<div class='alert alert-comment hide'>"+description+"</div>" +
@@ -166,20 +166,20 @@ var config = {
         }
         $('#option-'+group+'-table', config.container).append("<tbody>"+row+"</tbody>");
         
-        var row = $('#option-'+group+'-'+key+'-row', config.container);
+        var row = $('#option-'+group+'-'+id+'-row', config.container);
         
         var value = '';
-        if (typeof config.options[group][key] !== 'undefined') {
-            value = config.options[group][key];
+        if (typeof config.options[group][id] !== 'undefined') {
+            value = config.options[group][id];
         }
         else if (typeof info.valueDefault !== 'undefined') {
             value = info.valueDefault;
         }
         var type = info['type'].toUpperCase();
         if (typeof info['valueSelection'] !== 'undefined') {
-            row.append("<td><select id='option-"+group+"-"+key+"-input' class='option-input input-large'></select></td>");
+            row.append("<td><select id='option-"+group+"-"+id+"-input' class='option-input input-large'></select></td>");
             
-            var select = $('#option-'+group+'-'+key+'-input', config.container);
+            var select = $('#option-'+group+'-'+id+'-input', config.container);
             select.append("<option selected hidden value=''>Select a "+name+"</option>");
             for (var val in info.valueSelection) {
                 if (info.valueSelection.hasOwnProperty(val)) {
@@ -204,7 +204,7 @@ var config = {
                 "<td>" +
                     "<div class='option-input checkbox checkbox-slider--b-flat checkbox-slider-info'>" +
                         "<label>" +
-                            "<input id='option-"+group+"-"+key+"-input' type='checkbox'><span></span>" +
+                            "<input id='option-"+group+"-"+id+"-input' type='checkbox'><span></span>" +
                         "</label>" +
                     "</div>" +
                 "</td>"
@@ -213,25 +213,25 @@ var config = {
                 if (typeof value === 'string' || value instanceof String) {
                     value = (value == 'true');
                 }
-                $('#option-'+group+'-'+key+'-input', config.container).prop('checked', value);
+                $('#option-'+group+'-'+id+'-input', config.container).prop('checked', value);
             }
         }
         else {
-            row.append("<td><input id='option-"+group+"-"+key+"-input' type='text' class='option-input input-large'></input></td>");
+            row.append("<td><input id='option-"+group+"-"+id+"-input' type='text' class='option-input input-large'></input></td>");
             if (value != null) {
-                $('#option-'+group+'-'+key+'-input', config.container).val(value);
+                $('#option-'+group+'-'+id+'-input', config.container).val(value);
             }
         }
         
         if(!info.mandatory) {
             row.append("<td></td>")
-            row.append("<td><a id='option-"+group+"-"+key+"-remove' class='option-remove' title='Remove'><i class='icon-trash' style='cursor:pointer'></i></a></td>");
+            row.append("<td><a id='option-"+group+"-"+id+"-remove' class='option-remove' title='Remove'><i class='icon-trash' style='cursor:pointer'></i></a></td>");
         }
         else {
             row.append("<td><span style='color:#888; font-size:12px'><em>mandatory</em></span></td>")
             row.append("<td><a><i class='icon-trash' style='cursor:not-allowed;opacity:0.3'></i></a></td>");
             
-//            $('#option-'+group+'-'+key, config.container).prop('required', true);
+//            $('#option-'+group+'-'+id, config.container).prop('required', true);
         }
     },
 
@@ -254,9 +254,9 @@ var config = {
 
         $('#options', config.container).on('click', '.option', function() {
             var group = $(this).data('group');
-            var key = $(this).data('key');
+            var id = $(this).data('id');
             
-            var info = $('#option-'+group+'-'+key+'-info', config.container);
+            var info = $('#option-'+group+'-'+id+'-info', config.container);
             if (typeof info !== 'undefined' && info.data('show')) {
                 info.data('show', false);
                 info.find('td > div').slideUp(function() { info.hide(); });
@@ -277,7 +277,7 @@ var config = {
             e.stopPropagation();
             
             var row = $(this).closest('tr');
-            var info = $('#option-'+row.data('group')+'-'+row.data('key')+'-info', config.container);
+            var info = $('#option-'+row.data('group')+'-'+row.data('id')+'-info', config.container);
             if (typeof info !== 'undefined' && !info.data('show')) {
                 info.data('show', true).show().find('td > div').slideDown();
             }
@@ -288,7 +288,7 @@ var config = {
             
             var row = $(this).closest('tr');
             var group = row.data('group');
-            var key = row.data('key');
+            var id = row.data('id');
             
             var removeRow = function() {
                 $(this).remove(); 
@@ -298,11 +298,11 @@ var config = {
                     $('#option-'+group+'-none', config.container).show();
                 }
             }
-            $('#option-'+group+'-'+key+'-row', config.container).fadeOut(removeRow);
-            $('#option-'+group+'-'+key+'-info', config.container).fadeOut(removeRow);
+            $('#option-'+group+'-'+id+'-row', config.container).fadeOut(removeRow);
+            $('#option-'+group+'-'+id+'-info', config.container).fadeOut(removeRow);
             
             var info = config.infos[group].options.find(function(result) {
-                return result.key === key;
+                return result.id === id;
             });
             
             var select = $('#option-select-'+group, config.container);
@@ -311,7 +311,7 @@ var config = {
                 
                 select = $('#option-select-'+group, config.container);
             }
-            select.append("<option value='"+key+"' data-group='"+group+"' style='color:black'>"+info.name+"</option>");
+            select.append("<option value='"+id+"' data-group='"+group+"' style='color:black'>"+info.name+"</option>");
             
             select = $('#option-select', config.container);
             if ($("option", select).length > 1) {
@@ -329,12 +329,12 @@ var config = {
             var value = $('option:selected', select);
             
             var group = value.data('group');
-            var key = value.val();
-            if (key != "" && $("#option-"+group+"-"+key+"-row", config.container).val() === undefined) {
+            var id = value.val();
+            if (id != "" && $("#option-"+group+"-"+id+"-row", config.container).val() === undefined) {
                 value.remove();
                 
                 var info = config.infos[group].options.find(function(result) {
-                    return result.key === key;
+                    return result.id === id;
                 });
                 config.drawOptionInput(group, info);
                 
@@ -369,7 +369,7 @@ var config = {
         if (typeof config.infos[group] !== 'undefined') {
             for (var i = 0; i < config.infos[group].options.length; i++) {
                 var info = config.infos[group].options[i];
-                var input = $('#option-'+group+'-'+info.key+'-input', config.container);
+                var input = $('#option-'+group+'-'+info.id+'-input', config.container);
                 var value = null;
                 
                 if (typeof input.val() !== 'undefined') {
@@ -385,7 +385,7 @@ var config = {
                     }
                 }
                 if (value !== null && value !== "") {
-                    options[info.key] = value;
+                    options[info.id] = value;
                 }
             }
         }
@@ -412,8 +412,8 @@ var config = {
             	var keyValue;
             	if (syntax['separator'] != syntax['assignment']) {
             		var keyValue = optArr[p].split(syntax['assignment']);
-                    if (optInfo.key === keyValue[0]) {
-                        optList[optInfo.key] = keyValue[1];
+                    if (optInfo.id === keyValue[0]) {
+                        optList[optInfo.id] = keyValue[1];
                         p++;
                     }
             	}
@@ -421,14 +421,14 @@ var config = {
             		var key = optArr[p];
             		var value = optArr[p+1];
             		if (optInfo.key === key) {
-                        optList[optInfo.key] = value;
+                        optList[optInfo.id] = value;
                         p += 2;
                     }
             	}
             }
             else {
                 if (optInfo['mandatory'] || optArr.length > optMandatoryCount) {
-                    optList[optInfo.key] = optArr[p];
+                    optList[optInfo.id] = optArr[p];
                     p++;
                 }
             }
@@ -449,10 +449,10 @@ var config = {
             for (var p = 0, i = 0; i < infos.length; i++) {
                 optInfo = infos[i];
                 
-                if (options.hasOwnProperty(optInfo.key)) {
-                    var value = options[optInfo.key];
+                if (options.hasOwnProperty(optInfo.id)) {
+                    var value = options[optInfo.id];
                     if (syntax['keyValue']) {
-                        optArr.push(optInfo.key+syntax['assignment']+value);
+                        optArr.push(optInfo.id+syntax['assignment']+value);
                     }
                     else {
                         optArr.push(value);
@@ -473,9 +473,9 @@ var config = {
                     for (var i in infos) {
                         if (infos.hasOwnProperty(i)) {
                             var info = infos[i];
-                            var key = info['key'];
+                            var id = info['id'];
                             if (info['mandatory']) {
-                                if (!(key in options) || options[key].length === 0) {
+                                if (!(id in options) || options[id].length === 0) {
                                     return false;
                                 }
                             }
