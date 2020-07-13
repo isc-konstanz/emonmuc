@@ -29,7 +29,7 @@ class MucTemplate extends DeviceTemplate {
         
         $dir = $this->get_dir();
         if (is_dir($dir)) {
-            $it = new RecursiveDirectoryIterator($dir);
+            $it = new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::FOLLOW_SYMLINKS);
             foreach (new RecursiveIteratorIterator($it) as $file) {
                 if ($file->getExtension() == "json") {
                     $type = substr(pathinfo($file, PATHINFO_DIRNAME), strlen($dir)).'/'.pathinfo($file, PATHINFO_FILENAME);
