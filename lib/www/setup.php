@@ -21,7 +21,7 @@ if (isset($options['a']) || isset($options['apikey'])) {
 else if (isset($options['i']) || isset($options['init'])) {
     if ($user->get_number_of_users() == 0) {
         $email = 'admin@'.gethostname().'.local';
-        $result = $user->register('admin', 'admin', $email);
+        $result = $user->register('admin', 'admin', $email, date_default_timezone_get());
         if (isset($result['success']) && $result['success'] == false) {
             echo "Unable to register default user \"admin\": ".$result['message']."\n"; die;
         }

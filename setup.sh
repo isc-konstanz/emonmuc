@@ -54,13 +54,15 @@ find_emonmuc_user() {
 
 download_emonmuc() {
   echo "Downloading emonmuc framework"
-  apt-get install -y -qq git-core gradle
+  apt-get install -y -qq git-core
 
   git clone "https://github.com/isc-konstanz/emonmuc.git" "$EMONMUC_DIR"
 }
 
 install_emonmuc() {
   echo "Installing emonmuc framework"
+
+  apt-get install -y -qq git-core gradle
 
   mkdir -p /var/run/emonmuc /var/log/emonmuc "$EMONMUC_DATA" "$EMONCMS_LOG"
   chown $EMONMUC_USER /var/run/emonmuc /var/log/emonmuc "$EMONMUC_DATA" "$EMONCMS_LOG"
@@ -78,7 +80,7 @@ install_emonmuc() {
   echo "d /var/run/emonmuc 0755 $EMONMUC_USER root -" | sudo tee /usr/lib/tmpfiles.d/emonmuc.conf >/dev/null 2>&1
 
   if [ -n "$EMONCMS_DIR" ]; then
-    mkdir -u $EMONMUC_USER -p "$EMONMUC_DATA"/device
+    sudo -u $EMONMUC_USER mkdir -p "$EMONMUC_DATA"/device
     sudo -u $EMONMUC_USER ln -sf "$EMONMUC_DIR"/lib/device/* "$EMONMUC_DATA"/device/
 
     sudo -u $EMONMUC_USER ln -sf "$EMONMUC_DIR"/www/modules/channel "$EMONCMS_DIR"/Modules/
