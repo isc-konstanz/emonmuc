@@ -7,7 +7,6 @@ EMONMUC_PORT=8080
 EMONMUC_DIR="/opt/emonmuc"
 EMONMUC_DATA="/var/opt/emonmuc"
 EMONCMS_DIR="/var/www/emoncms"
-EMONCMS_LOG="/var/log/emoncms"
 
 if [[ $EUID -ne 0 ]]; then
   echo "Please make sure to run the emonmuc setup as root user"
@@ -54,7 +53,7 @@ find_emonmuc_user() {
 
 download_emonmuc() {
   echo "Downloading emonmuc framework"
-  apt-get install -y -qq git-core gradle
+  apt-get install -y -qq git-core
 
   git clone "https://github.com/isc-konstanz/emonmuc.git" "$EMONMUC_DIR"
 }
@@ -62,8 +61,10 @@ download_emonmuc() {
 install_emonmuc() {
   echo "Installing emonmuc framework"
 
-  mkdir -p /var/run/emonmuc /var/log/emonmuc "$EMONMUC_DATA" "$EMONCMS_LOG"
-  chown $EMONMUC_USER /var/run/emonmuc /var/log/emonmuc "$EMONMUC_DATA" "$EMONCMS_LOG"
+  apt-get install -y -qq git-core gradle
+
+  mkdir -p /var/run/emonmuc /var/log/emonmuc "$EMONMUC_DATA"
+  chown $EMONMUC_USER /var/run/emonmuc /var/log/emonmuc "$EMONMUC_DATA"
   chown $EMONMUC_USER -R "$EMONMUC_DIR"
 
   if [ ! -f "$EMONMUC_DIR"/conf/system.properties ]; then
@@ -77,8 +78,8 @@ install_emonmuc() {
   ln -sf "$EMONMUC_DIR"/lib/systemd/emonmuc.service /lib/systemd/system/emonmuc.service
   echo "d /var/run/emonmuc 0755 $EMONMUC_USER root -" | sudo tee /usr/lib/tmpfiles.d/emonmuc.conf >/dev/null 2>&1
 
-  if [ -n "$EMONCMS_DIR" ]; then
-    mkdir -u $EMONMUC_USER -p "$EMONMUC_DATA"/device
+  if [ -d "$EMONCMS_DIR" ]; then
+    sudo -u $EMONMUC_USER mkdir -p "$EMONMUC_DATA"/device
     sudo -u $EMONMUC_USER ln -sf "$EMONMUC_DIR"/lib/device/* "$EMONMUC_DATA"/device/
 
     sudo -u $EMONMUC_USER ln -sf "$EMONMUC_DIR"/www/modules/channel "$EMONCMS_DIR"/Modules/
@@ -94,7 +95,7 @@ install_emonmuc() {
   fi
   bash "$EMONMUC_DIR"/bin/emonmuc install --datalogger emoncms --server restws
 
-  if [ -n "$EMONCMS_DIR" ]; then
+  if [ -d "$EMONCMS_DIR" ]; then
     # Wait a while for the server to be available.
     # TODO: Explore necessity. May be necessary for Raspberry Pi V1
     printf "Restarting emonmuc service\nPlease wait"
@@ -114,7 +115,6 @@ install_emonmuc() {
     php "$EMONMUC_DIR"/lib/www/setup.php --dir "$EMONCMS_DIR" --apikey $API_KEY
     chown $EMONMUC_USER -R "$EMONMUC_DIR"/conf
   fi
-  rm "$EMONCMS_LOG"/emonmuc* >/dev/null 2>&1
 
   systemctl enable emonmuc.service
   systemctl restart emonmuc.service
