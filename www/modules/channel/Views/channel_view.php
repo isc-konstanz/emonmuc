@@ -335,10 +335,10 @@ function drawRecordTime(id, time) {
             else if (secs>180) updated = mins.toFixed(0)+" mins";
             
             secs = Math.abs(secs);
-            if (delta<0) color = "rgb(60,135,170)"
-            else if (secs<60) color = "rgb(50,200,50)"
-            else if (secs<900) color = "rgb(240,180,20)"; 
-            else if (secs<7200) color = "rgb(255,125,20)"
+            if (delta<0) color = "rgb(60,135,170)";
+            else if (secs<60) color = "rgb(50,200,50)";
+            else if (secs<900) color = "rgb(240,180,20)";
+            else if (secs<7200) color = "rgb(255,125,20)";
         }
     }
     return "<span style='color:"+color+";'>"+updated+"</span>";

@@ -4,6 +4,7 @@
 # Set the targeted directories of the emonmuc framework.
 EMONMUC_DIR="/opt/emonmuc"
 EMONMUC_DATA="/var/opt/emonmuc"
+EMONCMS_DIR="/var/www/emoncms"
 
 if [[ $EUID -ne 0 ]]; then
   echo "Please make sure to run the emonmuc update as root user"
@@ -45,11 +46,13 @@ update_emonmuc() {
 
   sudo chown $EMONMUC_USER -R "$EMONMUC_DIR"
 
-  if [ -d "$EMONMUC_DATA"/device ]; then
-    for x in "$EMONMUC_DATA"/device/*; do if [ -L "$x" ] && ! [ -e "$x" ]; then sudo rm -- "$x"; fi; done
-    sudo -u $EMONMUC_USER ln -sf "$EMONMUC_DIR"/lib/device/* "$EMONMUC_DATA"/device/
-    
-    php "$EMONMUC_DIR"/lib/www/reload.php
+  if [ -d "$EMONCMS_DIR" ]; then
+    if [ -d "$EMONMUC_DATA"/device ]; then
+      for x in "$EMONMUC_DATA"/device/*; do if [ -L "$x" ] && ! [ -e "$x" ]; then sudo rm -- "$x"; fi; done
+      sudo -u $EMONMUC_USER ln -sf "$EMONMUC_DIR"/lib/device/* "$EMONMUC_DATA"/device/
+
+      php "$EMONMUC_DIR"/lib/www/reload.php
+    fi
   fi
 
   systemctl daemon-reload
@@ -62,12 +65,17 @@ echo "Starting emonmuc update"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
+    -e | --emoncms)
+      EMONCMS_DIR="$2"
+      shift
+      shift
+      ;;
     -r | --reset)
       RESET=true
       shift
       ;;
     -h | --help)
-      echo "Synopsis: update.sh [-r|--reset]"
+      echo "Synopsis: update.sh [-e|--emoncms location] [-r|--reset]"
       exit 1
       ;;
   esac
