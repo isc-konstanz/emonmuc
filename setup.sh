@@ -53,7 +53,7 @@ find_emonmuc_user() {
 
 download_emonmuc() {
   echo "Downloading emonmuc framework"
-  apt-get install -y -qq git-core
+  apt-get install -y git-core
 
   git clone "https://github.com/isc-konstanz/emonmuc.git" "$EMONMUC_DIR"
 }
@@ -61,7 +61,7 @@ download_emonmuc() {
 install_emonmuc() {
   echo "Installing emonmuc framework"
 
-  apt-get install -y -qq git-core gradle
+  apt-get install -y git-core gradle
 
   mkdir -p /var/run/emonmuc /var/log/emonmuc "$EMONMUC_DATA"
   chown $EMONMUC_USER /var/run/emonmuc /var/log/emonmuc "$EMONMUC_DATA"
