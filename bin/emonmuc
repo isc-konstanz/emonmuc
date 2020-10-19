@@ -5,9 +5,9 @@
 # Add JVM options here.
 JVM_OPTS="-Djava.library.path=/usr/lib/jni -cp /usr/share/java/RXTXcomm.jar"
 
-# Set location for PID and Error output file. Default is "$EMONMUC_DIR/log/emonmuc.pid" or ".log"
-PID_FILE=/var/run/emonmuc/emonmuc.pid
-#ERR_FILE=/var/log/emoncms/emonmuc.out
+# Set location for PID and Error output file. Default is "$EMONMUC_DIR/log/openmuc.pid" or ".log"
+PID_FILE=/var/run/emonmuc/openmuc.pid
+#ERR_FILE=/var/log/emonmuc/openmuc.out
 ERR_FILE=/dev/null
 
 # Optionally set the location of the emonmuc framework. If the

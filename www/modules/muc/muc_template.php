@@ -532,13 +532,13 @@ class MucTemplate extends DeviceTemplate {
         if (isset($template->syntax) && isset($template->syntax->$type)) {
             $syntax = $template->syntax->$type;
         }
-        else if (substr($haystack, -strlen('Address')) === 'Address') {
+        else if (substr($type, -strlen('Address')) === 'Address') {
             $syntax = (object) array(
                 'keyValue' => false,
                 'separator' => ':'
             );
         }
-        else if (substr($haystack, -strlen('Settings')) === 'Settings') {
+        else if (substr($type, -strlen('Settings')) === 'Settings') {
             $syntax = (object) array(
                 'keyValue' => true,
                 'separator' => ',',

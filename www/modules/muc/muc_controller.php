@@ -54,51 +54,47 @@ function muc_controller() {
     }
     elseif ($route->format == 'json') {
         $ctrl = new Controller($mysqli, $redis);
-        try {
-            if ($route->action == "channel") $result = channel_controller($ctrl);
-            elseif ($route->action == "device") $result = device_controller($ctrl);
-            elseif ($route->action == "driver") $result = driver_controller($ctrl);
-            elseif ($route->action == "create" && $session['write']) {
-                $result = $ctrl->create($session['userid'], get('type'), get('name'), get('description'), get('options'));
+        
+        if ($route->action == "channel") $result = channel_controller($ctrl);
+        elseif ($route->action == "device") $result = device_controller($ctrl);
+        elseif ($route->action == "driver") $result = driver_controller($ctrl);
+        elseif ($route->action == "create" && $session['write']) {
+            $result = $ctrl->create($session['userid'], get('type'), get('name'), get('description'), get('options'));
+        }
+        elseif ($route->action == 'list') {
+            if ($route->subaction == "drivers") {
+                $result = $ctrl->get_child_list($session['userid'], 0);
             }
-            elseif ($route->action == 'list') {
-                if ($route->subaction == "drivers") {
-                    $result = $ctrl->get_child_list($session['userid'], 0);
-                }
-                elseif ($route->subaction == "devices") {
-                    $result = $ctrl->get_child_list($session['userid'], 1);
-                }
-                elseif ($route->subaction == "channels") {
-                    $result = $ctrl->get_child_list($session['userid'], 2);
-                }
-                else {
-                    $result = $ctrl->get_list($session['userid']);
-                }
+            elseif ($route->subaction == "devices") {
+                $result = $ctrl->get_child_list($session['userid'], 1);
             }
-            elseif ($route->action == 'driver') {
-                $result = $ctrl->get_list($session['userid']);
-            }
-            elseif ($route->action == "config") {
-                $result = $ctrl->get_config($session['userid'], get('id'));
+            elseif ($route->subaction == "channels") {
+                $result = $ctrl->get_child_list($session['userid'], 2);
             }
             else {
-                $details = access_ctrl($ctrl, 'id');
-                if ($route->action == "get") {
-                    $result = $details;
-                }
-                elseif ($route->action == 'load') {
-                    $result = $ctrl->load($details);
-                }
-                elseif ($route->action == 'update' && $session['write']) {
-                    $result = $ctrl->update($session['userid'], $details['id'], get('fields'));
-                }
-                elseif ($route->action == "delete" && $session['write']) {
-                    $result = $ctrl->delete($session['userid'], $details['id']);
-                }
+                $result = $ctrl->get_list($session['userid']);
             }
         }
-        catch(ControllerException $e) {
-            $result = $e->getResult();
+        elseif ($route->action == 'driver') {
+            $result = $ctrl->get_list($session['userid']);
+        }
+        elseif ($route->action == "config") {
+            $result = $ctrl->get_config($session['userid'], get('id'));
+        }
+        else {
+            $details = access_ctrl($ctrl, 'id');
+            if ($route->action == "get") {
+                $result = $details;
+            }
+            elseif ($route->action == 'load') {
+                $result = $ctrl->load($details);
+            }
+            elseif ($route->action == 'update' && $session['write']) {
+                $result = $ctrl->update($session['userid'], $details['id'], get('fields'));
+            }
+            elseif ($route->action == "delete" && $session['write']) {
+                $result = $ctrl->delete($session['userid'], $details['id']);
+            }
         }
     }
     return array('content'=>$result);
