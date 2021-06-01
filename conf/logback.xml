@@ -19,7 +19,9 @@
   </appender>
 
   <logger name="org.eclipse.jetty" level="WARN" />
- 
+  <logger name="org.eclipse.milo" level="WARN" />
+  <logger name="io.netty" level="WARN" />
+
   <root level="DEBUG">
     <appender-ref ref="STDOUT" />
     <appender-ref ref="FILE" />

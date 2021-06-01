@@ -5,7 +5,7 @@ After=network.target
 [Service]
 Type=forking
 Restart=always
-RestartSec=10
+RestartSec=60s
 ExecStart=/opt/emonmuc/bin/emonmuc start
 ExecReload=/opt/emonmuc/bin/emonmuc reload
 ExecStop=/opt/emonmuc/bin/emonmuc stop

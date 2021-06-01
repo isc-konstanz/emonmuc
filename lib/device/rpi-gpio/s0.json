@@ -8,8 +8,8 @@
         {
             "description": "Raspberry Pi Input",
             "driver": "rpi-gpio",
-            "address": "pin:<pin>",
-            "settings": "mode:DIGITAL_INPUT,pullResistance:PULL_DOWN,counter:true"
+            "address": "<pin>",
+            "settings": "mode=DIGITAL_INPUT;pullResistance=PULL_DOWN;counter=true"
         }
     ],
 
@@ -72,7 +72,7 @@
             "name": "<node>*energy",
             "description": "S0 pulse counter",
             "settings": "<impulses>",
-            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000},
             "configs": {"samplingInterval": "<refresh>", "valueType":"DOUBLE"},
             "processList": [
                 {

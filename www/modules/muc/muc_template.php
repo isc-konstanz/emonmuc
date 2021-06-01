@@ -46,6 +46,9 @@ class MucTemplate extends DeviceTemplate {
     }
 
     public function get($type) {
+        if (preg_replace('/[^\p{N}\p{L}\-\_\/]/u', '', $type) != $type) {
+            return array('success'=>false, 'message'=>"Device type must only contain A-Z a-z 0-9 - _ / characters");
+        }
         $file = $this->get_dir().$type.".json";
         if (!file_exists($file)) {
             return array('success'=>false, 'message'=>"Error reading template $type: $file does not exist");
@@ -271,8 +274,8 @@ class MucTemplate extends DeviceTemplate {
                     return $result;
                 }
             }
-            catch(ControllerException $e) {
-                if (stristr($e->getMessage(), 'already exists') === false) {
+            catch(Exception $e) {
+                if (stristr(strtolower($e->getMessage()), '409 conflict') === false) {
                     return $e->getResult();
                 }
             }
@@ -298,8 +301,8 @@ class MucTemplate extends DeviceTemplate {
                 }
             }
             else {
-                $deviceid = $devices{0}->id;
-                $driverid = $devices{0}->driver;
+                $deviceid = $devices[0]->id;
+                $driverid = $devices[0]->driver;
             }
             try {
                 $result = $this->ctrl->channel($ctrl)->create($driverid, $deviceid, json_encode($configs));
@@ -308,7 +311,7 @@ class MucTemplate extends DeviceTemplate {
                 }
             }
             catch(ControllerException $e) {
-                if (stristr($e->getMessage(), 'already exists') === false) {
+                if (stristr(strtolower($e->getMessage()), '409 conflict') === false) {
                     return $e->getResult();
                 }
             }

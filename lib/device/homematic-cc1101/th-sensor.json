@@ -88,7 +88,7 @@
             "description": "Temperature",
             "address": "0001",
             "settings": "type:ATTRIBUTE",
-            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 900000, "loggingTolerance": 0.25, "average": true},
+            "logging": {"loggingInterval": 60000, "loggingDelayMaximum": 900000, "loggingTolerance": 0.25, "loggingAverage": true},
             "configs": {"samplingInterval": 60000, "valueType":"FLOAT", "unit":"°C"},
             "processList": [
                 {
@@ -102,7 +102,7 @@
             "description": "Humidity",
             "address": "0002",
             "settings": "type:ATTRIBUTE",
-            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 900000},
+            "logging": {"loggingInterval": 60000, "loggingDelayMaximum": 900000},
             "configs": {"samplingInterval": 60000, "valueType":"FLOAT", "unit":"%"},
             "processList": [
                 {
@@ -116,7 +116,7 @@
             "description": "Battery state",
             "address": "0003",
             "settings": "type:ATTRIBUTE",
-            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 900000},
+            "logging": {"loggingInterval": 60000, "loggingDelayMaximum": 900000},
             "configs": {"samplingInterval": 60000, "valueType":"FLOAT", "unit":"%"}
         }
     ],
