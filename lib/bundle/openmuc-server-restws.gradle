@@ -1,3 +1,6 @@
 dependencies {
-    bundle group: "org.openmuc.framework", name: "openmuc-server-restws", version: openmucVersion
+    bundle group: "org.openmuc", name: "openmuc-lib-osgi",      version: openmucVersion
+    bundle group: "org.openmuc", name: "openmuc-lib-ssl",       version: openmucVersion
+    bundle group: "org.openmuc", name: "openmuc-lib-rest",      version: openmucVersion
+    bundle group: "org.openmuc", name: "openmuc-server-restws", version: openmucVersion
 }

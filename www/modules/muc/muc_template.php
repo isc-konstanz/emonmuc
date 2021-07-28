@@ -15,7 +15,7 @@ require_once "Modules/device/device_template.php";
 require_once "Modules/muc/muc_model.php";
 
 class MucTemplate extends DeviceTemplate {
-    const DIR_DEFAULT = "/var/opt/emonmuc/";
+    const DIR_DEFAULT = "/opt/emonmuc";
 
     private $ctrl;
 
@@ -109,6 +109,9 @@ class MucTemplate extends DeviceTemplate {
         if (substr($muc_template_dir, -1) !== "/") {
             $muc_template_dir .= "/";
         }
+		if ($muc_template_dir == "/opt/emonmuc") {
+			$muc_template_dir .= "lib/"
+		}
         return $muc_template_dir."device/";
     }
 

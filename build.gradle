@@ -63,12 +63,12 @@ task downloadGitHub {
 
 task copyBundles(type: Sync) {
     from configurations.bundle;
-    into rootDir.getPath() + "/bundle"
+    into "/opt/openmuc/bundle"
 }
 
 task copyMain(type: Copy) {
     from configurations.main;
-    into rootDir.getPath() + "/bin"
+    into "/opt/openmuc/bin"
     rename (/org.apache.felix.main-.*jar/, "felix.jar")
 }
 
