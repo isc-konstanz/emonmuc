@@ -1,0 +1,5 @@
+dependencies {
+    bundle group: "org.openmuc", name: "openmuc-lib-sql",    version: openmucVersion
+    bundle group: "org.openmuc", name: "openmuc-driver",     version: openmucVersion
+    bundle group: "org.openmuc", name: "openmuc-driver-sql", version: openmucVersion
+}

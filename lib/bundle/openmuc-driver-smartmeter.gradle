@@ -8,9 +8,10 @@ repositories {
     }
 }
 
-github.add([group: "isc-konstanz", name: projectName, version: projectVersion])
-
-dependencies {
-    bundle group: "org.openmuc", name: "openmuc-driver-smartmeter", version: projectVersion
-    bundle group: "org.openmuc", name: "jrxtx",                     version: "1.0.1"
-}
+//github.add([group: "isc-konstanz", name: projectName, version: projectVersion])
+//
+//dependencies {
+//    bundle group: "org.openmuc", name: "openmuc-driver-smartmeter", version: projectVersion
+//    bundle group: "org.openmuc", name: "jrxtx",                     version: "1.0.1"
+//}
+printl "WARNING: OpenSmartMeter Driver temporarily unavailable"
