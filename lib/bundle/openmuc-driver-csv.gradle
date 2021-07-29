@@ -1,3 +1,4 @@
 dependencies {
+    bundle group: "org.openmuc", name: "openmuc-driver",     version: openmucVersion
     bundle group: "org.openmuc", name: "openmuc-driver-csv", version: openmucVersion
 }

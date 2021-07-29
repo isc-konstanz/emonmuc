@@ -8,8 +8,9 @@ repositories {
     }
 }
 
-github.add([group: "isc-konstanz", name: projectName, version: projectVersion])
-
-dependencies {
-    bundle group: "org.openmuc", name: "openmuc-driver-pcharge", version: projectVersion
-}
+//github.add([group: "isc-konstanz", name: projectName, version: projectVersion])
+//
+//dependencies {
+//    bundle group: "org.openmuc", name: "openmuc-driver-pcharge", version: projectVersion
+//}
+printl "WARNING: OpenPCharge Driver temporarily unavailable"

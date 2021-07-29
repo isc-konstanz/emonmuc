@@ -1,0 +1,345 @@
+{
+    "name": "CBP 015+1",
+    "category": "EVSE",
+    "group": "chargeBIG",
+    "description": "Requires the <b>OPC UA</b> driver to be installed.",
+
+    "devices": [
+        {
+            "name": "<node>",
+            "description": "chargeBIG OPC UA server",
+            "driver": "opcua",
+            "address": "<address>",
+            "settings": "ns=1"
+        }
+    ],
+
+    "options": [
+        {
+            "id": "address",
+            "name": "Server address",
+            "description": "The address to the OPC server, e.g. 192.168.178.48:4840/opc.",
+            "type": "text",
+            "mandatory": true
+        },
+        {
+            "id": "current-min",
+            "name": "Minimum phase current",
+            "description": "The minimum current allowed on a phase",
+            "type": "text",
+            "default": 8,
+            "mandatory": false
+        },
+        {
+            "id": "current-max",
+            "name": "Maximum phase current",
+            "description": "The maximum current allowed on a phase",
+            "type": "text",
+            "default": 200,
+            "mandatory": false
+        },
+        {
+            "id": "refresh",
+            "name": "Refresh interval",
+            "description": "Defines at which interval the values will be read.",
+            "type": "selection",
+            "select": [
+                { "name": "1 second", "value": 1000 },
+                { "name": "2 seconds", "value": 2000 },
+                { "name": "3 seconds", "value": 3000 },
+                { "name": "4 seconds", "value": 4000 },
+                { "name": "5 seconds", "value": 5000 },
+                { "name": "10 seconds", "value": 10000 },
+                { "name": "15 seconds", "value": 15000 },
+                { "name": "20 seconds", "value": 20000 },
+                { "name": "25 seconds", "value": 25000 },
+                { "name": "30 seconds", "value": 30000 },
+                { "name": "35 seconds", "value": 35000 },
+                { "name": "40 seconds", "value": 40000 },
+                { "name": "45 seconds", "value": 45000 },
+                { "name": "50 seconds", "value": 50000 },
+                { "name": "55 seconds", "value": 55000 },
+                { "name": "1 minute",  "value": 60000 },
+                { "name": "2 minutes", "value": 120000 },
+                { "name": "3 minutes", "value": 180000 },
+                { "name": "4 minutes", "value": 240000 },
+                { "name": "5 minutes", "value": 300000 },
+                { "name": "10 minutes", "value": 600000 },
+                { "name": "15 minutes", "value": 900000 }
+            ],
+            "default": 5000,
+            "mandatory": false
+        }
+    ],
+
+    "items": [
+        {
+            "id": "l1",
+            "type": "Text",
+            "label": "Phase 1",
+            "format": "%.1f kW",
+            "scale": 0.001,
+            "input": "<node>*l1*power"
+        },
+        {
+            "id": "l2",
+            "type": "Text",
+            "label": "Phase 2",
+            "format": "%.1f kW",
+            "scale": 0.001,
+            "input": "<node>*l2*power"
+        },
+        {
+            "id": "l3",
+            "type": "Text",
+            "label": "Phase 3",
+            "format": "%.1f kW",
+            "scale": 0.001,
+            "input": "<node>*l3*power"
+        },
+        {
+            "id": "setpoint",
+            "type": "Slider",
+            "label": "Setpoint per Phase  ",
+            "format": "%.1f A",
+            "step": 1,
+            "min": "<current-min>",
+            "max": "<current-max>",
+            "default": "<current-max>",
+            "mapping": {
+                "SET": { "channel": "<node>*setpoint" }
+            },
+            "input": "<node>*setpoint"
+        }
+    ],
+
+    "channels": [
+        {
+            "name": "<node>*setpoint*enabled",
+            "description": "Setpoint enabled",
+            "address": "Summen_Grenzwert_aktiv",
+            "configs": {"samplingInterval": "<refresh>", "valueType": "BOOLEAN"}
+        },
+        {
+            "name": "<node>*setpoint",
+            "description": "Setpoint",
+            "address": "Sollwert_aktiv",
+            "configs": {"samplingInterval": "<refresh>", "valueType": "DOUBLE", "unit": "A"},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000, "engine":"SQL",
+                "feed": {"name": "Setpoint", "tag": "<name>"}
+            }
+        },
+        {
+            "name": "<node>*l1*power",
+            "description": "Phase 1 power",
+            "address": "Z\u00e4hler_Leistung_Phase1",
+            "configs": {"samplingInterval": "<refresh>", "valueType": "DOUBLE", "unit": "W"},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000, "loggingTolerance": 10, "loggingAverage": true, "engine":"SQL",
+                "feed": {"name": "Power", "tag": "<name> L1"}
+            }
+        },
+        {
+            "name": "<node>*l2*power",
+            "description": "Phase 2 power",
+            "address": "Z\u00e4hler_Leistung_Phase2",
+            "configs": {"samplingInterval": "<refresh>", "valueType": "DOUBLE", "unit": "W"},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000, "loggingTolerance": 10, "loggingAverage": true, "engine":"SQL",
+                "feed": {"name": "Power", "tag": "<name> L2"}
+            }
+        },
+        {
+            "name": "<node>*l3*power",
+            "description": "Phase 3 power",
+            "address": "Z\u00e4hler_Leistung_Phase3",
+            "configs": {"samplingInterval": "<refresh>", "valueType": "DOUBLE", "unit": "W"},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000, "loggingTolerance": 10, "loggingAverage": true, "engine":"SQL",
+                "feed": {"name": "Power", "tag": "<name> L3"}
+            }
+        },
+        {
+            "name": "<node>*l1*cos*phi",
+            "description": "Phase 1 cos phi",
+            "address": "Z\u00e4hler_CosPhi_Phase1",
+            "configs": {"samplingInterval": "<refresh>", "valueType": "DOUBLE"},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000, "loggingTolerance": 0.001, "loggingAverage": true, "engine":"SQL",
+                "feed": {"name": "Cos phi", "tag": "<name> L1"}
+            }
+        },
+        {
+            "name": "<node>*l2*cos*phi",
+            "description": "Phase 2 cos phi",
+            "address": "Z\u00e4hler_CosPhi_Phase2",
+            "configs": {"samplingInterval": "<refresh>", "valueType": "DOUBLE"},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000, "loggingTolerance": 0.001, "loggingAverage": true, "engine":"SQL",
+                "feed": {"name": "Cos phi", "tag": "<name> L2"}
+            }
+        },
+        {
+            "name": "<node>*l3*cos*phi",
+            "description": "Phase 3 cos phi",
+            "address": "Z\u00e4hler_CosPhi_Phase3",
+            "configs": {"samplingInterval": "<refresh>", "valueType": "DOUBLE"},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000, "loggingTolerance": 0.001, "loggingAverage": true, "engine":"SQL",
+                "feed": {"name": "Cos phi", "tag": "<name> L3"}
+            }
+        },
+        {
+            "name": "<node>*l1*energy",
+            "description": "Phase 1 energy",
+            "address": "Z\u00e4hler_Energiebezug_Phase1",
+            "configs": {"samplingInterval": "<refresh>", "valueType": "DOUBLE", "unit": "kWh"},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000, "engine":"SQL",
+                "feed": {"name": "Energy", "tag": "<name> L1"}
+            }
+        },
+        {
+            "name": "<node>*l2*energy",
+            "description": "Phase 2 energy",
+            "address": "Z\u00e4hler_Energiebezug_Phase2",
+            "configs": {"samplingInterval": "<refresh>", "valueType": "DOUBLE", "unit": "kWh"},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000, "engine":"SQL",
+                "feed": {"name": "Energy", "tag": "<name> L2"}
+            }
+        },
+        {
+            "name": "<node>*l3*energy",
+            "description": "Phase 3 energy",
+            "address": "Z\u00e4hler_Energiebezug_Phase3",
+            "configs": {"samplingInterval": "<refresh>", "valueType": "DOUBLE", "unit": "kWh"},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000, "engine":"SQL",
+                "feed": {"name": "Energy", "tag": "<name> L3"}
+            }
+        },
+        {
+            "name": "<node>*l1*current",
+            "description": "Phase 1 current",
+            "address": "Z\u00e4hler_Strom_Phase1",
+            "configs": {"samplingInterval": "<refresh>", "valueType": "DOUBLE", "unit": "A"},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000, "loggingTolerance": 10, "loggingAverage": true, "engine":"SQL",
+                "feed": {"name": "Current", "tag": "<name> L1"}
+            }
+        },
+        {
+            "name": "<node>*l2*current",
+            "description": "Phase 2 current",
+            "address": "Z\u00e4hler_Strom_Phase2",
+            "configs": {"samplingInterval": "<refresh>", "valueType": "DOUBLE", "unit": "A"},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000, "loggingTolerance": 10, "loggingAverage": true, "engine":"SQL",
+                "feed": {"name": "Current", "tag": "<name> L2"}
+            }
+        },
+        {
+            "name": "<node>*l3*current",
+            "description": "Phase 3 current",
+            "address": "Z\u00e4hler_Strom_Phase3",
+            "configs": {"samplingInterval": "<refresh>", "valueType": "DOUBLE", "unit": "A"},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000, "loggingTolerance": 10, "loggingAverage": true, "engine":"SQL",
+                "feed": {"name": "Current", "tag": "<name> L3"}
+            }
+        }
+    ],
+
+    "feeds": [
+        {
+            "name": "Setpoint",
+            "tag": "<name>",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::MYSQL",
+            "table": "<node>_setpoint",
+            "unit": "A"
+        },
+        {
+            "name": "Power",
+            "tag": "<name> L1",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::MYSQL",
+            "table": "<node>_l1_power",
+            "unit": "W"
+        },
+        {
+            "name": "Power",
+            "tag": "<name> L2",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::MYSQL",
+            "table": "<node>_l2_power",
+            "unit": "W"
+        },
+        {
+            "name": "Power",
+            "tag": "<name> L3",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::MYSQL",
+            "table": "<node>_l3_power",
+            "unit": "W"
+        },
+        {
+            "name": "Cos phi",
+            "tag": "<name> L1",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::MYSQL",
+            "table": "<node>_l1_cos_phi"
+        },
+        {
+            "name": "Cos phi",
+            "tag": "<name> L2",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::MYSQL",
+            "table": "<node>_l2_cos_phi"
+        },
+        {
+            "name": "Cos phi",
+            "tag": "<name> L3",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::MYSQL",
+            "table": "<node>_l3_cos_phi"
+        },
+        {
+            "name": "Energy",
+            "tag": "<name> L1",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::MYSQL",
+            "table": "<node>_l1_energy",
+            "unit": "kWh"
+        },
+        {
+            "name": "Energy",
+            "tag": "<name> L2",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::MYSQL",
+            "table": "<node>_l2_energy",
+            "unit": "kWh"
+        },
+        {
+            "name": "Energy",
+            "tag": "<name> L3",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::MYSQL",
+            "table": "<node>_l3_energy",
+            "unit": "kWh"
+        },
+        {
+            "name": "Current",
+            "tag": "<name> L1",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::MYSQL",
+            "table": "<node>_l1_current",
+            "unit": "A"
+        },
+        {
+            "name": "Current",
+            "tag": "<name> L2",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::MYSQL",
+            "table": "<node>_l2_current",
+            "unit": "A"
+        },
+        {
+            "name": "Current",
+            "tag": "<name> L3",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::MYSQL",
+            "table": "<node>_l3_current",
+            "unit": "A"
+        }
+    ]
+}

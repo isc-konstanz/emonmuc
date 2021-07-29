@@ -41,7 +41,7 @@ else {
 try {
     $ctrl->create($userid, 'http', 'Local', '', '{"address":"'.$address.'","port":'.$port.'}');
     
-    if (!is_writable($root.'/conf') || (is_file($root.'/conf/emoncms.conf') && !is_writable($root.'/conf/emoncms.conf'))) {
+    if (!is_writable('/openmuc/conf') || (is_file('/openmuc/conf/emoncms.conf') && !is_writable('/openmuc/conf/emoncms.conf'))) {
         echo "Unable to edit emoncms configution file in ".$root."/conf\n"; die;
     }
     if (isset($options['c']) || isset($options['config'])) {
@@ -59,7 +59,7 @@ try {
     $contents = str_replace(';address = http://localhost/emoncms/', 'address = '.$url, $contents);
     $contents = str_replace(';authorization = WRITE', 'authorization = WRITE', $contents);
     $contents = str_replace(';authentication = <apikey>', 'authentication = '.$apikey, $contents);
-    file_put_contents($root.'/conf/emoncms.conf', $contents);
+    file_put_contents('/openmuc/conf/emoncms.conf', $contents);
 }
 catch(Exception $e) {
     echo "Unable to register controller for user $userid: ".$e->getMessage()."\n";

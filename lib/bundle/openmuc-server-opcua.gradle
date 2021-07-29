@@ -1,0 +1,4 @@
+dependencies {
+    bundle group: "org.openmuc.framework", name: "openmuc-server",       version: openmucVersion
+    bundle group: "org.openmuc.framework", name: "openmuc-server-opcua", version: openmucVersion
+}

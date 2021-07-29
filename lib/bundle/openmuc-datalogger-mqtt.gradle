@@ -1,0 +1,5 @@
+dependencies {
+    bundle group: "org.openmuc", name: "openmuc-lib-mqtt",        version: openmucVersion
+    bundle group: "org.openmuc", name: "openmuc-lib-osgi",        version: openmucVersion
+    bundle group: "org.openmuc", name: "openmuc-datalogger-mqtt", version: openmucVersion
+}

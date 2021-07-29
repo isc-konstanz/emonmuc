@@ -33,7 +33,7 @@
             "name": "<node>*pv",
             "description": "Photovoltaic generation power",
             "address": "pv_power_production",
-            "logging": {"loggingInterval": 5000, "loggingMaxInterval": 60000},
+            "logging": {"loggingInterval": 5000, "loggingDelayMaximum": 60000},
             "configs": {"samplingInterval": 5000, "valueType":"DOUBLE", "unit": "kW"},
             "processList": [
                 {
@@ -54,7 +54,7 @@
             "name": "<node>*grid",
             "description": "Grid power",
             "address": "grid_power",
-            "logging": {"loggingInterval": 5000, "loggingMaxInterval": 60000},
+            "logging": {"loggingInterval": 5000, "loggingDelayMaximum": 60000},
             "configs": {"samplingInterval": 5000, "valueType":"DOUBLE", "unit": "kW"},
             "processList": [
                 {
@@ -99,7 +99,7 @@
             "name": "<node>*consumption",
             "description": "Consumption power",
             "address": "grid_power",
-            "logging": {"loggingInterval": 5000, "loggingTimeOffset": 1000, "loggingMaxInterval": 60000},
+            "logging": {"loggingInterval": 5000, "loggingTimeOffset": 1000, "loggingDelayMaximum": 60000},
             "configs": {"samplingInterval": 5000, "samplingTimeOffset": 1000, "valueType":"DOUBLE", "unit": "kW"},
             "processList": [
                 {
@@ -128,7 +128,7 @@
             "name": "<node>*hp",
             "description": "Heat pump consumption",
             "address": "hp_power_consumption",
-            "logging": {"loggingInterval": 5000, "loggingMaxInterval": 60000},
+            "logging": {"loggingInterval": 5000, "loggingDelayMaximum": 60000},
             "configs": {"samplingInterval": 5000, "valueType":"DOUBLE", "unit": "kW"},
             "processList": [
                 {
@@ -149,7 +149,7 @@
             "name": "<node>*ev",
             "description": "Electric vehicle consumption",
             "address": "ev_power_consumption",
-            "logging": {"loggingInterval": 5000, "loggingMaxInterval": 60000},
+            "logging": {"loggingInterval": 5000, "loggingDelayMaximum": 60000},
             "configs": {"samplingInterval": 5000, "valueType":"DOUBLE", "unit": "kW"},
             "processList": [
                 {

@@ -135,7 +135,7 @@
         {
             "name": "<node>*power*import",
             "address": "1.7.0",
-            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000 },
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000 },
             "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "scalingFactor": 1000, "valueType":"DOUBLE", "unit": "W"},
             "processList": [
                 {
@@ -147,7 +147,7 @@
         {
             "name": "<node>*power*export",
             "address": "2.7.0",
-            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000 },
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000 },
             "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "scalingFactor": 1000, "valueType":"DOUBLE", "unit": "W"},
             "processList": [
                 {
@@ -159,7 +159,7 @@
         {
             "name": "<node>*energy*import",
             "address": "1.8.0",
-            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000 },
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000 },
             "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"DOUBLE", "unit": "kWh"},
             "processList": [
                 {
@@ -171,7 +171,7 @@
         {
             "name": "<node>*energy*export",
             "address": "2.8.0",
-            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000 },
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000 },
             "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"DOUBLE", "unit": "kWh"},
             "processList": [
                 {
@@ -183,7 +183,7 @@
         {
             "name": "<node>*voltage*l1",
             "address": "32.7.0",
-            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "loggingTolerance": 0.01, "average": true },
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000, "loggingTolerance": 0.01, "loggingAverage": true },
             "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"DOUBLE", "unit": "V"},
             "processList": [
                 {
@@ -195,7 +195,7 @@
         {
             "name": "<node>*voltage*l2",
             "address": "52.7.0",
-            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "loggingTolerance": 0.01, "average": true },
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000, "loggingTolerance": 0.01, "loggingAverage": true },
             "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"DOUBLE", "unit": "V"},
             "processList": [
                 {
@@ -207,7 +207,7 @@
         {
             "name": "<node>*voltage*l3",
             "address": "72.7.0",
-            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "loggingTolerance": 0.01, "average": true },
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000, "loggingTolerance": 0.01, "loggingAverage": true },
             "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"DOUBLE", "unit": "V"},
             "processList": [
                 {

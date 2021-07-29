@@ -1,0 +1,17 @@
+[Unit]
+Description=Multi Utility Communication controller
+After=network.target
+
+[Service]
+User=pi
+Group=pi
+Type=forking
+Restart=always
+RestartSec=60s
+ExecStart=/usr/bin/bash /opt/openmuc/bin/openmuc start
+ExecReload=/usr/bin/bash /opt/openmuc/bin/openmuc reload
+ExecStop=/usr/bin/bash /opt/openmuc/bin/openmuc stop
+WorkingDirectory=/opt/openmuc
+
+[Install]
+WantedBy=multi-user.target

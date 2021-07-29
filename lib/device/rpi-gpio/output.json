@@ -8,8 +8,8 @@
         {
             "description": "Raspberry Pi Output",
             "driver": "rpi-gpio",
-            "address": "pin:<pin>",
-            "settings": "mode:DIGITAL_OUTPUT"
+            "address": "<pin>",
+            "settings": "mode=DIGITAL_OUTPUT"
         }
     ],
 
@@ -74,7 +74,7 @@
         {
             "name": "<node>*state",
             "description": "Pin state",
-            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 60000},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 60000},
             "configs": {"samplingInterval": "<refresh>", "valueType":"BOOLEAN"},
             "processList": [
                 {

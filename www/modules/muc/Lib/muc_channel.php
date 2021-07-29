@@ -225,15 +225,27 @@ abstract class ControllerChannel {
         $configs = (array) $details['configs'];
         $logging = array();
         if (isset($configs)) {
-            if (isset($configs['loggingInterval'])) $logging['loggingInterval'] = $configs['loggingInterval'];
-            if (isset($configs['loggingTimeOffset'])) $logging['loggingTimeOffset'] = $configs['loggingTimeOffset'];
-            
+            if (isset($configs['loggingInterval'])) {
+                $logging['loggingInterval'] = $configs['loggingInterval']; unset($configs['loggingInterval']);
+            }
+            if (isset($configs['loggingDelayMaximum'])) {
+                $logging['loggingDelayMaximum'] = $configs['loggingDelayMaximum']; unset($configs['loggingDelayMaximum']);
+            }
+            if (isset($configs['loggingTimeOffset'])) {
+                $logging['loggingTimeOffset'] = $configs['loggingTimeOffset']; unset($configs['loggingTimeOffset']);
+            }
+            if (isset($configs['loggingTolerance'])) {
+                $logging['loggingTolerance'] = $configs['loggingTolerance']; unset($configs['loggingTolerance']);
+            }
+            if (isset($configs['loggingAverage'])) {
+                $logging['loggingAverage'] = $configs['loggingAverage']; unset($configs['loggingAverage']);
+            }
             if(isset($configs['loggingSettings'])) {
-                $str = $configs['loggingSettings'];
-                if (strpos($str, ':') !== false) {
+                $str = str_replace('emonlogger:', '', $configs['loggingSettings']);
+                if (strpos($str, '=') !== false) {
                     $parameters = explode(',', $str);
                     foreach ($parameters as $parameter) {
-                        $keyvalue = explode(':', $parameter);
+                        $keyvalue = explode('=', $parameter);
                         $logging[$keyvalue[0]] = $keyvalue[1];
                     }
                 }
@@ -258,18 +270,14 @@ abstract class ControllerChannel {
             $channel['description'] = '';
         }
         
-        if (isset($configs['channelAddress'])) {
-            $channel['address'] = $configs['channelAddress'];
-            
-            unset($configs['channelAddress']);
+        if (isset($configs['address'])) {
+            $channel['address'] = $configs['address']; unset($configs['address']);
         }
         else {
             $channel['address'] = '';
         }
-        if (isset($configs['channelSettings'])) {
-            $channel['settings'] = $configs['channelSettings'];
-            
-            unset($configs['channelSettings']);
+        if (isset($configs['settings'])) {
+            $channel['settings'] = $configs['settings']; unset($configs['settings']);
         }
         else {
             $channel['settings'] = '';
@@ -352,9 +360,6 @@ abstract class ControllerChannel {
         
         if (isset($logging['inputid'])) $settings['inputid'] = $logging['inputid'];
         if (isset($logging['feedid'])) $settings['feedid'] = $logging['feedid'];
-        if (isset($logging['loggingMaxInterval'])) $settings['loggingMaxInterval'] = $logging['loggingMaxInterval'];
-        if (isset($logging['loggingTolerance'])) $settings['loggingTolerance'] = $logging['loggingTolerance'];
-        if (isset($logging['average'])) $settings['average'] = $logging['average'];
         
         return $settings;
     }
@@ -392,9 +397,16 @@ abstract class ControllerChannel {
         $configs = array('options'=>array());
         $logging = array('options'=>array());
         foreach($info['configs']['options'] as $option) {
-            if ($option['id'] == 'loggingTimeOffset' ||
-                $option['id'] == 'loggingInterval') {
-				if ($option['id'] == 'loggingInterval') {
+            if ($option['id'] == 'loggingInterval' ||
+                $option['id'] == 'loggingDelayMaximum' ||
+                $option['id'] == 'loggingTimeOffset' ||
+                $option['id'] == 'loggingTolerance' ||
+                $option['id'] == 'loggingAverage' ||
+                $option['id'] == 'loggingEvent') {
+                
+                if ($option['id'] == 'loggingInterval' ||
+                    $option['id'] == 'loggingDelayMaximum') {
+                    
 					$option['valueSelection'] = $times;
 				}
 				$option['name'] = str_replace('Logging', 'Post', $option['name']);
@@ -409,34 +421,23 @@ abstract class ControllerChannel {
 			}
         }
         $logging['options'][] = array(
-            'id'=>'loggingMaxInterval',
-            'name'=>'Post interval maximum',
-            'description'=>'Dynamically post records only on changed values, up until to a maximum amount of time.',
-            'type'=>'INTEGER',
-            'mandatory'=>false,
-            'valueSelection'=>$times
-        );
-        $logging['options'][] = array(
-            'id'=>'loggingTolerance',
-            'name'=>'Posting tolerance',
-            'description'=>'Value change tolerance for dynamically logged records.',
-            'type'=>'DOUBLE',
-            'mandatory'=>false,
-        );
-        $logging['options'][] = array(
-            'id'=>'average',
-            'name'=>'Average',
-            'description'=>'Average sampled values, if the logging interval is larger than its sampling interval.',
-            'type'=>'BOOLEAN',
-            'mandatory'=>false,
-            'valueDefault'=>false
-        );
-        $logging['options'][] = array(
             'id'=>'nodeid',
             'name'=>'Node',
             'description'=>'The node to post channel records to.',
             'type'=>'STRING',
             'mandatory'=>false
+        );
+        $inputs = array();
+        foreach ($this->input()->get_list($this->ctrl['userid']) as $input) {
+            $inputs[$input['id']] = $input['nodeid'].': '.$input['name'];
+        }
+        $logging['options'][] = array(
+            'id'=>'inputid',
+            'name'=>'Input',
+            'description'=>'The input, corresponding to the channel.',
+            'type'=>'INTEGER',
+            'mandatory'=>false,
+            'valueSelection'=>$inputs
         );
         $feeds = array();
         foreach ($this->feed()->get_user_feeds($this->ctrl['userid']) as $feed) {
@@ -516,16 +517,29 @@ abstract class ControllerChannel {
         );
         if ($description != '') $configs['description'] = $description;
         
-        if (isset($channel['address'])) $configs['channelAddress'] = $channel['address'];
-        if (isset($channel['settings'])) $configs['channelSettings'] = $channel['settings'];
-        if (!empty($logging)) {
-            $configs['loggingSettings'] = $this->encode_logging($logging);
-        }
+        if (isset($channel['address'])) $configs['address'] = $channel['address'];
+        if (isset($channel['settings'])) $configs['settings'] = $channel['settings'];
         if (isset($channel['logging'])) {
             $logging = (array) $channel['logging'];
-            if (isset($logging['loggingInterval'])) $configs['loggingInterval'] = $logging['loggingInterval'];
-            if (isset($logging['loggingTimeOffset'])) $configs['loggingTimeOffset'] = $logging['loggingTimeOffset'];
+            if (isset($logging['loggingInterval'])) {
+                $configs['loggingInterval'] = $logging['loggingInterval']; unset($logging['loggingInterval']);
+            }
+            if (isset($logging['loggingDelayMaximum'])) {
+                $configs['loggingDelayMaximum'] = $logging['loggingDelayMaximum']; unset($logging['loggingDelayMaximum']);
+            }
+            if (isset($logging['loggingTimeOffset'])) {
+                $configs['loggingTimeOffset'] = $logging['loggingTimeOffset']; unset($logging['loggingTimeOffset']);
+            }
             
+            if (!empty($logging)) {
+                $configs['loggingSettings'] = $this->encode_logging($logging);
+            }
+            if (isset($logging['loggingTolerance'])) {
+                $configs['loggingTolerance'] = $logging['loggingTolerance']; unset($logging['loggingTolerance']);
+            }
+            if (isset($logging['loggingAverage'])) {
+                $configs['loggingAverage'] = $logging['loggingAverage']; unset($logging['loggingAverage']);
+            }
         }
         if (isset($channel['configs'])) $configs = array_merge($configs, $channel['configs']);
         if (isset($channel['disabled'])) $configs['disabled'] = $channel['disabled'];
@@ -542,8 +556,8 @@ abstract class ControllerChannel {
             else if (is_numeric($value)) {
                 $value = str_replace(',', '.', strval($value));
             }
-            $arr[] = $key.':'.$value;
+            $arr[] = $key.'='.$value;
         }
-        return implode(",", $arr);
+        return 'emonlogger:'.implode(",", $arr);
     }
 }

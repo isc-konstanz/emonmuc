@@ -194,16 +194,14 @@ abstract class ControllerDevice {
             $device['description'] = '';
         }
         
-        if (isset($configs['deviceAddress'])) {
-            $device['address'] = $configs['deviceAddress'];
-            unset($configs['deviceAddress']);
+        if (isset($configs['address'])) {
+            $device['address'] = $configs['address']; unset($configs['address']);
         }
         else {
             $device['address'] = '';
         }
         if (isset($configs['settings'])) {
-            $device['settings'] = $configs['settings'];
-            unset($configs['settings']);
+            $device['settings'] = $configs['settings']; unset($configs['settings']);
         }
         else {
             $device['settings'] = '';
@@ -231,7 +229,7 @@ abstract class ControllerDevice {
             'id' => $id
         );
         if (isset($device['description'])) $configs['description'] = $device['description'];
-        if (isset($device['address'])) $configs['deviceAddress'] = $device['address'];
+        if (isset($device['address'])) $configs['address'] = $device['address'];
         if (isset($device['settings'])) $configs['settings'] = $device['settings'];
         if (isset($device['configs'])) $configs = array_merge($configs, $device['configs']);
         if (isset($device['disabled'])) $configs['disabled'] = $device['disabled'];

@@ -123,7 +123,7 @@
             "name": "<node>*energy",
             "description": "Energy",
             "address": "06:fd61",
-            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000},
             "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "scalingFactor": 0.01, "valueType":"DOUBLE", "unit": "kWh"},
             "processList": [
                 {
