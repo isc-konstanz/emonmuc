@@ -32,7 +32,7 @@ To install the whole system, including a LAMP server and related packages, redis
 To start the installation process, simply execute the initialization:
 
 ~~~
-wget -O - https://raw.githubusercontent.com/isc-konstanz/EmonScripts/isc/install/init.sh | bash
+wget -O - https://raw.githubusercontent.com/isc-konstanz/emonscripts/isc/install/init.sh | bash
 ~~~
 
 With both components installed and running, the OpenMUC framework needs to be registered to the emoncms user. This can be done in the **Controllers** page, accessible from the **Setup** cogwheel menu item.
@@ -54,8 +54,8 @@ For the framework to be able to post values to emoncms, a few parameters are nec
 Defaults for all parameters can be found in ``emoncms.default.conf``. 
 
 ~~~
-cp /opt/emonmuc/conf/emoncms.default.conf /opt/emonmuc/conf/emoncms.conf
-nano /opt/emonmuc/conf/emoncms.conf
+cp /opt/emonmuc/conf/emoncms.default.conf /opt/openmuc/conf/emoncms.conf
+nano /opt/openmuc/conf/emoncms.conf
 ~~~
 
 - The web servers location may be changed. By default, it is commented and points to an emoncms sever at http://localhost/emoncms/, e.g. VPN addresses or the remote [emoncms.org](https://emoncms.org) server can be a valid selection though.
@@ -77,7 +77,7 @@ nano /opt/emonmuc/conf/emoncms.conf
 After changing any of the configurations, a restart of the framework is currently still necessary for the changes to take effect
 
 ~~~
-sudo systemctl restart emonmuc
+sudo systemctl restart openmuc
 ~~~
 
 
@@ -99,14 +99,19 @@ emonmuc remove csv
 Several drivers can be enabled at once, while each needs to be selected individually. A list of possible integrated drivers are:
 
   - **csv**: Read CSV files
+  - **amqp**: [AMQP](https://www.openmuc.org/openmuc/user-guide/#_amqp)
   - **dlms**: [DLMS/COSEM](https://www.openmuc.org/openmuc/user-guide/#_dlmscosem)
   - **homematic-cc1101**: [HomeMatic (CC1101)](https://github.com/isc-konstanz/OpenHomeMatic)
   - **iec60870**: [IEC 60870-5-104](https://www.openmuc.org/openmuc/user-guide/#_iec_60870_5_104)
   - **iec61850**: [IEC 61850](https://www.openmuc.org/openmuc/user-guide/#_iec_61850)
+  - **iec62056p21**: [IEC 62056 part 21](https://www.openmuc.org/openmuc/user-guide/#_iec_62056_part_21)
   - **knx**: [KNX](https://www.openmuc.org/openmuc/user-guide/#_knx)
   - **mbus**: [M-Bus (Wired)](https://www.openmuc.org/openmuc/user-guide/#_m_bus_wired)
   - **wmbus**: [M-Bus (Wireless)](https://www.openmuc.org/openmuc/user-guide/#_m_bus_wireless)
   - **modbus**: [Modbus (RTU and TCP/IP)](https://www.openmuc.org/openmuc/user-guide/#_modbus)
+  - **mqtt**: [MQTT)](https://www.openmuc.org/openmuc/user-guide/#_mqtt)
+  - **mysql**: MySQL
+  - **opcua**: OPC UA
   - **pcharge**: [P-CHARGE](https://github.com/isc-konstanz/OpenPCharge)
   - **rpi-gpio**: GPIO (Raspberry Pi)
   - **rpi-w1**: 1-Wire (Raspberry Pi)
@@ -119,7 +124,7 @@ Details about drivers and specific information about their usage and configurati
 As prompted after installing one or several drivers, a restart of the framework is currently still necessary for the changes to take effect
 
 ~~~
-sudo systemctl restart emonmuc
+sudo systemctl restart openmuc
 ~~~
 
 
