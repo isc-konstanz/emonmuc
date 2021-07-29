@@ -48,6 +48,9 @@ try {
         $config = isset($options['c']) ? $options['c'] : $options['config'];
     }
     else {
+        $config = '/opt/openmuc/conf/emoncms.conf';
+    }
+    if (!is_file($config)) {
         $config = $root.'/conf/emoncms.default.conf';
     }
     if (!is_file($config)) {
