@@ -8,15 +8,17 @@ repositories {
     }
 }
 
-github.add([group: "isc-konstanz", name: projectName, version: projectVersion])
+//github.add([group: "isc-konstanz", name: projectName, version: projectVersion])
+//
+//dependencies {
+//    bundle group: "org.openmuc", name: "openmuc-app-pcharge", version: projectVersion
+//}
+//
+//task copyConfigs(type: Copy) {
+//    from tempDir + "/" + projectName + "/conf"
+//    into rootDir.getPath() + "/conf"
+//}
+//
+//bundles.dependsOn copyConfigs
 
-dependencies {
-    bundle group: "org.openmuc", name: "openmuc-app-pcharge", version: projectVersion
-}
-
-task copyConfigs(type: Copy) {
-    from tempDir + "/" + projectName + "/conf"
-    into rootDir.getPath() + "/conf"
-}
-
-bundles.dependsOn copyConfigs
+printl "WARNING: OpenPCharge Application temporarily unavailable"

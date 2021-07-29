@@ -76,7 +76,7 @@
             "description": "Plug State",
             "address": "0001",
             "settings": "type:ATTRIBUTE",
-            "logging": {"loggingInterval": 5000, "loggingMaxInterval": 180000},
+            "logging": {"loggingInterval": 5000, "loggingDelayMaximum": 180000},
             "configs": {"samplingInterval": 5000, "valueType":"BOOLEAN"},
             "processList": [
                 {
@@ -90,7 +90,7 @@
             "description": "Plug Energy",
             "address": "0006",
             "settings": "type:ATTRIBUTE",
-            "logging": {"loggingInterval": 5000, "loggingMaxInterval": 180000},
+            "logging": {"loggingInterval": 5000, "loggingDelayMaximum": 180000},
             "configs": {"samplingInterval": 5000, "valueType":"FLOAT", "unit":"kWh"},
             "processList": [
                 {
@@ -104,7 +104,7 @@
             "description": "Plug Power",
             "address": "0004",
             "settings": "type:ATTRIBUTE",
-            "logging": {"loggingInterval": 5000, "loggingMaxInterval": 180000},
+            "logging": {"loggingInterval": 5000, "loggingDelayMaximum": 180000},
             "configs": {"samplingInterval": 5000, "valueType":"FLOAT", "unit":"W"},
             "processList": [
                 {
@@ -118,7 +118,7 @@
             "description": "Plug Current",
             "address": "0002",
             "settings": "type:ATTRIBUTE",
-            "logging": {"loggingInterval": 5000, "loggingMaxInterval": 180000},
+            "logging": {"loggingInterval": 5000, "loggingDelayMaximum": 180000},
             "configs": {"samplingInterval": 5000, "valueType":"FLOAT", "scalingFactor": 0.001, "unit":"A"},
             "processList": [
                 {
@@ -132,7 +132,7 @@
             "description": "Plug Voltage",
             "address": "0003",
             "settings": "type:ATTRIBUTE",
-            "logging": {"loggingInterval": 5000, "loggingMaxInterval": 180000, "loggingTolerance": 1, "average": true},
+            "logging": {"loggingInterval": 5000, "loggingDelayMaximum": 180000, "loggingTolerance": 1, "loggingAverage": true},
             "configs": {"samplingInterval": 5000, "valueType":"FLOAT", "unit":"V"},
             "processList": [
                 {
@@ -146,7 +146,7 @@
             "description": "Plug Frequency",
             "address": "0005",
             "settings": "type:ATTRIBUTE",
-            "logging": {"loggingInterval": 5000, "loggingMaxInterval": 180000, "loggingTolerance": 0.1, "average": true},
+            "logging": {"loggingInterval": 5000, "loggingDelayMaximum": 180000, "loggingTolerance": 0.1, "loggingAverage": true},
             "configs": {"samplingInterval": 5000, "valueType":"FLOAT", "unit":"Hz"},
             "processList": [
                 {

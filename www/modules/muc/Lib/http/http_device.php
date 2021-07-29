@@ -224,7 +224,7 @@ class HttpDevice extends ControllerDevice {
                 'settings'=>array()
             );
             if (isset($scan['description'])) $device['description'] = $scan['description'];
-            if (isset($scan['deviceAddress'])) $device['address'] = $scan['deviceAddress'];
+            if (isset($scan['address'])) $device['address'] = $scan['address'];
             if (isset($scan['settings'])) $device['settings'] = $scan['settings'];
             
             $devices[] = $device;

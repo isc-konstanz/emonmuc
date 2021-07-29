@@ -9,7 +9,7 @@
             "description": "DS18B20 temperature sensor",
             "driver": "rpi-w1",
             "address": "<id>",
-            "settings": "type:SENSOR_TEMPERATURE"
+            "settings": "type=SENSOR_TEMPERATURE"
         }
     ],
 
@@ -73,7 +73,7 @@
             "name": "<node>*temperature",
             "description": "DS18B20 temperature",
             "settings": "unit:CELSIUS",
-            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "loggingTolerance": 0.25, "average": true},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000, "loggingTolerance": 0.25, "loggingAverage": true},
             "configs": {"samplingInterval": "<refresh>", "unit": "°C", "valueType":"DOUBLE"},
             "processList": [
                 {

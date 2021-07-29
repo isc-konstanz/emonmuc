@@ -1,3 +1,5 @@
 dependencies {
+    bundle group: "org.openmuc", name: "openmuc-lib-rest",    version: openmucVersion
+    bundle group: "org.openmuc", name: "openmuc-driver",      version: openmucVersion
     bundle group: "org.openmuc", name: "openmuc-driver-rest", version: openmucVersion
 }

@@ -122,7 +122,7 @@
             "name": "<node>*l1*voltage",
             "description": "Phase1 Voltage",
             "address": "<unitId>:INPUT_REGISTERS:0:FLOAT",
-            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "loggingTolerance": 0.01, "average": true},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000, "loggingTolerance": 0.01, "loggingAverage": true},
             "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"FLOAT", "unit": "V"},
             "processList": [
                 {
@@ -135,7 +135,7 @@
             "name": "<node>*l2*voltage",
             "description": "Phase2 Voltage",
             "address": "<unitId>:INPUT_REGISTERS:2:FLOAT",
-            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "loggingTolerance": 0.01, "average": true},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000, "loggingTolerance": 0.01, "loggingAverage": true},
             "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"FLOAT", "unit": "V"},
             "processList": [
                 {
@@ -148,7 +148,7 @@
             "name": "<node>*l3*voltage",
             "description": "Phase3 Voltage",
             "address": "<unitId>:INPUT_REGISTERS:4:FLOAT",
-            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "loggingTolerance": 0.01, "average": true},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000, "loggingTolerance": 0.01, "loggingAverage": true},
             "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"FLOAT", "unit": "V"},
             "processList": [
                 {
@@ -161,7 +161,7 @@
             "name": "<node>*l1*current",
             "description": "Phase1 current",
             "address": "<unitId>:INPUT_REGISTERS:6:FLOAT",
-            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000},
             "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"FLOAT", "unit": "A"},
             "processList": [
                 {
@@ -174,7 +174,7 @@
             "name": "<node>*l2*current",
             "description": "Phase2 current",
             "address": "<unitId>:INPUT_REGISTERS:8:FLOAT",
-            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000},
             "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"FLOAT", "unit": "A"},
             "processList": [
                 {
@@ -187,7 +187,7 @@
             "name": "<node>*l3*current",
             "description": "Phase3 current",
             "address": "<unitId>:INPUT_REGISTERS:10:FLOAT",
-            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000},
             "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"FLOAT", "unit": "A"},
             "processList": [
                 {
@@ -200,7 +200,7 @@
             "name": "<node>*power",
             "description": "Power",
             "address": "<unitId>:INPUT_REGISTERS:52:FLOAT",
-            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000},
             "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"FLOAT", "unit": "W"},
             "processList": [
                 {
@@ -213,7 +213,7 @@
             "name": "<node>*frequency",
             "description": "Frequency",
             "address": "<unitId>:INPUT_REGISTERS:70:FLOAT",
-            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "loggingTolerance": 0.1, "average": true},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000, "loggingTolerance": 0.1, "loggingAverage": true},
             "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"FLOAT", "unit": "Hz"},
             "processList": [
                 {
@@ -226,7 +226,7 @@
             "name": "<node>*l1*import",
             "description": "Phase1 Energy import",
             "address": "<unitId>:INPUT_REGISTERS:346:FLOAT",
-            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000},
             "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"FLOAT", "unit": "kWh"},
             "processList": [
                 {
@@ -243,7 +243,7 @@
             "name": "<node>*l2*import",
             "description": "Phase2 Energy import",
             "address": "<unitId>:INPUT_REGISTERS:348:FLOAT",
-            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000},
             "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"FLOAT", "unit": "kWh"},
             "processList": [
                 {
@@ -260,7 +260,7 @@
             "name": "<node>*l3*import",
             "description": "Phase3 Energy import",
             "address": "<unitId>:INPUT_REGISTERS:350:FLOAT",
-            "logging": {"loggingInterval": "<refresh>", "loggingTimeOffset": 1000, "loggingMaxInterval": 900000},
+            "logging": {"loggingInterval": "<refresh>", "loggingTimeOffset": 1000, "loggingDelayMaximum": 900000},
             "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"FLOAT", "unit": "kWh"},
             "processList": [
                 {
@@ -297,7 +297,7 @@
             "name": "<node>*l1*export",
             "description": "Phase1 Energy export",
             "address": "<unitId>:INPUT_REGISTERS:352:FLOAT",
-            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000},
             "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"FLOAT", "unit": "kWh"},
             "processList": [
                 {
@@ -314,7 +314,7 @@
             "name": "<node>*l2*export",
             "description": "Phase2 Energy export",
             "address": "<unitId>:INPUT_REGISTERS:354:FLOAT",
-            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000},
             "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"FLOAT", "unit": "kWh"},
             "processList": [
                 {
@@ -331,7 +331,7 @@
             "name": "<node>*l3*export",
             "description": "Phase3 Energy export",
             "address": "<unitId>:INPUT_REGISTERS:356:FLOAT",
-            "logging": {"loggingInterval": "<refresh>", "loggingTimeOffset": 1000, "loggingMaxInterval": 900000},
+            "logging": {"loggingInterval": "<refresh>", "loggingTimeOffset": 1000, "loggingDelayMaximum": 900000},
             "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"FLOAT", "unit": "kWh"},
             "processList": [
                 {

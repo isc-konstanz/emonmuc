@@ -15,7 +15,7 @@ require_once "Modules/device/device_template.php";
 require_once "Modules/muc/muc_model.php";
 
 class MucTemplate extends DeviceTemplate {
-    const DIR_DEFAULT = "/var/opt/emonmuc/";
+    const DIR_DEFAULT = "/opt/emonmuc";
 
     private $ctrl;
 
@@ -46,6 +46,9 @@ class MucTemplate extends DeviceTemplate {
     }
 
     public function get($type) {
+        if (preg_replace('/[^\p{N}\p{L}\-\_\/]/u', '', $type) != $type) {
+            return array('success'=>false, 'message'=>"Device type must only contain A-Z a-z 0-9 - _ / characters");
+        }
         $file = $this->get_dir().$type.".json";
         if (!file_exists($file)) {
             return array('success'=>false, 'message'=>"Error reading template $type: $file does not exist");
@@ -106,6 +109,9 @@ class MucTemplate extends DeviceTemplate {
         if (substr($muc_template_dir, -1) !== "/") {
             $muc_template_dir .= "/";
         }
+		if ($muc_template_dir == "/opt/emonmuc") {
+			$muc_template_dir .= "lib/"
+		}
         return $muc_template_dir."device/";
     }
 
@@ -271,8 +277,8 @@ class MucTemplate extends DeviceTemplate {
                     return $result;
                 }
             }
-            catch(ControllerException $e) {
-                if (stristr($e->getMessage(), 'already exists') === false) {
+            catch(Exception $e) {
+                if (stristr(strtolower($e->getMessage()), '409 conflict') === false) {
                     return $e->getResult();
                 }
             }
@@ -298,8 +304,8 @@ class MucTemplate extends DeviceTemplate {
                 }
             }
             else {
-                $deviceid = $devices{0}->id;
-                $driverid = $devices{0}->driver;
+                $deviceid = $devices[0]->id;
+                $driverid = $devices[0]->driver;
             }
             try {
                 $result = $this->ctrl->channel($ctrl)->create($driverid, $deviceid, json_encode($configs));
@@ -308,7 +314,7 @@ class MucTemplate extends DeviceTemplate {
                 }
             }
             catch(ControllerException $e) {
-                if (stristr($e->getMessage(), 'already exists') === false) {
+                if (stristr(strtolower($e->getMessage()), '409 conflict') === false) {
                     return $e->getResult();
                 }
             }
@@ -532,13 +538,13 @@ class MucTemplate extends DeviceTemplate {
         if (isset($template->syntax) && isset($template->syntax->$type)) {
             $syntax = $template->syntax->$type;
         }
-        else if (substr($haystack, -strlen('Address')) === 'Address') {
+        else if (substr($type, -strlen('Address')) === 'Address') {
             $syntax = (object) array(
                 'keyValue' => false,
                 'separator' => ':'
             );
         }
-        else if (substr($haystack, -strlen('Settings')) === 'Settings') {
+        else if (substr($type, -strlen('Settings')) === 'Settings') {
             $syntax = (object) array(
                 'keyValue' => true,
                 'separator' => ',',

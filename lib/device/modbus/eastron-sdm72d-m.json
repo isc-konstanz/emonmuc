@@ -122,7 +122,7 @@
             "name": "<node>*power",
             "description": "Total power",
             "address": "<unitId>:INPUT_REGISTERS:52:FLOAT",
-            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000},
             "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"FLOAT", "unit": "W"},
             "processList": [
                 {
@@ -135,7 +135,7 @@
             "name": "<node>*import*energy",
             "description": "Energy import",
             "address": "<unitId>:INPUT_REGISTERS:72:FLOAT",
-            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000},
             "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"FLOAT", "unit": "kWh"},
             "processList": [
                 {
@@ -148,7 +148,7 @@
             "name": "<node>*export*energy",
             "description": "Energy export",
             "address": "<unitId>:INPUT_REGISTERS:74:FLOAT",
-            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000},
             "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"FLOAT", "unit": "kWh"},
             "processList": [
                 {
@@ -161,7 +161,7 @@
             "name": "<node>*import*power",
             "description": "Power import",
             "address": "<unitId>:INPUT_REGISTERS:1280:FLOAT",
-            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000},
             "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"FLOAT", "unit": "W"},
             "processList": [
                 {
@@ -174,7 +174,7 @@
             "name": "<node>*export*power",
             "description": "Energy export",
             "address": "<unitId>:INPUT_REGISTERS:1282:FLOAT",
-            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000},
             "configs": {"samplingInterval": "<refresh>", "samplingTimeOffset": "<offset>", "valueType":"FLOAT", "unit": "W"},
             "processList": [
                 {

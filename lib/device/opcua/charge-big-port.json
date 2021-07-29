@@ -1,0 +1,147 @@
+{
+    "name": "CBP 015+1 Port",
+    "category": "EVSE",
+    "group": "chargeBIG",
+    "description": "Requires the <b>OPC UA</b> driver to be installed.",
+
+    "devices": [
+        {
+            "name": "<server>",
+            "driver": "opcua",
+            "create": false
+        }
+    ],
+
+    "options": [
+        {
+            "id": "server",
+            "name": "Server",
+            "description": "The device key of the chargeBIG OPC UA server, managing this charging port.",
+            "type": "text",
+            "mandatory": true
+        },
+        {
+            "id": "port",
+            "name": "Charging port",
+            "description": "Defines at which interval the values will be read.",
+            "type": "selection",
+            "select": [
+                { "name": "1", "value": 0 },
+                { "name": "2", "value": 1 },
+                { "name": "3", "value": 2 },
+                { "name": "4", "value": 3 },
+                { "name": "5", "value": 4 },
+                { "name": "6", "value": 5 },
+                { "name": "7", "value": 6 },
+                { "name": "8", "value": 7 },
+                { "name": "9", "value": 8 },
+                { "name": "10", "value": 9 },
+                { "name": "11", "value": 10 },
+                { "name": "12", "value": 11 },
+                { "name": "13", "value": 12 },
+                { "name": "14", "value": 13 },
+                { "name": "15", "value": 14 },
+                { "name": "16", "value": 15 },
+                { "name": "17", "value": 16 },
+                { "name": "18", "value": 17 }
+            ],
+            "mandatory": true
+        },
+        {
+            "id": "refresh",
+            "name": "Refresh interval",
+            "description": "Defines at which interval the values will be read.",
+            "type": "selection",
+            "select": [
+                { "name": "1 second", "value": 1000 },
+                { "name": "2 seconds", "value": 2000 },
+                { "name": "3 seconds", "value": 3000 },
+                { "name": "4 seconds", "value": 4000 },
+                { "name": "5 seconds", "value": 5000 },
+                { "name": "10 seconds", "value": 10000 },
+                { "name": "15 seconds", "value": 15000 },
+                { "name": "20 seconds", "value": 20000 },
+                { "name": "25 seconds", "value": 25000 },
+                { "name": "30 seconds", "value": 30000 },
+                { "name": "35 seconds", "value": 35000 },
+                { "name": "40 seconds", "value": 40000 },
+                { "name": "45 seconds", "value": 45000 },
+                { "name": "50 seconds", "value": 50000 },
+                { "name": "55 seconds", "value": 55000 },
+                { "name": "1 minute",  "value": 60000 },
+                { "name": "2 minutes", "value": 120000 },
+                { "name": "3 minutes", "value": 180000 },
+                { "name": "4 minutes", "value": 240000 },
+                { "name": "5 minutes", "value": 300000 },
+                { "name": "10 minutes", "value": 600000 },
+                { "name": "15 minutes", "value": 900000 }
+            ],
+            "default": 5000,
+            "mandatory": false
+        }
+    ],
+
+    "items": [
+        {
+            "id": "state",
+            "type": "Text",
+            "header": true,
+            "select": {
+                "0":"Failure",
+                "1":"Standby",
+                "2":"Connected",
+                "3":"Charging",
+                "4":"Ventilating",
+                "5":"Error"
+            },
+            "default": "Loading",
+            "input": "<node>*state"
+        },
+        {
+            "id": "limit",
+            "type": "Text",
+            "label": "Limit",
+            "format": "%.1f A",
+            "input": "<node>*limit"
+        }
+    ],
+
+    "channels": [
+        {
+            "name": "<node>*state",
+            "description": "Charging port state",
+            "address": "Ladepunkt_<port>_Status",
+            "configs": {"samplingInterval": "<refresh>", "valueType": "INTEGER"},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000, "engine":"SQL",
+                "feed": {"name": "State", "tag": "<name>"}
+            }
+        },
+        {
+            "name": "<node>*limit",
+            "description": "Charging port current limit",
+            "address": "Ladepunkt_<port>_Grenzwert",
+            "configs": {"samplingInterval": "<refresh>", "valueType": "DOUBLE", "unit": "A"},
+            "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000, "engine":"SQL",
+                "feed": {"name": "Current limit", "tag": "<name>"}
+            }
+        }
+    ],
+
+    "feeds": [
+        {
+            "name": "State",
+            "tag": "<name>",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::MYSQL",
+            "table": "<node>_state"
+        },
+        {
+            "name": "Current limit",
+            "tag": "<name>",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::MYSQL",
+            "table": "<node>_limit",
+            "unit": "A"
+        }
+    ]
+}
