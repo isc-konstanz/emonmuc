@@ -14,9 +14,10 @@ build/
 # Framework
 log/
 cache/
-conf/*
 bundle/
-!lib/bundle/
+install/
+load/
+conf/*
 !conf/bundle.gradle
 !conf/logback.xml
 !conf/system.default.properties
@@ -25,4 +26,5 @@ bundle/
 !conf/emoncms.default.conf
 !conf/emoncms.settings.php
 !conf/https-certificate.jks
+!lib/bundle/
 bin/felix.jar
