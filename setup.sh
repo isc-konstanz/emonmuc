@@ -3,7 +3,6 @@
 
 # Set the targeted directories of the emonmuc framework.
 # If a specified directory is empty, the component will be created.
-OPENMUC_PORT=8080
 OPENMUC_DATA="/var/opt/openmuc"
 OPENMUC_DIR="/opt/openmuc"
 EMONMUC_DIR="/opt/emonmuc"
@@ -78,6 +77,9 @@ install_emonmuc() {
         if [ ! -f "$OPENMUC_DIR"/conf/config.properties ]; then
             cp -p "$EMONMUC_DIR"/conf/config.default.properties "$OPENMUC_DIR"/conf/config.properties
         fi
+        if [ ! -f "$OPENMUC_DIR"/conf/emoncms.conf ]; then
+            cp -p "$EMONMUC_DIR"/conf/emoncms.default.conf "$OPENMUC_DIR"/conf/emoncms.conf
+        fi
         cp -pf "$EMONMUC_DIR"/conf/logback.xml "$OPENMUC_DIR"/conf/logback.xml
 
         cp -rpf "$EMONMUC_DIR"/cert "$OPENMUC_DIR"/
@@ -88,7 +90,7 @@ install_emonmuc() {
 
         ln -sf "$EMONMUC_DIR"/lib/systemd/openmuc.service /lib/systemd/system/openmuc.service
         cp -f "$EMONMUC_DIR"/lib/tmpfiles/openmuc.conf /usr/lib/tmpfiles.d/openmuc.conf
-        bash "$EMONMUC_DIR"/bin/emonmuc install --datalogger emoncms --server restws
+        sudo -u $EMONMUC_USER bash "$EMONMUC_DIR"/bin/emonmuc install --datalogger emoncms --server restws
 
         chown $EMONMUC_USER -R "$EMONMUC_DIR" "$OPENMUC_DIR" /var/tmp/emonmuc
     fi
@@ -106,8 +108,12 @@ install_emonmuc() {
         # Wait a while for the server to be available.
         # TODO: Explore necessity. May be necessary for Raspberry Pi V1
         printf "Waiting for openmuc service\nPlease wait"
+
+        http_port_key="org.osgi.service.http.port"
+        http_port_val=`grep -m 1 $http_port_key $OPENMUC_DIR/conf/system.properties | sed "s/$http_port_key.*=//" | sed -r "s/\s+//g"`
+
         wait=0
-        while ! nc -z localhost $OPENMUC_PORT && [ $wait -lt 60 ]; do
+        while ! nc -z localhost $http_port_val && [ $wait -lt 60 ]; do
             wait=$((wait + 3))
             sleep 3
             printf "."
@@ -123,7 +129,6 @@ install_emonmuc() {
         chown $EMONMUC_USER -R "$OPENMUC_DIR"/conf
         systemctl restart openmuc.service
     fi
-
 }
 
 API_KEY=""
@@ -150,9 +155,7 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-if [ -z ${EMONMUC_DIR+x} ]; then
-    find_emonmuc_dir
-fi
+find_emonmuc_dir
 find_emonmuc_user
 
 if [ "$CLEAN" ]; then
