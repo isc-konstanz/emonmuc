@@ -93,6 +93,9 @@ install_emonmuc() {
         sudo -u $EMONMUC_USER bash "$EMONMUC_DIR"/bin/emonmuc install --datalogger emoncms --server restws
 
         chown $EMONMUC_USER -R "$EMONMUC_DIR" "$OPENMUC_DIR" /var/tmp/emonmuc
+
+        systemctl enable openmuc.service
+        systemctl start openmuc.service
     fi
     if [ -d "$EMONCMS_DIR" ]; then
         sudo -u $EMONMUC_USER ln -sf "$EMONMUC_DIR"/www/modules/channel "$EMONCMS_DIR"/Modules/
@@ -101,46 +104,12 @@ install_emonmuc() {
 
         php "$EMONMUC_DIR"/lib/www/upgrade.php
     fi
-    systemctl enable openmuc.service
-    systemctl start openmuc.service
-
-    if [ -d "$EMONCMS_DIR" ]; then
-        # Wait a while for the server to be available.
-        # TODO: Explore necessity. May be necessary for Raspberry Pi V1
-        printf "Waiting for openmuc service\nPlease wait"
-
-        http_port_key="org.osgi.service.http.port"
-        http_port_val=`grep -m 1 $http_port_key $OPENMUC_DIR/conf/system.properties | sed "s/$http_port_key.*=//" | sed -r "s/\s+//g"`
-
-        wait=0
-        while ! nc -z localhost $http_port_val && [ $wait -lt 60 ]; do
-            wait=$((wait + 3))
-            sleep 3
-            printf "."
-        done
-        while [ $wait -lt 15 ]; do
-            wait=$((wait + 3))
-            sleep 3
-            printf "."
-        done
-        printf "\n"
-
-        php "$EMONMUC_DIR"/lib/www/setup.php --dir "$EMONCMS_DIR" --apikey $API_KEY
-        chown $EMONMUC_USER -R "$OPENMUC_DIR"/conf
-        systemctl restart openmuc.service
-    fi
 }
 
-API_KEY=""
 while [[ $# -gt 0 ]]; do
     case "$1" in
         -e | --emoncms)
             EMONCMS_DIR="$2"
-            shift
-            shift
-            ;;
-        -a | --apikey)
-            API_KEY="$2"
             shift
             shift
             ;;
