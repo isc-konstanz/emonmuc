@@ -40,26 +40,29 @@ else {
 }
 try {
     $ctrl->create($userid, 'http', 'Local', '', '{"address":"'.$address.'","port":'.$port.'}');
-    
-    if (!is_writable('/openmuc/conf') || (is_file('/openmuc/conf/emoncms.conf') && !is_writable('/openmuc/conf/emoncms.conf'))) {
-        echo "Unable to edit emoncms configution file in ".$root."/conf\n"; die;
+
+    if (!is_writable('/opt/openmuc/conf') || (is_file('/opt/openmuc/conf/emoncms.conf') && !is_writable('/opt/openmuc/conf/emoncms.conf'))) {
+        echo "Unable to edit emoncms configution file in /opt/openmuc/conf\n"; die;
     }
     if (isset($options['c']) || isset($options['config'])) {
         $config = isset($options['c']) ? $options['c'] : $options['config'];
     }
     else {
+        $config = '/opt/openmuc/conf/emoncms.conf';
+    }
+    if (!is_file($config)) {
         $config = $root.'/conf/emoncms.default.conf';
     }
     if (!is_file($config)) {
         echo "Unable to find default emoncms configuration $config\n"; die;
     }
-    
+
     $url = $type.'://'.$address.'/';
     $contents = file_get_contents($config);
     $contents = str_replace(';address = http://localhost/emoncms/', 'address = '.$url, $contents);
     $contents = str_replace(';authorization = WRITE', 'authorization = WRITE', $contents);
     $contents = str_replace(';authentication = <apikey>', 'authentication = '.$apikey, $contents);
-    file_put_contents('/openmuc/conf/emoncms.conf', $contents);
+    file_put_contents('/opt/openmuc/conf/emoncms.conf', $contents);
 }
 catch(Exception $e) {
     echo "Unable to register controller for user $userid: ".$e->getMessage()."\n";
