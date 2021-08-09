@@ -32,7 +32,7 @@ To install the whole system, including a LAMP server and related packages, redis
 To start the installation process, simply execute the initialization:
 
 ~~~
-wget -O - https://raw.githubusercontent.com/isc-konstanz/emonscripts/isc/install/init.sh | bash
+bash <(curl -s https://raw.githubusercontent.com/isc-konstanz/emonscripts/seal/install/init.sh)
 ~~~
 
 With both components installed and running, the OpenMUC framework needs to be registered to the emoncms user. This can be done in the **Controllers** page, accessible from the **Setup** cogwheel menu item.
