@@ -2,12 +2,12 @@
     "name": "Radiator Thermostat",
     "category": "Thermostat",
     "group": "eQ-3 HomeMatic",
+    "driver": "homematic-cc1101",
     "description": "Requires the <b><a href='https://github.com/isc-konstanz/OpenHomeMatic/'>HomeMatic CC1101</a></b> driver to be installed.<br><br>eQ-3 HomeMatic Wireless Radiator Thermostat",
 
     "devices": [
         {
             "description": "eQ-3 HomeMatic Thermostat",
-            "driver": "homematic-cc1101",
             "address": "<address>",
             "settings": "type:<type>"
         }

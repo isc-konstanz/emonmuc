@@ -2,13 +2,13 @@
     "name": "SDM630M-CT-V2",
     "category": "Meter",
     "group": "EASTRON",
+    "driver": "modbus",
     "description": "Requires the <b>Modbus</b> (RTU) driver to be installed.<br><br><b>Energy Meter SDM630M-CT-V2</b>:<br>Current: 0.25-5(6)A<br>Voltage : 3*230/400V<br>50/60Hz",
 
     "devices": [
         {
             "name": "serial<address>",
             "description": "Modbus RTU connection",
-            "driver": "modbus",
             "address": "<address>",
             "settings": "RTU:SERIAL_ENCODING_RTU:<baudRate>:DATABITS_8:PARITY_NONE:STOPBITS_2:ECHO_FALSE:FLOWCONTROL_NONE:FLOWCONTROL_NONE"        }
     ],
