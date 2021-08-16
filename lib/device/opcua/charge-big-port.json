@@ -2,12 +2,12 @@
     "name": "CBP 015+1 Port",
     "category": "EVSE",
     "group": "chargeBIG",
+    "driver": "opcua",
     "description": "Requires the <b>OPC UA</b> driver to be installed.",
 
     "devices": [
         {
             "name": "<server>",
-            "driver": "opcua",
             "create": false
         }
     ],

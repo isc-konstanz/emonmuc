@@ -2,12 +2,12 @@
     "name": "CONTO D4-S",
     "category": "Meter",
     "group": "IME Messger&auml;te GmbH",
+    "driver": "mbus",
     "description": "Requires the <b>M-Bus</b> (Wired) driver to be installed.<br><br><b>Energy Meter CONTO D4-S</b>:<br>Current: 10(63)A<br>Voltage : 230(400) - 240(415)V",
 
     "devices": [
         {
             "description": "Energy Meter",
-            "driver": "mbus",
             "address": "<serialPort>:<mBusAddress>",
             "settings": "<baudRate>"
         }

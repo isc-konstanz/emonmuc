@@ -2,12 +2,12 @@
     "name": "Counter",
     "category": "Meter",
     "group": "Pulses (Raspberry Pi)",
+    "driver": "rpi-gpio",
     "description": "Requires the <b>GPIO</b> driver to be installed.<br><br>Configuration for a Raspberry Pi pin as an generic pulse counter.",
 
     "devices": [
         {
             "description": "Raspberry Pi Input",
-            "driver": "rpi-gpio",
             "address": "<pin>",
             "settings": "mode=DIGITAL_INPUT;pullResistance=PULL_DOWN;counter=true"
         }
@@ -24,6 +24,7 @@
             "description": "The Pin number, according to the <a href='http://pi4j.com/pin-numbering-scheme.html'>WiringPi Pin Numbering Scheme</a>",
             "type": "text",
             "scan": true,
+            "syntax": "deviceAddress",
             "mandatory": true
         },
         {
@@ -91,4 +92,5 @@
             "engine": "Engine::PHPTIMESERIES"
         }
     ]
+
 }
