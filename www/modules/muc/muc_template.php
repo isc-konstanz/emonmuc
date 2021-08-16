@@ -1,12 +1,12 @@
 <?php
 /*
-     Released under the GNU Affero General Public License.
-     See COPYRIGHT.txt and LICENSE.txt.
-
-     Device module contributed by Nuno Chaveiro nchaveiro(at)gmail.com 2015
-     ---------------------------------------------------------------------
-     Sponsored by http://archimetrics.co.uk/
-*/
+ Released under the GNU Affero General Public License.
+ See COPYRIGHT.txt and LICENSE.txt.
+ 
+ Device module contributed by Nuno Chaveiro nchaveiro(at)gmail.com 2015
+ ---------------------------------------------------------------------
+ Sponsored by http://archimetrics.co.uk/
+ */
 
 // no direct access
 defined('EMONCMS_EXEC') or die('Restricted access');
@@ -15,15 +15,14 @@ require_once "Modules/device/device_template.php";
 require_once "Modules/muc/muc_model.php";
 
 class MucTemplate extends DeviceTemplate {
-    const DIR_DEFAULT = "/opt/emonmuc";
-
+    
     private $ctrl;
-
+    
     function __construct(&$parent) {
         parent::__construct($parent);
         $this->ctrl = new Controller($this->mysqli, $this->redis);
     }
-
+    
     protected function load_list() {
         $list = array();
         
@@ -44,7 +43,7 @@ class MucTemplate extends DeviceTemplate {
         }
         return $list;
     }
-
+    
     public function get($type) {
         if (preg_replace('/[^\p{N}\p{L}\-\_\/]/u', '', $type) != $type) {
             return array('success'=>false, 'message'=>"Device type must only contain A-Z a-z 0-9 - _ / characters");
@@ -54,6 +53,20 @@ class MucTemplate extends DeviceTemplate {
             return array('success'=>false, 'message'=>"Error reading template $type: $file does not exist");
         }
         $content = file_get_contents($file);
+        
+        if (strpos($content, "<emoncms_dir>") !== false) {
+            global $settings;
+            $content = str_replace("<emoncms_dir>", $settings['emoncms_dir'], $content);
+        }
+        if (strpos($content, "<emonmuc_dir>") !== false) {
+            global $settings;
+            $content = str_replace("<emonmuc_dir>", $settings['openenergymonitor_dir']."/emonmuc", $content);
+        }
+        if (strpos($content, "<openenergymonitor_dir>") !== false) {
+            global $settings;
+            $content = str_replace("<openenergymonitor_dir>", $settings['openenergymonitor_dir'], $content);
+        }
+        
         $template = json_decode($content);
         if (json_last_error() != 0) {
             return array('success'=>false, 'message'=>"Error reading template $type: ".json_last_error_msg());
@@ -97,24 +110,21 @@ class MucTemplate extends DeviceTemplate {
         // Recursively cast associative arrays to objects
         return json_decode(json_encode($template));
     }
-
+    
     private function get_dir() {
         global $settings;
         if (isset($settings['muc']) && !empty($settings['muc']['lib_dir'])) {
             $muc_template_dir = $settings['muc']['lib_dir'];
         }
         else {
-            $muc_template_dir = self::DIR_DEFAULT;
+            $muc_template_dir = $settings['openenergymonitor_dir']."/emonmuc/lib/";
         }
         if (substr($muc_template_dir, -1) !== "/") {
             $muc_template_dir .= "/";
         }
-		if ($muc_template_dir == "/opt/emonmuc") {
-			$muc_template_dir .= "lib/"
-		}
         return $muc_template_dir."device/";
     }
-
+    
     public function prepare($device) {
         $userid = intval($device['userid']);
         $nodeid = $device['nodeid'];
@@ -154,7 +164,7 @@ class MucTemplate extends DeviceTemplate {
         }
         return array('success'=>true, 'feeds'=>$feeds, 'inputs'=>$channels);
     }
-
+    
     public function prepare_template($device) {
         $file = $this->get_dir().$device['type'].".json";
         if (!file_exists($file)) {
@@ -168,7 +178,7 @@ class MucTemplate extends DeviceTemplate {
         }
         return $this->prepare_json($device, $template, $content, $configs);
     }
-
+    
     protected function prepare_json($device, $template, $content, $configs) {
         $result = json_decode($this->prepare_str($device, $template, $content, $configs));
         if (json_last_error() != 0) {
@@ -176,7 +186,7 @@ class MucTemplate extends DeviceTemplate {
         }
         return $result;
     }
-
+    
     protected function prepare_str($device, $template, $content, $configs) {
         if (strpos($content, '*') !== false) {
             $separator = isset($configs['sep']) ? $configs['sep'] : self::SEPARATOR;
@@ -203,7 +213,7 @@ class MucTemplate extends DeviceTemplate {
         }
         return $content;
     }
-
+    
     public function init($device, $template) {
         $userid = intval($device['userid']);
         
@@ -266,7 +276,7 @@ class MucTemplate extends DeviceTemplate {
         }
         return array('success'=>true, 'message'=>'Device initialized');
     }
-
+    
     // Create the devices
     private function create_devices($ctrlid, $devices) {
         $ctrl = $this->ctrl->get($ctrlid);
@@ -285,7 +295,7 @@ class MucTemplate extends DeviceTemplate {
         }
         return array('success'=>true, 'message'=>'Devices successfully created');
     }
-
+    
     // Create the channels
     private function create_channels($ctrlid, $devices, &$channels) {
         $ctrl = $this->ctrl->get($ctrlid);
@@ -330,7 +340,7 @@ class MucTemplate extends DeviceTemplate {
         }
         return array('success'=>true, 'message'=>'Channels successfully created');
     }
-
+    
     protected function create_feeds($userid, &$feeds) {
         foreach($feeds as $f) {
             $datatype = constant($f->type); // DataType::
@@ -361,7 +371,7 @@ class MucTemplate extends DeviceTemplate {
             }
         }
     }
-
+    
     public function set_fields($device, $fields) {
         if (count((array) $fields) < 1) {
             return array('success'=>true, 'message'=>"No fields to update passed");
@@ -399,7 +409,7 @@ class MucTemplate extends DeviceTemplate {
         }
         return array('success'=>true, 'message'=>"Device updated");
     }
-
+    
     protected function update_devices($ctrlid, $device, $update, $template) {
         $ctrl = $this->ctrl->get($ctrlid);
         foreach($template->devices as $d) {
@@ -422,16 +432,16 @@ class MucTemplate extends DeviceTemplate {
             }
         }
     }
-
+    
     protected function update_channels($ctrlid, $device, $update, $template) {
         $ctrl = $this->ctrl->get($ctrlid);
         foreach($template->channels as $c) {
             $configs = isset($device['configs']) ? $device['configs'] : $update['configs'];
             $configs = $this->prepare_json($update, $template, json_encode($c), $configs);
             $channel = $this->decode_channel($update['nodeid'], $configs, $template, $update['configs']);
-            $channel->id = $this->prepare_str($device, $template, $c->name, $update['configs']);
+            $channel->id = $channel->name;
             
-            $id = $channel->id;
+            $id = $this->prepare_str($device, $template, $c->name, $update['configs']);
             if (!$this->ctrl->channel($ctrl)->exists($id)) {
                 if (!$this->ctrl->channel($ctrl)->exists($configs->name)) {
                     continue;
@@ -447,11 +457,11 @@ class MucTemplate extends DeviceTemplate {
             }
         }
     }
-
+    
     protected function update_feeds($device, $update, $template) {
         foreach($template->feeds as $f) {
             $feed = $this->prepare_json($device, $template, json_encode($f), $update['configs']);
-            $id = $this->feed->exists_tag_name(intval($device['userid']), isset($feed->tag) ? $feed->tag : $device['nodeid'], 
+            $id = $this->feed->exists_tag_name(intval($device['userid']), isset($feed->tag) ? $feed->tag : $device['nodeid'],
                 $this->prepare_str($device, $template, $feed->name, $update['configs']));
             
             if ($id > 0) {
@@ -463,145 +473,7 @@ class MucTemplate extends DeviceTemplate {
             }
         }
     }
-
-    private function decode_devices($id, $template, $parameters) {
-        $devices = array();
-        foreach ($template->devices as $device) {
-            $devices[] = $this->decode_device($id, $device, $template, $parameters);
-        }
-        return $devices;
-    }
-
-    private function decode_device($id, $device, $template, $parameters) {
-        if (isset($device->name)) {
-            $device->id = $device->name;
-        }
-        else {
-            $device->id = $id;
-        }
-        if (empty($device->driver)) {
-            $device->driver = isset($template->driver) ? $template->driver : null;
-        }
-        if (isset($template->options)) {
-            $device = $this->decode_configs('device', $device, $template, $parameters);
-        }
-        return $device;
-    }
-
-    private function decode_channels($deviceid, $channels, $template, $parameters, $feeds) {
-        $result = array();
-        foreach ($channels as $channel) {
-            $result[] = $this->decode_channel($deviceid, $channel, $template, $parameters, $feeds);
-        }
-        return $result;
-    }
-
-    private function decode_channel($deviceid, $channel, $template, $parameters, $feeds=null) {
-        if(!isset($channel->node)) {
-            $channel->node = $deviceid;
-        }
-        if (empty($channel->logging)) {
-            $logging = array();
-        }
-        else if (isset($channel->logging)) {
-            $logging = (array) $channel->logging;
-            if (isset($logging['feed']) && isset($feeds)) {
-                $feed = $logging['feed'];
-                $result = $this->search_feed($feeds, $feed->tag, $feed->name);
-                if (isset($result->id) && $result->id > 0) {
-                    $logging['feedid'] = $result->id;
-                }
-                unset($logging['feed']);
-            }
-        }
-        $logging['nodeid'] = $channel->node;
-        $channel->logging = $logging;
-        
-        if (isset($template->options)) {
-            $channel = $this->decode_configs('channel', $channel, $template, $parameters);
-        }
-        return $channel;
-    }
-
-    private function decode_configs($type, $configs, $template, $parameters) {
-        foreach (array('address', 'settings') as $key) {
-            if (empty($configs->$key)) {
-                $configs->$key = $this->decode_options($type.ucfirst($key), $template, $parameters);
-            }
-        }
-        return $configs;
-    }
-
-    private function decode_options($type, $template, $parameters) {
-        $result = "";
-        
-        if (isset($template->syntax) && isset($template->syntax->$type)) {
-            $syntax = $template->syntax->$type;
-        }
-        else if (substr($type, -strlen('Address')) === 'Address') {
-            $syntax = (object) array(
-                'keyValue' => false,
-                'separator' => ':'
-            );
-        }
-        else if (substr($type, -strlen('Settings')) === 'Settings') {
-            $syntax = (object) array(
-                'keyValue' => true,
-                'separator' => ',',
-                'assignment' => ':'
-            );
-        }
-        
-        // Iterate all options as configured in the template and parse them accordingly, 
-        // if they exist in the passed key value options array
-        foreach ($template->options as $option) {
-            if (empty($option->syntax)) {
-                continue;
-            }
-            if ($option->syntax !== $type) {
-                continue;
-            }
-            if (isset($parameters[$option->id])) {
-                $value = $parameters[$option->id];
-            }
-            else if (isset($option->default)) {
-                $value = $option->default;
-            }
-            else {
-                continue;
-            }
-            
-            if (!empty($result)) {
-                $result .= $syntax->separator;
-            }
-            if (!$syntax->keyValue) {
-                $result .= $value;
-            }
-            else {
-                $result .= $option->id.$syntax->assignment.$value;
-            }
-        }
-        return $result;
-    }
-
-    public function delete($device) {
-        $configs = $this->device->get_configs($device);
-        if (isset($configs['ctrlid'])) {
-            $ctrlid = intval($configs['ctrlid']);
-            $ctrl = $this->ctrl->get($ctrlid);
-            
-            try {
-                $this->ctrl->device($ctrl)->delete($device['nodeid']);
-            }
-            catch (ControllerException $e) {
-                if (stristr($e->getMessage(), 'does not exist') === false) {
-                    return $e->getResult();
-                }
-            }
-        }
-        return array('success'=>true, 'message'=>"No device to delete");
-    }
-
+    
     public function scan_start($type, $options) {
         global $session;
         $userid = $session['userid'];
@@ -610,11 +482,18 @@ class MucTemplate extends DeviceTemplate {
         if (is_array($template) && isset($template['success']) && $template['success'] == false) {
             return $template;
         }
-        if (empty($template->driver)) {
+        if (!isset($template->scan) || !$template->scan) {
+            return array('success'=>false, 'message'=>'Scanning not enabled for device template.');
+        }
+        if (empty($template->scan->driver)) {
+            $template->scan->driver = isset($template->driver) ? $template->driver : null;
+        }
+        if (empty($template->scan->driver)) {
             return array('success'=>false, 'message'=>'Unspecified driver in device template.');
         }
-        $driverid = $template->driver;
+        $driverid = $template->scan->driver;
         
+        $options = json_decode($options, true);
         if (empty($options['ctrlid'])) {
             return array('success'=>false, 'message'=>'Unspecified controller ID in device options.');
         }
@@ -654,19 +533,25 @@ class MucTemplate extends DeviceTemplate {
             return $e->getResult();
         }
     }
-
+    
     public function scan_progress($type) {
         global $session;
         $userid = $session['userid'];
         
-        $result = $this->get($type);
-        if (is_array($result) && isset($result['success']) && $result['success'] == false) {
-            return $result;
+        $template = $this->get($type);
+        if (is_array($template) && isset($template['success']) && $template['success'] == false) {
+            return $template;
         }
-        if (empty($result->driver)) {
+        if (!isset($template->scan) || !$template->scan) {
+            return array('success'=>false, 'message'=>'Scanning not enabled for device template.');
+        }
+        if (empty($template->scan->driver)) {
+            $template->scan->driver = isset($template->driver) ? $template->driver : null;
+        }
+        if (empty($template->scan->driver)) {
             return array('success'=>false, 'message'=>'Unspecified driver in device template.');
         }
-        $driverid = $result->driver;
+        $driverid = $template->scan->driver;
         
         $options = array();
         if (!$this->redis) {
@@ -681,26 +566,32 @@ class MucTemplate extends DeviceTemplate {
         $ctrlid = intval($options['ctrlid']);
         $ctrl = $this->ctrl->get($ctrlid);
         try {
-            return $this->decode_progress($userid, $ctrlid, $type, $result,
+            return $this->decode_progress($userid, $ctrlid, $type, $template,
                 $this->ctrl->device($ctrl)->scan_progress($driverid));
             
         } catch(ControllerException $e) {
             return $e->getResult();
         }
     }
-
+    
     public function scan_cancel($type) {
         global $session;
         $userid = $session['userid'];
         
-        $result = $this->get($type);
-        if (is_array($result) && isset($result['success']) && $result['success'] == false) {
-            return $result;
+        $template = $this->get($type);
+        if (is_array($template) && isset($template['success']) && $template['success'] == false) {
+            return $template;
         }
-        if (empty($result->driver)) {
+        if (!isset($template->scan) || !$template->scan) {
+            return array('success'=>false, 'message'=>'Scanning not enabled for device template.');
+        }
+        if (empty($template->scan->driver)) {
+            $template->scan->driver = isset($template->driver) ? $template->driver : null;
+        }
+        if (empty($template->scan->driver)) {
             return array('success'=>false, 'message'=>'Unspecified driver in device template.');
         }
-        $driverid = $result->driver;
+        $driverid = $template->scan->driver;
         
         $options = array();
         if ($this->redis && $this->redis->exists("user#$userid:device:$type")) {
@@ -718,5 +609,210 @@ class MucTemplate extends DeviceTemplate {
             return $e->getResult();
         }
     }
-
+    
+    public function delete($device) {
+        $configs = $this->device->get_configs($device);
+        if (isset($configs['ctrlid'])) {
+            $ctrlid = intval($configs['ctrlid']);
+            $ctrl = $this->ctrl->get($ctrlid);
+            
+            try {
+                $this->ctrl->device($ctrl)->delete($device['nodeid']);
+            }
+            catch (ControllerException $e) {
+                if (stristr($e->getMessage(), 'does not exist') === false) {
+                    return $e->getResult();
+                }
+            }
+        }
+        return array('success'=>true, 'message'=>"No device to delete");
+    }
+    
+    private function decode_devices($id, $template, $parameters) {
+        $devices = array();
+        foreach ($template->devices as $device) {
+            $devices[] = $this->decode_device($id, $device, $template, $parameters);
+        }
+        return $devices;
+    }
+    
+    private function decode_device($id, $device, $template, $parameters) {
+        if (isset($device->name)) {
+            $device->id = $device->name;
+        }
+        else {
+            $device->id = $id;
+        }
+        if (empty($device->driver)) {
+            $device->driver = isset($template->driver) ? $template->driver : null;
+        }
+        if (isset($template->options)) {
+            $device = $this->encode_configs('device', $device, $template, $parameters);
+        }
+        return $device;
+    }
+    
+    private function decode_channels($deviceid, $channels, $template, $parameters, $feeds) {
+        $result = array();
+        foreach ($channels as $channel) {
+            $result[] = $this->decode_channel($deviceid, $channel, $template, $parameters, $feeds);
+        }
+        return $result;
+    }
+    
+    private function decode_channel($deviceid, $channel, $template, $parameters, $feeds=null) {
+        if(!isset($channel->node)) {
+            $channel->node = $deviceid;
+        }
+        if (empty($channel->logging)) {
+            $logging = array();
+        }
+        else if (isset($channel->logging)) {
+            $logging = (array) $channel->logging;
+            if (isset($logging['feed']) && isset($feeds)) {
+                $feed = $logging['feed'];
+                $result = $this->search_feed($feeds, $feed->tag, $feed->name);
+                if (isset($result->id) && $result->id > 0) {
+                    $logging['feedid'] = $result->id;
+                }
+                unset($logging['feed']);
+            }
+        }
+        $logging['nodeid'] = $channel->node;
+        $channel->logging = $logging;
+        
+        if (isset($template->options)) {
+            $channel = $this->encode_configs('channel', $channel, $template, $parameters);
+        }
+        return $channel;
+    }
+    
+    private function encode_configs($type, $configs, $template, $parameters) {
+        foreach (array('address', 'settings') as $key) {
+            if (empty($configs->$key)) {
+                $configs->$key = $this->encode_options($type.ucfirst($key), $template, $parameters);
+            }
+        }
+        return $configs;
+    }
+    
+    private function encode_options($type, $template, $parameters) {
+        $result = "";
+        
+        if (isset($template->syntax) && isset($template->syntax->$type)) {
+            $syntax = $template->syntax->$type;
+        }
+        if (substr($type, -strlen('Address')) === 'Address') {
+            if (!isset($syntax)) $syntax = new stdClass();
+            if (!isset($syntax->keyValue)) $syntax->keyValue = false;
+            if (!isset($syntax->separator)) $syntax->separator = ':';
+        }
+        else if (substr($type, -strlen('Settings')) === 'Settings') {
+            if (!isset($syntax)) $syntax = new stdClass();
+            if (!isset($syntax->keyValue)) $syntax->keyValue = true;
+            if (!isset($syntax->separator)) $syntax->separator = ';';
+            if (!isset($syntax->assignment)) $syntax->assignment = '=';
+        }
+        
+        // Iterate all options as configured in the template and encode them accordingly,
+        // if they exist in the passed key value options array
+        foreach ($template->options as $option) {
+            if (empty($option->syntax)) {
+                continue;
+            }
+            if ($option->syntax !== $type) {
+                continue;
+            }
+            if (isset($parameters[$option->id])) {
+                $value = $parameters[$option->id];
+            }
+            else if (isset($option->default)) {
+                $value = $option->default;
+            }
+            else {
+                continue;
+            }
+            
+            if (!empty($result)) {
+                $result .= $syntax->separator;
+            }
+            if (!$syntax->keyValue) {
+                $result .= $value;
+            }
+            else {
+                $result .= $option->id.$syntax->assignment.$value;
+            }
+        }
+        return $result;
+    }
+    
+    private function decode_options($type, $template, $parameters) {
+        $result = array();
+        
+        if (isset($template->syntax) && isset($template->syntax->$type)) {
+            $syntax = $template->syntax->$type;
+        }
+        if (substr($type, -strlen('Address')) === 'Address') {
+            if (!isset($syntax)) $syntax = new stdClass();
+            if (!isset($syntax->keyValue)) $syntax->keyValue = false;
+            if (!isset($syntax->separator)) $syntax->separator = ':';
+        }
+        else if (substr($type, -strlen('Settings')) === 'Settings') {
+            if (!isset($syntax)) $syntax = new stdClass();
+            if (!isset($syntax->keyValue)) $syntax->keyValue = true;
+            if (!isset($syntax->separator)) $syntax->separator = ';';
+            if (!isset($syntax->assignment)) $syntax->assignment = '=';
+        }
+        
+        // Iterate all options as configured in the template and decode them accordingly,
+        // if they exist in the passed parameter strings
+        $options = array();
+        foreach ($template->options as $option) {
+            if (empty($option->syntax)) {
+                continue;
+            }
+            foreach(explode(',', $option->syntax) as $t) {
+                if ($t === $type) $options[] = $option;
+            }
+        }
+        
+        $arr = explode($syntax->separator, $parameters);
+        
+        for($i=0; $i<count($options); $i++) {
+            if (isset($syntax->keyValue) && !$syntax->keyValue) {
+                $result[$options[$i]->id] = $arr[$i];
+            }
+            else {
+                $pair = explode($syntax->assignment, $arr[$i]);
+                $result[$pair[0]] = $pair[1];
+            }
+        }
+        return $result;
+    }
+    
+    private function decode_progress($userid, $ctrlid, $type, $template, $result) {
+        if (isset($result['success']) && $result['success'] == false) {
+            return $result;
+        }
+        
+        $devices = array();
+        foreach($result['devices'] as $device) {
+            $options = array();
+            foreach (array('address', 'settings') as $key) {
+                $options = array_merge($options,
+                    $this->decode_options('device'.ucfirst($key), $template, $device[$key]));
+            }
+            $devices[] = array(
+                'userid'=>$userid,
+                'name'=>$device['id'],
+                'description'=>$device['description'],
+                'type'=>$type,
+                'options'=>$options
+            );
+        }
+        $result['devices'] = $devices;
+        
+        return $result;
+    }
+    
 }
