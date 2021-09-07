@@ -1,5 +1,7 @@
 dependencies {
-    bundle group: 'com.pi4j',    name: 'pi4j-core',               version: '1.2'
+    bundle group: 'com.pi4j',    name: 'pi4j-core',               version: '1.4'
+    bundle group: 'com.pi4j',    name: 'pi4j-device',             version: '1.3'
+    bundle group: 'com.pi4j',    name: 'pi4j-gpio-extension',     version: '1.3'
     bundle group: "org.openmuc", name: "openmuc-driver",          version: openmucVersion
     bundle group: "org.openmuc", name: "openmuc-driver-rpi-gpio", version: openmucVersion
 }
