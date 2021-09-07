@@ -40,7 +40,7 @@ Next, connect one wire (black) from the ground-pin to the breadboard. Connect th
 
 Create a *New device* in the device view and select its type **Control > GPIO (Raspberry Pi) > Pin**. Enter a *Key* and optional a *Description*, as well as the number of the priorly chosen pin.
 
-**Caution**: Pins are sorted according to the [WiringPi Pin Numbering Scheme](http://pi4j.com/pin-numbering-scheme.html). This might be different to the numbering you know from former projects!
+**Caution**: Pins are sorted according to the [WiringPi Pin Numbering Scheme](https://pi4j.com/1.4/pin-numbering-scheme.html). This might be different to the numbering you know from former projects!
 
 ![device config](img/rpi-gpio/device-config.png)
 
