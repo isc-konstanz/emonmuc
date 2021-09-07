@@ -21,7 +21,7 @@
         {
             "id": "pin",
             "name": "Pin",
-            "description": "The Pin number, according to the <a href='http://pi4j.com/pin-numbering-scheme.html'>WiringPi Pin Numbering Scheme</a>",
+            "description": "The Pin number, according to the <a href='https://pi4j.com/1.4/pin-numbering-scheme.html'>WiringPi Pin Numbering Scheme</a>",
             "type": "text",
             "scan": true,
             "syntax": "deviceAddress",
