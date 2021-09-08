@@ -485,6 +485,9 @@ class MucTemplate extends DeviceTemplate {
         if (!isset($template->scan) || !$template->scan) {
             return array('success'=>false, 'message'=>'Scanning not enabled for device template.');
         }
+        if (!is_object($template->scan)) {
+            $template->scan = new stdClass();
+        }
         if (empty($template->scan->driver)) {
             $template->scan->driver = isset($template->driver) ? $template->driver : null;
         }
