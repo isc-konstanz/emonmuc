@@ -520,7 +520,7 @@ class MucTemplate extends DeviceTemplate {
                 }
             }
             else {
-                $settings = $this->encode_options($template, $options);
+                $settings = $this->encode_options('deviceScanSettings', $template, $options);
             }
         }
         
@@ -547,6 +547,9 @@ class MucTemplate extends DeviceTemplate {
         }
         if (!isset($template->scan) || !$template->scan) {
             return array('success'=>false, 'message'=>'Scanning not enabled for device template.');
+        }
+        if (!is_object($template->scan)) {
+            $template->scan = new stdClass();
         }
         if (empty($template->scan->driver)) {
             $template->scan->driver = isset($template->driver) ? $template->driver : null;
@@ -689,7 +692,7 @@ class MucTemplate extends DeviceTemplate {
         }
         return $channel;
     }
-    
+
     private function encode_configs($type, $configs, $template, $parameters) {
         foreach (array('address', 'settings') as $key) {
             if (empty($configs->$key)) {
@@ -698,7 +701,7 @@ class MucTemplate extends DeviceTemplate {
         }
         return $configs;
     }
-    
+
     private function encode_options($type, $template, $parameters) {
         $result = "";
         
