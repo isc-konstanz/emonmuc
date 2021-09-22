@@ -8,7 +8,7 @@
     "devices": [
         {
             "description": "DRS110M Energy Meter",
-            "address": "serialPort:<serialPort>,address:<address>",
+            "address": "<serialPort>:<address>",
             "settings": "mode:ABC,password:00000000,baudRate:<baudRate>,handshake:false"
         }
     ],
