@@ -8,7 +8,7 @@
     "devices": [
         {
             "description": "MT631 Energy Meter",
-            "address": "serialPort:<serialPort>",
+            "address": "<serialPort>",
             "settings": "mode:SML,baudRate:<baudRate>"
         }
     ],

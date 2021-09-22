@@ -8,7 +8,7 @@
     "devices": [
         {
             "description": "IEC 62056-21 Meter",
-            "address": "serialPort:<serialPort>,address:<address>",
+            "address": "<serialPort>:<address>",
             "settings": "mode:ABC,baudRate:<baudRate>,baudRateChangeDelay:<baudRateChangeDelay>"
         }
     ],
