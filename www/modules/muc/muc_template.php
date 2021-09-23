@@ -671,10 +671,17 @@ class MucTemplate extends DeviceTemplate {
             $channel->node = $deviceid;
         }
         if (empty($channel->logging)) {
-            $logging = array();
+            $logging = array(
+                'nodeid'=>$channel->node
+            );
         }
         else if (isset($channel->logging)) {
             $logging = (array) $channel->logging;
+            $logging['nodeid'] = $channel->node;
+            
+            if (isset($channel->id) && $channel->id > 0) {
+                $logging['inputid'] = $channel->id;
+            }
             if (isset($logging['feed']) && isset($feeds)) {
                 $feed = $logging['feed'];
                 $result = $this->search_feed($feeds, $feed->tag, $feed->name);
@@ -684,7 +691,6 @@ class MucTemplate extends DeviceTemplate {
                 unset($logging['feed']);
             }
         }
-        $logging['nodeid'] = $channel->node;
         $channel->logging = $logging;
         
         if (isset($template->options)) {
