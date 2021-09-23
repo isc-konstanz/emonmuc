@@ -524,21 +524,29 @@ abstract class ControllerChannel {
             if (isset($logging['loggingInterval'])) {
                 $configs['loggingInterval'] = $logging['loggingInterval']; unset($logging['loggingInterval']);
             }
+            if (isset($logging['loggingMaxInterval'])) {
+                $configs['loggingDelayMaximum'] = $logging['loggingMaxInterval']; unset($logging['loggingMaxInterval']);
+            }
             if (isset($logging['loggingDelayMaximum'])) {
                 $configs['loggingDelayMaximum'] = $logging['loggingDelayMaximum']; unset($logging['loggingDelayMaximum']);
             }
             if (isset($logging['loggingTimeOffset'])) {
                 $configs['loggingTimeOffset'] = $logging['loggingTimeOffset']; unset($logging['loggingTimeOffset']);
             }
-            
-            if (!empty($logging)) {
-                $configs['loggingSettings'] = $this->encode_logging($logging);
-            }
             if (isset($logging['loggingTolerance'])) {
                 $configs['loggingTolerance'] = $logging['loggingTolerance']; unset($logging['loggingTolerance']);
             }
+            if (isset($logging['tolerance'])) {
+                $configs['loggingTolerance'] = $logging['tolerance']; unset($logging['tolerance']);
+            }
             if (isset($logging['loggingAverage'])) {
                 $configs['loggingAverage'] = $logging['loggingAverage']; unset($logging['loggingAverage']);
+            }
+            if (isset($logging['average'])) {
+                $configs['loggingAverage'] = $logging['average']; unset($logging['average']);
+            }
+            if (!empty($logging)) {
+                $configs['loggingSettings'] = $this->encode_logging($logging);
             }
         }
         if (isset($channel['configs'])) $configs = array_merge($configs, $channel['configs']);

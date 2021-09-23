@@ -213,7 +213,7 @@ class MucTemplate extends DeviceTemplate {
         }
         return $content;
     }
-    
+
     public function init($device, $template) {
         $userid = intval($device['userid']);
         
@@ -232,17 +232,20 @@ class MucTemplate extends DeviceTemplate {
             throw new DeviceException('Unspecified controller ID in device configs.');
         }
         $device['configs'] = $configs;
+        $deviceid = $device['nodeid'];
+        $ctrlid = intval($configs['ctrlid']);
         try {
             $result = $this->prepare_template($device);
-            if (empty($result->devices)) {
-                return array('success'=>false, 'message'=>'Bad device template. Devices undefined.');
+            
+            if (!empty($result->devices)) {
+                $devices = $this->decode_devices($deviceid, $result, $configs);
+                $response = $this->create_devices($ctrlid, $devices);
+                if (isset($response['success']) && $response['success'] == false) {
+                    return $response;
+                }
             }
-            $ctrlid = intval($configs['ctrlid']);
-            $deviceid = $device['nodeid'];
-            $devices = $this->decode_devices($deviceid, $result, $configs);
-            $response = $this->create_devices($ctrlid, $devices);
-            if (isset($response['success']) && $response['success'] == false) {
-                return $response;
+            else {
+                $devices = array();
             }
             
             if (isset($template->feeds)) {
@@ -276,7 +279,7 @@ class MucTemplate extends DeviceTemplate {
         }
         return array('success'=>true, 'message'=>'Device initialized');
     }
-    
+
     // Create the devices
     private function create_devices($ctrlid, $devices) {
         $ctrl = $this->ctrl->get($ctrlid);
@@ -295,7 +298,7 @@ class MucTemplate extends DeviceTemplate {
         }
         return array('success'=>true, 'message'=>'Devices successfully created');
     }
-    
+
     // Create the channels
     private function create_channels($ctrlid, $devices, &$channels) {
         $ctrl = $this->ctrl->get($ctrlid);
@@ -305,17 +308,26 @@ class MucTemplate extends DeviceTemplate {
             
             if (isset($configs['device'])) {
                 $deviceid = $configs['device'];
-                
-                foreach ($devices as $d) {
-                    if ($d->id == $deviceid) {
-                        $driverid = $d->driver;
+            }
+            else if (!empty($result->devices)) {
+                $deviceid = $devices[0]->id;
+            }
+            else {
+                throw new DeviceException("Bad device template. No device for channel ".$configs['id']);
+            }
+            if (isset($configs['driver'])) {
+                $driverid = $configs['driver'];
+            }
+            else if (!empty($result->devices)) {
+                foreach ($devices as $device) {
+                    if ($device->id == $deviceid) {
+                        $driverid = $device->driver;
                         break;
                     }
                 }
             }
-            else {
-                $deviceid = $devices[0]->id;
-                $driverid = $devices[0]->driver;
+            if (empty(driverid)) {
+                throw new DeviceException("Bad device template. No driver for channel ".$configs['id']);
             }
             try {
                 $result = $this->ctrl->channel($ctrl)->create($driverid, $deviceid, json_encode($configs));
@@ -340,7 +352,7 @@ class MucTemplate extends DeviceTemplate {
         }
         return array('success'=>true, 'message'=>'Channels successfully created');
     }
-    
+
     protected function create_feeds($userid, &$feeds) {
         foreach($feeds as $f) {
             $datatype = constant($f->type); // DataType::
@@ -371,7 +383,7 @@ class MucTemplate extends DeviceTemplate {
             }
         }
     }
-    
+
     public function set_fields($device, $fields) {
         if (count((array) $fields) < 1) {
             return array('success'=>true, 'message'=>"No fields to update passed");
@@ -409,7 +421,7 @@ class MucTemplate extends DeviceTemplate {
         }
         return array('success'=>true, 'message'=>"Device updated");
     }
-    
+
     protected function update_devices($ctrlid, $device, $update, $template) {
         $ctrl = $this->ctrl->get($ctrlid);
         foreach($template->devices as $d) {
@@ -432,7 +444,7 @@ class MucTemplate extends DeviceTemplate {
             }
         }
     }
-    
+
     protected function update_channels($ctrlid, $device, $update, $template) {
         $ctrl = $this->ctrl->get($ctrlid);
         foreach($template->channels as $c) {
@@ -457,7 +469,7 @@ class MucTemplate extends DeviceTemplate {
             }
         }
     }
-    
+
     protected function update_feeds($device, $update, $template) {
         foreach($template->feeds as $f) {
             $feed = $this->prepare_json($device, $template, json_encode($f), $update['configs']);
@@ -473,7 +485,7 @@ class MucTemplate extends DeviceTemplate {
             }
         }
     }
-    
+
     public function scan_start($type, $options) {
         global $session;
         $userid = $session['userid'];
@@ -536,7 +548,7 @@ class MucTemplate extends DeviceTemplate {
             return $e->getResult();
         }
     }
-    
+
     public function scan_progress($type) {
         global $session;
         $userid = $session['userid'];
@@ -579,7 +591,7 @@ class MucTemplate extends DeviceTemplate {
             return $e->getResult();
         }
     }
-    
+
     public function scan_cancel($type) {
         global $session;
         $userid = $session['userid'];
@@ -615,7 +627,7 @@ class MucTemplate extends DeviceTemplate {
             return $e->getResult();
         }
     }
-    
+
     public function delete($device) {
         $configs = $this->device->get_configs($device);
         if (isset($configs['ctrlid'])) {
@@ -633,7 +645,7 @@ class MucTemplate extends DeviceTemplate {
         }
         return array('success'=>true, 'message'=>"No device to delete");
     }
-    
+
     private function decode_devices($id, $template, $parameters) {
         $devices = array();
         foreach ($template->devices as $device) {
@@ -641,7 +653,7 @@ class MucTemplate extends DeviceTemplate {
         }
         return $devices;
     }
-    
+
     private function decode_device($id, $device, $template, $parameters) {
         if (isset($device->name)) {
             $device->id = $device->name;
@@ -657,7 +669,7 @@ class MucTemplate extends DeviceTemplate {
         }
         return $device;
     }
-    
+
     private function decode_channels($deviceid, $channels, $template, $parameters, $feeds) {
         $result = array();
         foreach ($channels as $channel) {
@@ -665,16 +677,23 @@ class MucTemplate extends DeviceTemplate {
         }
         return $result;
     }
-    
+
     private function decode_channel($deviceid, $channel, $template, $parameters, $feeds=null) {
         if(!isset($channel->node)) {
             $channel->node = $deviceid;
         }
         if (empty($channel->logging)) {
-            $logging = array();
+            $logging = array(
+                'nodeid'=>$channel->node
+            );
         }
         else if (isset($channel->logging)) {
             $logging = (array) $channel->logging;
+            $logging['nodeid'] = $channel->node;
+            
+            if (isset($channel->id) && $channel->id > 0) {
+                $logging['inputid'] = $channel->id;
+            }
             if (isset($logging['feed']) && isset($feeds)) {
                 $feed = $logging['feed'];
                 $result = $this->search_feed($feeds, $feed->tag, $feed->name);
@@ -684,7 +703,6 @@ class MucTemplate extends DeviceTemplate {
                 unset($logging['feed']);
             }
         }
-        $logging['nodeid'] = $channel->node;
         $channel->logging = $logging;
         
         if (isset($template->options)) {
@@ -751,7 +769,7 @@ class MucTemplate extends DeviceTemplate {
         }
         return $result;
     }
-    
+
     private function decode_options($type, $template, $parameters) {
         $result = array();
         
@@ -795,7 +813,7 @@ class MucTemplate extends DeviceTemplate {
         }
         return $result;
     }
-    
+
     private function decode_progress($userid, $ctrlid, $type, $template, $result) {
         if (isset($result['success']) && $result['success'] == false) {
             return $result;
@@ -820,5 +838,5 @@ class MucTemplate extends DeviceTemplate {
         
         return $result;
     }
-    
+
 }
