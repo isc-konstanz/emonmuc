@@ -55,7 +55,7 @@ class HttpChannel extends ControllerChannel {
         if (isset($input)) {
             $inputid = $input['id'];
         }
-        else if (isset($logging['loggingInterval'])) {
+        else if ($inputid <= 0 && isset($logging['loggingInterval']) && $logging['loggingInterval'] > 0) {
             $inputid = $this->input()->create_input($this->ctrl['userid'], $nodeid, $id);
             if ($inputid < 0) {
                 return array('success'=>false, 'message'=>_("Unable to create input for channel: $id"));

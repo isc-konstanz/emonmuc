@@ -309,7 +309,7 @@ class MucTemplate extends DeviceTemplate {
             if (isset($configs['device'])) {
                 $deviceid = $configs['device'];
             }
-            else if (!empty($result->devices)) {
+            else if (!empty($devices)) {
                 $deviceid = $devices[0]->id;
             }
             else {
@@ -341,7 +341,7 @@ class MucTemplate extends DeviceTemplate {
                 }
             }
             //if (empty($c->node) ||
-            if (empty($c->logging) && empty($c->logging->loggingInterval)) {
+            if (empty($c->logging) || empty($c->logging->loggingInterval) || $c->logging->loggingInterval <= 0) {
                 // Remove the channel from list to avoid the unnecessary input creation
                 $c->action = 'none';
             }
