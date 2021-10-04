@@ -147,7 +147,7 @@ class MucTemplate extends DeviceTemplate {
             
             if (isset($template->channels)) {
                 $channels = $template->channels;
-                $this->prepare_inputs($userid, $nodeid, $channels);
+                $this->prepare_channels($userid, $nodeid, $channels);
             }
             else {
                 $channels = [];
@@ -178,7 +178,32 @@ class MucTemplate extends DeviceTemplate {
         }
         return $this->prepare_json($device, $template, $content, $configs);
     }
-    
+
+    protected function prepare_channels($userid, $nodeid, &$channels) {
+        
+        foreach($channels as $c) {
+            if(!isset($c->node)) {
+                $c->node = $nodeid;
+            }
+            
+            if (empty($c->logging) || empty($c->logging->loggingInterval) || $c->logging->loggingInterval <= 0) {
+                // Remove the channel from list to avoid the unnecessary input creation
+                $c->action = 'none';
+            }
+            else {
+                $inputid = $this->input->exists_nodeid_name($userid, $c->node, $c->name);
+                if ($inputid == false) {
+                    $c->action = 'create';
+                    $c->id = -1;
+                }
+                else {
+                    $c->action = 'none';
+                    $c->id = $inputid;
+                }
+            }
+        }
+    }
+
     protected function prepare_json($device, $template, $content, $configs) {
         $result = json_decode($this->prepare_str($device, $template, $content, $configs));
         if (json_last_error() != 0) {
