@@ -364,7 +364,7 @@ class MucTemplate extends DeviceTemplate {
             if (isset($configs['driver'])) {
                 $driverid = $configs['driver'];
             }
-            else if (!empty($result->devices)) {
+            else if (!empty($devices)) {
                 foreach ($devices as $device) {
                     if ($device->id == $deviceid) {
                         $driverid = $device->driver;
@@ -372,7 +372,7 @@ class MucTemplate extends DeviceTemplate {
                     }
                 }
             }
-            if (empty(driverid)) {
+            if (empty($driverid)) {
                 throw new DeviceException("Bad device template. No driver for channel ".$configs['id']);
             }
             try {
