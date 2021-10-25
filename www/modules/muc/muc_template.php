@@ -493,10 +493,18 @@ class MucTemplate extends DeviceTemplate {
 
     protected function update_channels($ctrlid, $device, $update, $template) {
         $ctrl = $this->ctrl->get($ctrlid);
+        
+        if (isset($template->feeds)) {
+            $feeds = $template->feeds;
+            $this->prepare_feeds($device['userid'], $device['nodeid'], $feeds);
+        }
+        else {
+            $feeds = [];
+        }
         foreach($template->channels as $c) {
             $configs = isset($device['configs']) ? $device['configs'] : $update['configs'];
             $configs = $this->prepare_json($update, $template, json_encode($c), $configs);
-            $channel = $this->decode_channel($update['nodeid'], $configs, $template, $update['configs']);
+            $channel = $this->decode_channel($update['nodeid'], $configs, $template, $update['configs'], $feeds);
             $channel->id = $channel->name;
             
             $id = $this->prepare_str($device, $template, $c->name, $update['configs']);
@@ -519,15 +527,15 @@ class MucTemplate extends DeviceTemplate {
     protected function update_feeds($device, $update, $template) {
         foreach($template->feeds as $f) {
             $feed = $this->prepare_json($device, $template, json_encode($f), $update['configs']);
-            $id = $this->feed->exists_tag_name(intval($device['userid']), isset($feed->tag) ? $feed->tag : $device['nodeid'],
+            $feedid = $this->feed->exists_tag_name(intval($device['userid']), isset($feed->tag) ? $feed->tag : $device['nodeid'],
                 $this->prepare_str($device, $template, $feed->name, $update['configs']));
             
-            if ($id > 0) {
+            if ($feedid > 0) {
                 $feed = $this->prepare_json($update, $template, json_encode($f), $update['configs']);
                 if (!isset($feed->tag)) {
                     $feed->tag = $update['nodeid'];
                 }
-                $this->feed->set_feed_fields($id, json_encode(array('name' => $feed->name, 'tag' => $feed->tag)));
+                $this->feed->set_feed_fields($feedid, json_encode(array('name' => $feed->name, 'tag' => $feed->tag)));
             }
         }
     }
