@@ -187,7 +187,7 @@
             "name": "<node>*l1*energy",
             "description": "Phase 1 energy",
             "address": "Z\u00e4hler_Energiebezug_Phase1",
-            "configs": {"samplingInterval": "<refresh>", "valueType": "DOUBLE", "unit": "kWh"},
+            "configs": {"samplingInterval": "<refresh>", "valueType": "DOUBLE", "scalingFactor":0.001, "unit": "kWh"},
             "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000, "engine":"SQL",
                 "feed": {"name": "Energy", "tag": "<name> L1"}
             }
@@ -196,7 +196,7 @@
             "name": "<node>*l2*energy",
             "description": "Phase 2 energy",
             "address": "Z\u00e4hler_Energiebezug_Phase2",
-            "configs": {"samplingInterval": "<refresh>", "valueType": "DOUBLE", "unit": "kWh"},
+            "configs": {"samplingInterval": "<refresh>", "valueType": "DOUBLE", "scalingFactor":0.001, "unit": "kWh"},
             "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000, "engine":"SQL",
                 "feed": {"name": "Energy", "tag": "<name> L2"}
             }
@@ -205,7 +205,7 @@
             "name": "<node>*l3*energy",
             "description": "Phase 3 energy",
             "address": "Z\u00e4hler_Energiebezug_Phase3",
-            "configs": {"samplingInterval": "<refresh>", "valueType": "DOUBLE", "unit": "kWh"},
+            "configs": {"samplingInterval": "<refresh>", "valueType": "DOUBLE", "scalingFactor":0.001, "unit": "kWh"},
             "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000, "engine":"SQL",
                 "feed": {"name": "Energy", "tag": "<name> L3"}
             }
