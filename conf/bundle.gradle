@@ -1,19 +1,19 @@
 ext.tempDir = "/var/tmp/emonmuc/bundle"
 ext.tempDownload = true
 
-ext.openmucVersion = "0.20.0"
+ext.openmucVersion = "0.20.2"
 
 repositories {
     flatDir {
       dirs tempDir + "/OpenMUC/libs"
-      dirs tempDir + "/OpenMUC/build/libs-all"
+      dirs tempDir + "/OpenMUC/build/libs"
     }
 }
 
 github.add([group: "isc-konstanz", name: "OpenMUC", version: openmucVersion])
 
 dependencies {
-    main group:    "org.apache.felix",      name: "org.apache.felix.main",                  version: "6.0.3"
+    main group:    "org.apache.felix",      name: "org.apache.felix.main",                  version: "7.0.1"
 
     //------------------------------------------------------------------------------------------------------
     // OpenMUC Core bundles
@@ -25,76 +25,75 @@ dependencies {
     //------------------------------------------------------------------------------------------------------
     // Bundles which have to be added since JDK 11
     //------------------------------------------------------------------------------------------------------
-    bundle group: "com.sun.activation",     name: "javax.activation",                      version: "1.2.0"
+    bundle group: "com.sun.activation",  name: "javax.activation",                         version: "1.2.0"
 
     //------------------------------------------------------------------------------------------------------
     // The Apache Felix Gogo standard shell for OSGi (http://felix.apache.org/site/apache-felix-gogo.html)
     //------------------------------------------------------------------------------------------------------
-    bundle group: "org.apache.felix",     name: "org.apache.felix.gogo.runtime",           version: "1.1.2"
-    bundle group: "org.apache.felix",     name: "org.apache.felix.gogo.command",           version: "1.0.2"
-    //bundle group: "org.apache.felix",     name: "org.apache.felix.gogo.shell",             version: "1.1.4"
-    bundle group: "org.apache.felix",     name: "org.apache.felix.gogo.jline",             version: "1.1.2"
+    bundle group: "org.apache.felix",     name: "org.apache.felix.gogo.runtime",           version: "1.1.4"
+    bundle group: "org.apache.felix",     name: "org.apache.felix.gogo.command",           version: "1.1.2"
+    bundle group: "org.apache.felix",     name: "org.apache.felix.gogo.jline",             version: "1.1.8"
+    bundle group: "org.jline",            name: "jline",                                   version: "3.20.0"
     bundle group: "org.apache.felix",     name: "org.apache.felix.useradmin",              version: "1.0.4"
     bundle group: "org.apache.felix",     name: "org.apache.felix.useradmin.filestore",    version: "1.0.2"
-    bundle group: "org.jline",            name: "jline",                                   version: "3.14.1"
 
     //------------------------------------------------------------------------------------------------------
-    // Adds a telnet server so that the Felix Gogo Shell can be accessed using telnet clients. By default 
-    // this server only listens on localhost port 6666. Therefor you can on only access it from the same host 
-    // on which felix is running.
-    // NOTE: org.apache.felix.shell.remote does not work with org.apache.felix.gogo.jline use 
-    // org.apache.felix.gogo.shell instead
+    // Adds a telnet server so that the Felix Gogo Shell can be accessed
+    // using telnet clients. By default this server only listens on
+    // localhost port 6666. Therefor you can on only access it from the
+    // same host on which felix is running.
     //------------------------------------------------------------------------------------------------------
-    //bundle group: "org.apache.felix",     name: "org.apache.felix.shell.remote",           version: "1.2.0"
+    bundle group: "org.apache.felix",     name: "org.apache.felix.shell.remote",           version: "1.2.0"
 
     //------------------------------------------------------------------------------------------------------
     // message logging libraries, SLF4J is a light-weight logging API,
     // Logback is a message logger implementation that implements SLF4J
     // natively
     //------------------------------------------------------------------------------------------------------
-    bundle group: "org.slf4j",            name: "slf4j-api",                               version: "1.7.30"
-    bundle group: "ch.qos.logback",       name: "logback-classic",                         version: "1.2.3"
-    bundle group: "ch.qos.logback",       name: "logback-core",                            version: "1.2.3"
+    bundle group: "org.slf4j",            name: "slf4j-api",                               version: "1.7.33"
+    bundle group: "ch.qos.logback",       name: "logback-classic",                         version: "1.2.10"
+    bundle group: "ch.qos.logback",       name: "logback-core",                            version: "1.2.10"
 
     //------------------------------------------------------------------------------------------------------
     // Apache Felix Service Component Runtime that implements the OSGi Declarative Services Specification
     // the OpenMUC core bundles use declarative services and thus depend on them
     //------------------------------------------------------------------------------------------------------
-    bundle group: "org.apache.felix",     name: "org.apache.felix.scr",                    version: "2.1.20"
+    bundle group: "org.apache.felix",     name: "org.apache.felix.scr",                    version: "2.1.30"
     bundle group: "org.osgi",             name: "org.osgi.util.promise",                   version: "1.1.1"
     bundle group: "org.osgi",             name: "org.osgi.util.function",                  version: "1.1.0"
 
     //------------------------------------------------------------------------------------------------------
     // An implementation of the OSGi HTTP Service Specification, needed by the WebUI bundles
     //------------------------------------------------------------------------------------------------------
-    bundle group: "org.apache.felix",     name: "org.apache.felix.http.servlet-api",       version: "1.1.2"
+    bundle group: "org.apache.felix",     name: "org.apache.felix.http.servlet-api",       version: "1.1.4"
     bundle group: "org.apache.felix",     name: "org.apache.felix.http.api",               version: "3.0.0"
-    bundle group: "org.apache.felix",     name: "org.apache.felix.http.jetty",             version: "4.0.18"
+    bundle group: "org.apache.felix",     name: "org.apache.felix.http.jetty",             version: "4.1.12"
     bundle group: "javax.annotation",     name: "javax.annotation-api",                    version: "1.3.2"
     bundle group: "javax.xml.bind",       name: "jaxb-api",                                version: "2.3.1"
 
     //------------------------------------------------------------------------------------------------------
     // Implementations of the OSGi Event Admin, Configuration Admin and MetaType services, needed by jetty
     //------------------------------------------------------------------------------------------------------
-    bundle group: "org.apache.felix",     name: "org.apache.felix.eventadmin",             version: "1.5.0"
-    bundle group: "org.apache.felix",     name: "org.apache.felix.configadmin",            version: "1.9.16"
-    bundle group: "org.apache.felix",     name: "org.apache.felix.metatype",               version: "1.2.2"
+    bundle group: "org.apache.felix",     name: "org.apache.felix.eventadmin",             version: "1.6.2"
+    bundle group: "org.apache.felix",     name: "org.apache.felix.configadmin",            version: "1.9.22"
+    bundle group: "org.apache.felix",     name: "org.apache.felix.metatype",               version: "1.2.4"
+    bundle group: 'org.osgi',             name: 'org.osgi.service.log',                    version: '1.5.0'
     bundle group: 'org.apache.felix',     name: 'org.apache.felix.fileinstall',            version: '3.6.8'
-
+  
     //------------------------------------------------------------------------------------------------------
     // Adds a web console for felix bundle management
     // http://localhost:8888/system/console/httpservice
     // https://localhost:8889/system/console/httpservice
     //------------------------------------------------------------------------------------------------------
-    bundle group: "org.apache.felix",     name: "org.apache.felix.webconsole",            version: "4.5.4"
-    bundle group: "commons-io",           name: "commons-io",                             version: "2.6"
-    bundle group: "commons-fileupload",   name: "commons-fileupload",                     version: "1.4"
-    bundle group: "commons-codec",        name: "commons-codec",                          version: "1.14"
+    bundle group: "org.apache.felix",     name: "org.apache.felix.webconsole",             version: "4.7.0"
+    bundle group: "commons-io",           name: "commons-io",                              version: "2.11.0"
+    bundle group: "commons-fileupload",   name: "commons-fileupload",                      version: "1.4"
+    bundle group: "commons-codec",        name: "commons-codec",                           version: "1.15"
 
     //------------------------------------------------------------------------------------------------------
     // Adds Google dependencies, needed by REST, MySQL or OPC UA bundles
     //------------------------------------------------------------------------------------------------------
-    bundle group: 'com.google.code.gson', name: 'gson',                                   version: '2.8.6'
-    bundle group: 'com.google.protobuf',  name: 'protobuf-java',                          version: '3.11.1'
-    //bundle group: 'com.google.guava',     name: 'guava',                                  version: '26.0-jre'
+    bundle group: 'com.google.code.gson', name: 'gson',                                    version: '2.8.6'
+    bundle group: 'com.google.protobuf',  name: 'protobuf-java',                           version: '3.11.1'
+    //bundle group: 'com.google.guava',     name: 'guava',                                   version: '26.0-jre'
 }
