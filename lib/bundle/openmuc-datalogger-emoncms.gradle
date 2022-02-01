@@ -1,5 +1,5 @@
 def projectName = "emonjava"
-def projectVersion = "1.5.0"
+def projectVersion = "1.5.2"
 
 repositories {
     flatDir {
