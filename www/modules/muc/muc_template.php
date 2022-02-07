@@ -321,6 +321,7 @@ class MucTemplate extends DeviceTemplate {
                 $this->create_input_processes($userid, $feeds, $channels);
             }
         } catch(Exception $e) {
+            $this->log->error($e->getMessage());
             return array('success'=>false, 'message'=>$e->getMessage());
         }
         return array('success'=>true, 'message'=>'Device initialized');
@@ -387,7 +388,10 @@ class MucTemplate extends DeviceTemplate {
                 }
             }
             //if (empty($c->node) ||
-            if (empty($c->logging) || empty($c->logging->loggingInterval) || $c->logging->loggingInterval <= 0) {
+            if (empty($configs['logging']) 
+                || empty($configs['logging']['loggingInterval']) 
+                || intval($configs['logging']['loggingInterval']) <= 0) {
+
                 // Remove the channel from list to avoid the unnecessary input creation
                 $c->action = 'none';
             }
@@ -397,37 +401,6 @@ class MucTemplate extends DeviceTemplate {
             }
         }
         return array('success'=>true, 'message'=>'Channels successfully created');
-    }
-
-    protected function create_feeds($userid, &$feeds) {
-        foreach($feeds as $f) {
-            $datatype = constant($f->type); // DataType::
-            $engine = constant($f->engine); // Engine::
-            if (isset($f->unit)) $unit = $f->unit; else $unit = "";
-            
-            $options = new stdClass();
-            if ($engine == Engine::PHPFIWA || $engine == Engine::PHPFINA || $engine == Engine::PHPTIMESTORE || $engine == Engine::TIMESTORE) {
-                if (property_exists($f, "interval")) {
-                    $options->interval = $f->interval;
-                }
-            }
-            else if ($engine == Engine::MYSQL || $engine == Engine::MYSQLMEMORY) {
-                if (property_exists($f, "table")) {
-                    $options->name = $f->table;
-                }
-                if (property_exists($f, "valueType")) {
-                    $options->type = $f->valueType;
-                }
-                $options->empty = true;
-            }
-            
-            if ($f->action === 'create') {
-                $result = $this->feed->create($userid, $f->tag, $f->name, $datatype, $engine, $options, $unit);
-                if($result['success'] === true) {
-                    $f->id = $result["feedid"];
-                }
-            }
-        }
     }
 
     public function set_fields($device, $fields) {

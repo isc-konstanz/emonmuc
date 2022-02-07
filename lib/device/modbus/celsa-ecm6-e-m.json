@@ -1,10 +1,10 @@
 {
     "name": "ECM6-E M",
-    "category": "Meter",
     "group": "Celsa Messgeräte GmbH",
-    "driver": "modbus",
+    "category": "Meter",
     "description": "Requires the <b>Modbus</b> (TCP) driver to be installed.<br><br><b>Energy Meter ECM6-E M</b>:<br>6A three phase 4 wire energy meter with Ethernet",
 
+    "driver": "modbus",
     "devices": [
         {
             "description": "Modbus TCP connection",
@@ -287,7 +287,6 @@
         {
             "name": "Voltage L1",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_voltage_l1",
             "unit": "V"
@@ -295,7 +294,6 @@
         {
             "name": "Voltage L2",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_voltage_l2",
             "unit": "V"
@@ -303,7 +301,6 @@
         {
             "name": "Voltage L3",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_voltage_l3",
             "unit": "V"
@@ -311,7 +308,6 @@
         {
             "name": "Voltage",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_voltage",
             "unit": "V"
@@ -319,35 +315,30 @@
         {
             "name": "Power factor L1",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_power_factor_l1"
         },
         {
             "name": "Power factor L2",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_power_factor_l2"
         },
         {
             "name": "Power factor L3",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_power_factor_l3"
         },
         {
             "name": "Power factor",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_power_factor"
         },
         {
             "name": "Power active L1",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_power_active_l1",
             "unit": "W"
@@ -355,7 +346,6 @@
         {
             "name": "Power active L2",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_power_active_l2",
             "unit": "W"
@@ -363,7 +353,6 @@
         {
             "name": "Power active L3",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_power_active_l3",
             "unit": "W"
@@ -371,7 +360,6 @@
         {
             "name": "Power active",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_power_active",
             "unit": "W"
@@ -379,7 +367,6 @@
         {
             "name": "Power reactive L1",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_power_reactive_l1",
             "unit": "var"
@@ -387,7 +374,6 @@
         {
             "name": "Power reactive L2",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_power_reactive_l2",
             "unit": "var"
@@ -395,7 +381,6 @@
         {
             "name": "Power reactive L3",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_power_reactive_l3",
             "unit": "var"
@@ -403,7 +388,6 @@
         {
             "name": "Power reactive",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_power_reactive",
             "unit": "var"
@@ -411,7 +395,6 @@
         {
             "name": "Frequency",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_frequency",
             "unit": "Hz"
@@ -419,7 +402,6 @@
         {
             "name": "Energy import L1",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_energy_import_l1",
             "unit": "kWh"
@@ -427,7 +409,6 @@
         {
             "name": "Energy import L2",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_energy_import_l2",
             "unit": "kWh"
@@ -435,7 +416,6 @@
         {
             "name": "Energy import L3",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_energy_import_l3",
             "unit": "kWh"
@@ -443,7 +423,6 @@
         {
             "name": "Energy import",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_energy_import",
             "unit": "kWh"
@@ -451,7 +430,6 @@
         {
             "name": "Energy export L1",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_energy_export_l1",
             "unit": "kWh"
@@ -459,7 +437,6 @@
         {
             "name": "Energy export L2",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_energy_export_l2",
             "unit": "kWh"
@@ -467,7 +444,6 @@
         {
             "name": "Energy export L3",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_energy_export_l3",
             "unit": "kWh"
@@ -475,7 +451,6 @@
         {
             "name": "Energy export",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_energy_export",
             "unit": "kWh"

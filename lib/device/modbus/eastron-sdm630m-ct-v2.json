@@ -1,10 +1,10 @@
 {
     "name": "SDM630M-CT-V2",
-    "category": "Meter",
     "group": "EASTRON",
-    "driver": "modbus",
+    "category": "Meter",
     "description": "Requires the <b>Modbus</b> (RTU) driver to be installed.<br><br><b>Energy Meter SDM630M-CT-V2</b>:<br>Current: 0.25-5(6)A<br>Voltage : 3*230/400V<br>50/60Hz",
 
+    "driver": "modbus",
     "devices": [
         {
             "name": "serial<address>",
@@ -371,168 +371,144 @@
         {
             "name": "Voltage",
             "tag": "<name> L1",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "V"
         },
         {
             "name": "Voltage",
             "tag": "<name> L2",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "V"
         },
         {
             "name": "Voltage",
             "tag": "<name> L3",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "V"
         },
         {
             "name": "Current",
             "tag": "<name> L1",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "A"
         },
         {
             "name": "Current",
             "tag": "<name> L2",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "A"
         },
         {
             "name": "Current",
             "tag": "<name> L3",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "A"
         },
         {
             "name": "Power",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "W"
         },
         {
             "name": "Frequency",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "Hz"
         },
         {
             "name": "Energy import",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "kWh"
         },
         {
             "name": "Energy import",
             "tag": "<name> L1",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "kWh"
         },
         {
             "name": "Energy import",
             "tag": "<name> L2",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "kWh"
         },
         {
             "name": "Energy import",
             "tag": "<name> L3",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "kWh"
         },
         {
             "name": "Energy export",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "kWh"
         },
         {
             "name": "Energy export",
             "tag": "<name> L1",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "kWh"
         },
         {
             "name": "Energy export",
             "tag": "<name> L2",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "kWh"
         },
         {
             "name": "Energy export",
             "tag": "<name> L3",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "kWh"
         },
         {
             "name": "Power import",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "W"
         },
         {
             "name": "Power import",
             "tag": "<name> L1",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "W"
         },
         {
             "name": "Power import",
             "tag": "<name> L2",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "W"
         },
         {
             "name": "Power import",
             "tag": "<name> L3",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "W"
         },
         {
             "name": "Power export",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "W"
         },
         {
             "name": "Power export",
             "tag": "<name> L1",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "W"
         },
         {
             "name": "Power export",
             "tag": "<name> L2",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "W"
         },
         {
             "name": "Power export",
             "tag": "<name> L3",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "W"
         }

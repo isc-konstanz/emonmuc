@@ -1,7 +1,7 @@
 {
-    "name"         : "EmonMUC Core",
+    "name"         : "EmonMUC",
     "version"      : "4.2.0",
-    "location"     : "/var/www/emoncms/Modules",
+    "location"     : "/opt/emonmuc",
     "branches_available": ["stable","seal","master"],
     "requires": ["device"]
 }

@@ -1,10 +1,10 @@
 {
     "name": "SDM230-M",
-    "category": "Meter",
     "group": "EASTRON",
-    "driver": "modbus",
+    "category": "Meter",
     "description": "Requires the <b>Modbus</b> (RTU) driver to be installed.<br><br><b>Energy Meter SDM230-M</b>:<br>Current: 10(100)A<br>Voltage : 230V<br>50(60)Hz",
 
+    "driver": "modbus",
     "devices": [
         {
             "name": "serial<address>",
@@ -211,56 +211,48 @@
         {
             "name": "Voltage",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "V"
         },
         {
             "name": "Current",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "A"
         },
         {
             "name": "Power",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "W"
         },
         {
             "name": "Frequency",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "Hz"
         },
         {
             "name": "Energy import",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "kWh"
         },
         {
             "name": "Power import",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "kWh"
         },
         {
             "name": "Energy export",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "kWh"
         },
         {
             "name": "Power export",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "kWh"
         }
