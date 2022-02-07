@@ -1,10 +1,10 @@
 {
     "name": "CBP 015+1 Port",
-    "category": "EVSE",
     "group": "chargeBIG",
-    "driver": "opcua",
+    "category": "EVSE",
     "description": "Requires the <b>OPC UA</b> driver to be installed.",
 
+    "driver": "opcua",
     "devices": [
         {
             "name": "<server>",
@@ -131,14 +131,12 @@
         {
             "name": "State",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_state"
         },
         {
             "name": "Current limit",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_limit",
             "unit": "A"

@@ -1,10 +1,10 @@
 {
     "name": "Temperature/Humidity",
-    "category": "Sensor",
     "group": "eQ-3 HomeMatic",
-    "driver": "homematic-cc1101",
+    "category": "Sensor",
     "description": "Requires the <b><a href='https://github.com/isc-konstanz/OpenHomeMatic/'>HomeMatic CC1101</a></b> driver to be installed.<br><br>eQ-3 HomeMatic Wireless Temperature/Humidity Sensor",
 
+    "driver": "homematic-cc1101",
     "devices": [
         {
             "description": "eQ-3 HomeMatic Sensor",
@@ -125,14 +125,12 @@
         {
             "name": "Temperature",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "°C"
         },
         {
             "name": "Humidity",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "%"
         }

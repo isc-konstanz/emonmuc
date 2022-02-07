@@ -1,10 +1,10 @@
 {
     "name": "DS18B20",
-    "category": "Sensor",
     "group": "1-Wire (Raspberry Pi)",
-    "driver": "rpi-w1",
+    "category": "Sensor",
     "description": "Requires the <b>1-Wire</b> driver to be installed.<br><br>Configuration for a 1-Wire temperature sensor for the Raspberry Pi, type DS18B20",
 
+    "driver": "rpi-w1",
     "devices": [
         {
             "description": "DS18B20 temperature sensor",
@@ -89,7 +89,6 @@
         {
             "name": "Temperature",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "°C"
         }
