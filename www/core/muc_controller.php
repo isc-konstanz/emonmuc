@@ -17,7 +17,7 @@ const DIR_VIEWS = DIR_MODULE."/Views";
 require_once DIR_MODULE."/muc_model.php";
 
 function muc_controller() {
-    global $mysqli, $redis, $session, $route;
+    global $settings, $mysqli, $redis, $session, $route;
     
     $result = false;
     if ($route->format == 'html') {
@@ -95,6 +95,71 @@ function muc_controller() {
             elseif ($route->action == "delete" && $session['write']) {
                 $result = $ctrl->delete($session['userid'], $details['id']);
             }
+        }
+    }
+    if ($route->action == 'log' && $session['admin']) {
+        if (isset($settings['muc']) && !empty($settings['muc']['log_dir'])) {
+            $log_file = $settings['muc']['log_dir'].'/openmuc.log';
+        }
+        else {
+            $log_file='/var/log/openmuc/openmuc.log';
+        }
+        if (!file_exists($log_file)) {
+            $route->format = "json";
+            return array('success'=>false, 'message'=>"$log_file does not exist");
+        }
+        if ($route->subaction == "get") {
+            $route->format = "text";
+            ob_start();
+            // PHP replacement for tail starts here
+            function read_file($file, $lines)
+            {
+                //global $fsize;
+                $handle = fopen($file, "r");
+                $linecounter = $lines;
+                $pos = -2;
+                $beginning = false;
+                $text = array();
+                while ($linecounter > 0) {
+                    $t = " ";
+                    while ($t != "\n") {
+                        if (!empty($handle) && fseek($handle, $pos, SEEK_END) == -1) {
+                            $beginning = true;
+                            break;
+                        }
+                        if(!empty($handle)) $t = fgetc($handle);
+                        $pos --;
+                    }
+                    $linecounter --;
+                    if ($beginning) {
+                        rewind($handle);
+                    }
+                    $text[$lines-$linecounter-1] = fgets($handle);
+                    if ($beginning) break;
+                }
+                fclose ($handle);
+                return array_reverse($text);
+            }
+            
+            $fsize = round(filesize($log_file)/1024/1024,2);
+            $lines = read_file($log_file, 25);
+            
+            foreach ($lines as $line) {
+                echo $line;
+            } //End PHP replacement for Tail
+            return trim(ob_get_clean());
+        }
+        elseif ($route->subaction == "download") {
+            header("Content-Type: application/octet-stream");
+            header("Content-Transfer-Encoding: Binary");
+            header("Content-disposition: attachment; filename=\"" . basename($log_file) . "\"");
+            header("Pragma: no-cache");
+            header("Expires: 0");
+            flush();
+            if (file_exists($log_file)) {
+                readfile($log_file);
+            }
+            exit;
         }
     }
     return array('content'=>$result);
