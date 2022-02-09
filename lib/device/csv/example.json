@@ -14,14 +14,14 @@
     ],
 
     "scan": {
-        "settings": "path=<emonmuc_dir>/lib/driver/csv/"
+        "settings": "path=<emonmuc_lib>/driver/csv/"
     },
 
     "options": [
         {
             "id": "file",
             "name": "CSV file",
-            "description": "The location of the provided demonstration CSV file.<br><b>Default:</b><ul><li><emonmuc_dir>/lib/driver/csv/home1.csv</li><li><emonmuc_dir>/lib/driver/csv/home2.csv</li></ul>",
+            "description": "The location of the provided demonstration CSV file.<br><b>Examples:</b><ul><li><emonmuc_lib>/driver/csv/home1.csv</li><li><emonmuc_lib>/driver/csv/home2.csv</li></ul>",
             "type": "text",
             "scan": true,
             "syntax": "deviceAddress",

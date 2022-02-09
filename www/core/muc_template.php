@@ -25,8 +25,8 @@ class MucTemplate extends DeviceTemplate {
 
     protected function load_list() {
         $list = array();
-        $this->load_dir($this->get_root_dir(), $list);
-        $this->load_dir($this->get_lib_dir(), $list);
+        $this->load_dir($this->get_root_dir()."/lib/device", $list);
+        $this->load_dir($this->get_lib_dir()."/device", $list);
         
         return $list;
     }
@@ -36,7 +36,7 @@ class MucTemplate extends DeviceTemplate {
             $it = new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::FOLLOW_SYMLINKS);
             foreach (new RecursiveIteratorIterator($it) as $file) {
                 if ($file->getExtension() == "json") {
-                    $type = substr(pathinfo($file, PATHINFO_DIRNAME), strlen($dir)).'/'.pathinfo($file, PATHINFO_FILENAME);
+                    $type = substr(pathinfo($file, PATHINFO_DIRNAME), strlen($dir)+1).'/'.pathinfo($file, PATHINFO_FILENAME);
                     
                     $result = $this->get($type);
                     if (is_array($result) && isset($result['success']) && $result['success'] == false) {
@@ -51,17 +51,21 @@ class MucTemplate extends DeviceTemplate {
     public function get($type) {
         $content = $this->get_file_content($type);
         
+        if (strpos($content, "<openenergymonitor_dir>") !== false) {
+            global $settings;
+            $content = str_replace("<openenergymonitor_dir>", $settings['openenergymonitor_dir'], $content);
+        }
         if (strpos($content, "<emoncms_dir>") !== false) {
             global $settings;
             $content = str_replace("<emoncms_dir>", $settings['emoncms_dir'], $content);
         }
         if (strpos($content, "<emonmuc_dir>") !== false) {
             global $settings;
-            $content = str_replace("<emonmuc_dir>", $settings['openenergymonitor_dir']."/emonmuc", $content);
+            $content = str_replace("<emonmuc_dir>", $this->get_root_dir(), $content);
         }
-        if (strpos($content, "<openenergymonitor_dir>") !== false) {
+        if (strpos($content, "<emonmuc_lib>") !== false) {
             global $settings;
-            $content = str_replace("<openenergymonitor_dir>", $settings['openenergymonitor_dir'], $content);
+            $content = str_replace("<emonmuc_lib>", $this->get_lib_dir(), $content);
         }
         
         $template = json_decode($content);
@@ -112,9 +116,9 @@ class MucTemplate extends DeviceTemplate {
         if (preg_replace('/[^\p{N}\p{L}\-\_\/]/u', '', $type) != $type) {
             throw new ParseError("Device type must only contain A-Z a-z 0-9 - _ / characters");
         }
-        $file = $this->get_root_dir().$type.".json";
+        $file = $this->get_root_dir()."/lib/device/$type.json";
         if (!file_exists($file)) {
-            $file = $this->get_lib_dir().$type.".json";
+            $file = $this->get_lib_dir()."/device/$type.json";
         }
         if (!file_exists($file)) {
             throw new ParseError("Error reading template ".$type.": $file does not exist");
@@ -125,29 +129,29 @@ class MucTemplate extends DeviceTemplate {
     private function get_root_dir() {
         global $settings;
         if (isset($settings['muc']) && !empty($settings['muc']['root_dir'])) {
-            $muc_template_dir = $settings['muc']['root_dir']."/lib/";
+            $muc_root_dir = $settings['muc']['root_dir'];
         }
         else {
-            $muc_template_dir = $settings['openenergymonitor_dir']."/emonmuc/lib/";
+            $muc_root_dir = $settings['openenergymonitor_dir']."/emonmuc";
         }
-        if (substr($muc_template_dir, -1) !== "/") {
-            $muc_template_dir .= "/";
+        if (substr($muc_root_dir, -1) === "/") {
+            $muc_root_dir = substr($muc_lib_dir, 0, -1);
         }
-        return $muc_template_dir."device/";
+        return $muc_root_dir;
     }
 
     private function get_lib_dir() {
         global $settings;
         if (isset($settings['muc']) && !empty($settings['muc']['lib_dir'])) {
-            $muc_template_dir = $settings['muc']['lib_dir'];
+            $muc_lib_dir = $settings['muc']['lib_dir'];
         }
         else {
-            $muc_template_dir = "/var/opt/emonmuc/";
+            $muc_lib_dir = "/var/opt/emonmuc";
         }
-        if (substr($muc_template_dir, -1) !== "/") {
-            $muc_template_dir .= "/";
+        if (substr($muc_lib_dir, -1) === "/") {
+            $muc_lib_dir = substr($muc_lib_dir, 0, -1);
         }
-        return $muc_template_dir."device/";
+        return $muc_lib_dir;
     }
 
     public function prepare($device) {
