@@ -121,7 +121,8 @@ class HttpDevice extends ControllerDevice {
                     }
                 }
                 usort($result, function($c1, $c2) {
-                    return strcmp($c1['id'], $c2['id']);
+                    return strcmp(preg_replace('/[^\p{N}\p{L}]/u', '', $c1['id']), 
+                                  preg_replace('/[^\p{N}\p{L}]/u', '', $c2['id']));
                 });
             }
             $device['channels'] = $result;
@@ -129,7 +130,18 @@ class HttpDevice extends ControllerDevice {
         usort($devices, function($d1, $d2) {
             if($d1['id'] == $d2['id'])
                 return $d1['ctrlid'] - $d2['ctrlid'];
-            return strcmp($d1['id'], $d2['id']);
+            
+            $id1 = preg_replace('/[^\p{N}\p{L}]/u', '', $d1['id']);
+            $id2 = preg_replace('/[^\p{N}\p{L}]/u', '', $d2['id']);
+            if ($id1 == $id2) {
+                if (strpos($d2['id'], '_') === 0 || strpos($d1['id'], '_') === 0) {
+                    return 1;
+                }
+                if ($id1 != $d1['id'] || $id2 != $d2['id']) {
+                    return strcmp($d1['id'], $d2['id']);
+                }
+            }
+            return strcmp($id1, $id2);
         });
         return $devices;
     }
