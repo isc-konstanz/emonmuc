@@ -240,6 +240,9 @@ abstract class ControllerChannel {
             if (isset($configs['loggingAverage'])) {
                 $logging['loggingAverage'] = $configs['loggingAverage']; unset($configs['loggingAverage']);
             }
+            if (isset($configs['loggingEvent'])) {
+                $logging['loggingEvent'] = $configs['loggingEvent']; unset($configs['loggingEvent']);
+            }
             if(isset($configs['loggingSettings'])) {
                 $str = str_replace('emonlogger:', '', $configs['loggingSettings']);
                 if (strpos($str, '=') !== false) {
@@ -547,6 +550,9 @@ abstract class ControllerChannel {
             }
             if (isset($logging['average'])) {
                 $configs['loggingAverage'] = $logging['average']; unset($logging['average']);
+            }
+            if (isset($logging['loggingEvent'])) {
+                $configs['loggingEvent'] = $logging['loggingEvent']; unset($logging['loggingEvent']);
             }
             if (!empty($logging) && $logging_enabled) {
                 $configs['loggingSettings'] = $this->encode_logging($logging);
