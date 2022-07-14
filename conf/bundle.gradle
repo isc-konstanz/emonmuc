@@ -1,7 +1,7 @@
 ext.tempDir = "/var/tmp/emonmuc/bundle"
 ext.tempDownload = true
 
-ext.openmucVersion = "0.20.2"
+ext.openmucVersion = "0.20.3"
 
 repositories {
     flatDir {
