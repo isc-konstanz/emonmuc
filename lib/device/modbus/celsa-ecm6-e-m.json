@@ -27,6 +27,11 @@
             "description": "Defines at which interval the values of the meter device will be read.",
             "type": "selection",
             "select": [
+                { "name": "100 milliseconds", "value": 100 },
+                { "name": "200 milliseconds", "value": 200 },
+                { "name": "300 milliseconds", "value": 300 },
+                { "name": "400 milliseconds", "value": 400 },
+                { "name": "500 milliseconds", "value": 500 },
                 { "name": "1 second", "value": 1000 },
                 { "name": "2 seconds", "value": 2000 },
                 { "name": "3 seconds", "value": 3000 },
@@ -48,9 +53,9 @@
                 { "name": "4 minutes", "value": 240000 },
                 { "name": "5 minutes", "value": 300000 },
                 { "name": "10 minutes", "value": 600000 },
-                { "name": "15 minutes", "value": 900000 }
+                { "name": "15 minutes", "value": 180000 }
             ],
-            "default": 60000,
+            "default": 1000,
             "mandatory": false
         }
     ],
@@ -60,7 +65,7 @@
             "name": "<node>*voltage*l1",
             "description": "Voltage L1-N",
             "address": "1:INPUT_REGISTERS:4096:FLOAT",
-            "configs": {"samplingInterval": "<refresh>", "valueType":"FLOAT", "unit": "V"},
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"VOLTAGE", "valueType":"FLOAT", "unit": "V"},
             "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "loggingTolerance": 0.1, "average": true, "engine":"SQL",
                 "feed": {"name": "Voltage L1", "tag": "<name>"}
             }
@@ -69,7 +74,7 @@
             "name": "<node>*voltage*l2",
             "description": "Voltage L2-N",
             "address": "1:INPUT_REGISTERS:4098:FLOAT",
-            "configs": {"samplingInterval": "<refresh>", "valueType":"FLOAT", "unit": "V"},
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"VOLTAGE", "valueType":"FLOAT", "unit": "V"},
             "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "loggingTolerance": 0.1, "average": true, "engine":"SQL",
                 "feed": {"name": "Voltage L2", "tag": "<name>"}
             }
@@ -78,7 +83,7 @@
             "name": "<node>*voltage*l3",
             "description": "Voltage L3-N",
             "address": "1:INPUT_REGISTERS:4100:FLOAT",
-            "configs": {"samplingInterval": "<refresh>", "valueType":"FLOAT", "unit": "V"},
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"VOLTAGE", "valueType":"FLOAT", "unit": "V"},
             "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "loggingTolerance": 0.1, "average": true, "engine":"SQL",
                 "feed": {"name": "Voltage L3", "tag": "<name>"}
             }
@@ -87,7 +92,7 @@
             "name": "<node>*voltage",
             "description": "System voltage",
             "address": "1:INPUT_REGISTERS:4108:FLOAT",
-            "configs": {"samplingInterval": "<refresh>", "valueType":"FLOAT", "unit": "V"},
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"VOLTAGE", "valueType":"FLOAT", "unit": "V"},
             "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "loggingTolerance": 0.1, "average": true, "engine":"SQL",
                 "feed": {"name": "Voltage", "tag": "<name>"}
             }
@@ -96,7 +101,7 @@
             "name": "<node>*power*factor*l1",
             "description": "Power factor L1",
             "address": "1:INPUT_REGISTERS:4120:FLOAT",
-            "configs": {"samplingInterval": "<refresh>", "valueType":"FLOAT"},
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"POWER", "valueType":"FLOAT"},
             "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "loggingTolerance": 0.1, "average": true, "engine":"SQL",
                 "feed": {"name": "Power factor L1", "tag": "<name>"}
             }
@@ -105,7 +110,7 @@
             "name": "<node>*power*factor*l2",
             "description": "Power factor L2",
             "address": "1:INPUT_REGISTERS:4122:FLOAT",
-            "configs": {"samplingInterval": "<refresh>", "valueType":"FLOAT"},
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"POWER", "valueType":"FLOAT"},
             "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "loggingTolerance": 0.1, "average": true, "engine":"SQL",
                 "feed": {"name": "Power factor L2", "tag": "<name>"}
             }
@@ -114,7 +119,7 @@
             "name": "<node>*power*factor*l3",
             "description": "Power factor L3",
             "address": "1:INPUT_REGISTERS:4124:FLOAT",
-            "configs": {"samplingInterval": "<refresh>", "valueType":"FLOAT"},
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"POWER", "valueType":"FLOAT"},
             "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "loggingTolerance": 0.1, "average": true, "engine":"SQL",
                 "feed": {"name": "Power factor L3", "tag": "<name>"}
             }
@@ -123,7 +128,7 @@
             "name": "<node>*power*factor",
             "description": "System power factor",
             "address": "1:INPUT_REGISTERS:4126:FLOAT",
-            "configs": {"samplingInterval": "<refresh>", "valueType":"FLOAT"},
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"POWER", "valueType":"FLOAT"},
             "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "loggingTolerance": 0.1, "average": true, "engine":"SQL",
                 "feed": {"name": "Power factor", "tag": "<name>"}
             }
@@ -132,7 +137,7 @@
             "name": "<node>*power*active*l1",
             "description": "Active power L1",
             "address": "1:INPUT_REGISTERS:4128:FLOAT",
-            "configs": {"samplingInterval": "<refresh>", "valueType":"FLOAT", "unit": "W"},
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"POWER", "valueType":"FLOAT", "unit": "W"},
             "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "loggingTolerance": 10, "average": true, "engine":"SQL",
                 "feed": {"name": "Power active L1", "tag": "<name>"}
             }
@@ -141,7 +146,7 @@
             "name": "<node>*power*active*l2",
             "description": "Active power L2",
             "address": "1:INPUT_REGISTERS:4130:FLOAT",
-            "configs": {"samplingInterval": "<refresh>", "valueType":"FLOAT", "unit": "W"},
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"POWER", "valueType":"FLOAT", "unit": "W"},
             "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "loggingTolerance": 10, "average": true, "engine":"SQL",
                 "feed": {"name": "Power active L2", "tag": "<name>"}
             }
@@ -150,7 +155,7 @@
             "name": "<node>*power*active*l3",
             "description": "Active power L3",
             "address": "1:INPUT_REGISTERS:4132:FLOAT",
-            "configs": {"samplingInterval": "<refresh>", "valueType":"FLOAT", "unit": "W"},
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"POWER", "valueType":"FLOAT", "unit": "W"},
             "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "loggingTolerance": 10, "average": true, "engine":"SQL",
                 "feed": {"name": "Power active L3", "tag": "<name>"}
             }
@@ -159,7 +164,7 @@
             "name": "<node>*power*active",
             "description": "System active power",
             "address": "1:INPUT_REGISTERS:4134:FLOAT",
-            "configs": {"samplingInterval": "<refresh>", "valueType":"FLOAT", "unit": "W"},
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"POWER", "valueType":"FLOAT", "unit": "W"},
             "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "loggingTolerance": 10, "average": true, "engine":"SQL",
                 "feed": {"name": "Power active", "tag": "<name>"}
             }
@@ -168,7 +173,7 @@
             "name": "<node>*power*reactive*l1",
             "description": "Reactive power L1",
             "address": "1:INPUT_REGISTERS:4144:FLOAT",
-            "configs": {"samplingInterval": "<refresh>", "valueType":"FLOAT", "unit": "W"},
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"POWER", "valueType":"FLOAT", "unit": "W"},
             "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "loggingTolerance": 10, "average": true, "engine":"SQL",
                 "feed": {"name": "Power reactive L1", "tag": "<name>"}
             }
@@ -177,7 +182,7 @@
             "name": "<node>*power*reactive*l2",
             "description": "Reactive power L2",
             "address": "1:INPUT_REGISTERS:4146:FLOAT",
-            "configs": {"samplingInterval": "<refresh>", "valueType":"FLOAT", "unit": "var"},
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"POWER", "valueType":"FLOAT", "unit": "var"},
             "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "loggingTolerance": 10, "average": true, "engine":"SQL",
                 "feed": {"name": "Power reactive L2", "tag": "<name>"}
             }
@@ -186,7 +191,7 @@
             "name": "<node>*power*reactive*l3",
             "description": "Reactive power L3",
             "address": "1:INPUT_REGISTERS:4148:FLOAT",
-            "configs": {"samplingInterval": "<refresh>", "valueType":"FLOAT", "unit": "var"},
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"POWER", "valueType":"FLOAT", "unit": "var"},
             "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "loggingTolerance": 10, "average": true, "engine":"SQL",
                 "feed": {"name": "Power reactive L3", "tag": "<name>"}
             }
@@ -195,7 +200,7 @@
             "name": "<node>*power*reactive",
             "description": "System reactive power",
             "address": "1:INPUT_REGISTERS:4150:FLOAT",
-            "configs": {"samplingInterval": "<refresh>", "valueType":"FLOAT", "unit": "var"},
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"POWER", "valueType":"FLOAT", "unit": "var"},
             "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "loggingTolerance": 10, "average": true, "engine":"SQL",
                 "feed": {"name": "Power reactive", "tag": "<name>"}
             }
@@ -213,7 +218,7 @@
             "name": "<node>*energy*import*l1",
             "description": "Energy import L1",
             "address": "1:INPUT_REGISTERS:4352:FLOAT",
-            "configs": {"samplingInterval": "<refresh>", "scalingFactor":0.001, "valueType":"FLOAT", "unit": "kWh"},
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"ENERGY", "scalingFactor":0.001, "valueType":"FLOAT", "unit": "kWh"},
             "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "engine":"SQL",
                 "feed": {"name": "Energy import L1", "tag": "<name>"}
             }
@@ -222,7 +227,7 @@
             "name": "<node>*energy*import*l2",
             "description": "Energy import L2",
             "address": "1:INPUT_REGISTERS:4354:FLOAT",
-            "configs": {"samplingInterval": "<refresh>", "scalingFactor":0.001, "valueType":"FLOAT", "unit": "kWh"},
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"ENERGY", "scalingFactor":0.001, "valueType":"FLOAT", "unit": "kWh"},
             "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "engine":"SQL",
                 "feed": {"name": "Energy import L2", "tag": "<name>"}
             }
@@ -231,7 +236,7 @@
             "name": "<node>*energy*import*l3",
             "description": "Energy import L3",
             "address": "1:INPUT_REGISTERS:4356:FLOAT",
-            "configs": {"samplingInterval": "<refresh>", "scalingFactor":0.001, "valueType":"FLOAT", "unit": "kWh"},
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"ENERGY", "scalingFactor":0.001, "valueType":"FLOAT", "unit": "kWh"},
             "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "engine":"SQL",
                 "feed": {"name": "Energy import L3", "tag": "<name>"}
             }
@@ -240,7 +245,7 @@
             "name": "<node>*energy*import",
             "description": "System energy import",
             "address": "1:INPUT_REGISTERS:4358:FLOAT",
-            "configs": {"samplingInterval": "<refresh>", "scalingFactor":0.001, "valueType":"FLOAT", "unit": "kWh"},
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"ENERGY", "scalingFactor":0.001, "valueType":"FLOAT", "unit": "kWh"},
             "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "engine":"SQL",
                 "feed": {"name": "Energy import", "tag": "<name>"}
             }
@@ -249,7 +254,7 @@
             "name": "<node>*energy*export*l1",
             "description": "Energy export L1",
             "address": "1:INPUT_REGISTERS:4360:FLOAT",
-            "configs": {"samplingInterval": "<refresh>", "scalingFactor":0.001, "valueType":"FLOAT", "unit": "kWh"},
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"ENERGY", "scalingFactor":0.001, "valueType":"FLOAT", "unit": "kWh"},
             "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "engine":"SQL",
                 "feed": {"name": "Energy export L1", "tag": "<name>"}
             }
@@ -258,7 +263,7 @@
             "name": "<node>*energy*export*l2",
             "description": "Energy export L2",
             "address": "1:INPUT_REGISTERS:4362:FLOAT",
-            "configs": {"samplingInterval": "<refresh>", "scalingFactor":0.001, "valueType":"FLOAT", "unit": "kWh"},
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"ENERGY", "scalingFactor":0.001, "valueType":"FLOAT", "unit": "kWh"},
             "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "engine":"SQL",
                 "feed": {"name": "Energy export L2", "tag": "<name>"}
             }
@@ -267,7 +272,7 @@
             "name": "<node>*energy*export*l3",
             "description": "Energy export L3",
             "address": "1:INPUT_REGISTERS:4364:FLOAT",
-            "configs": {"samplingInterval": "<refresh>", "scalingFactor":0.001, "valueType":"FLOAT", "unit": "kWh"},
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"ENERGY", "scalingFactor":0.001, "valueType":"FLOAT", "unit": "kWh"},
             "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "engine":"SQL",
                 "feed": {"name": "Energy export L3", "tag": "<name>"}
             }
@@ -276,7 +281,7 @@
             "name": "<node>*energy*export",
             "description": "System energy export",
             "address": "1:INPUT_REGISTERS:4366:FLOAT",
-            "configs": {"samplingInterval": "<refresh>", "scalingFactor":0.001, "valueType":"FLOAT", "unit": "kWh"},
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"ENERGY", "scalingFactor":0.001, "valueType":"FLOAT", "unit": "kWh"},
             "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 900000, "engine":"SQL",
                 "feed": {"name": "Energy export", "tag": "<name>"}
             }
