@@ -1,10 +1,10 @@
 {
     "name": "CBP 015+1",
-    "category": "EVSE",
     "group": "chargeBIG",
-    "driver": "opcua",
+    "category": "EVSE",
     "description": "Requires the <b>OPC UA</b> driver to be installed.",
 
+    "driver": "opcua",
     "devices": [
         {
             "name": "<node>",
@@ -99,17 +99,25 @@
         },
         {
             "id": "setpoint",
-            "type": "Slider",
+            "type": "Text",
             "label": "Setpoint per Phase  ",
+            "format": "%.1f A",
+            "default": "<current-max>",
+            "input": "<node>*setpoint"
+        },
+        {
+            "id": "setpoint-max",
+            "type": "Slider",
+            "label": "Maximum per Phase  ",
             "format": "%.1f A",
             "step": 1,
             "min": "<current-min>",
             "max": "<current-max>",
             "default": "<current-max>",
             "mapping": {
-                "SET": { "channel": "<node>*setpoint" }
+                "SET": { "channel": "<node>*setpoint*max" }
             },
-            "input": "<node>*setpoint"
+            "input": "<node>*setpoint*max"
         }
     ],
 
@@ -187,7 +195,7 @@
             "name": "<node>*l1*energy",
             "description": "Phase 1 energy",
             "address": "Z\u00e4hler_Energiebezug_Phase1",
-            "configs": {"samplingInterval": "<refresh>", "valueType": "DOUBLE", "unit": "kWh"},
+            "configs": {"samplingInterval": "<refresh>", "valueType": "DOUBLE", "scalingFactor":0.001, "unit": "kWh"},
             "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000, "engine":"SQL",
                 "feed": {"name": "Energy", "tag": "<name> L1"}
             }
@@ -196,7 +204,7 @@
             "name": "<node>*l2*energy",
             "description": "Phase 2 energy",
             "address": "Z\u00e4hler_Energiebezug_Phase2",
-            "configs": {"samplingInterval": "<refresh>", "valueType": "DOUBLE", "unit": "kWh"},
+            "configs": {"samplingInterval": "<refresh>", "valueType": "DOUBLE", "scalingFactor":0.001, "unit": "kWh"},
             "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000, "engine":"SQL",
                 "feed": {"name": "Energy", "tag": "<name> L2"}
             }
@@ -205,7 +213,7 @@
             "name": "<node>*l3*energy",
             "description": "Phase 3 energy",
             "address": "Z\u00e4hler_Energiebezug_Phase3",
-            "configs": {"samplingInterval": "<refresh>", "valueType": "DOUBLE", "unit": "kWh"},
+            "configs": {"samplingInterval": "<refresh>", "valueType": "DOUBLE", "scalingFactor":0.001, "unit": "kWh"},
             "logging": {"loggingInterval": "<refresh>", "loggingDelayMaximum": 900000, "engine":"SQL",
                 "feed": {"name": "Energy", "tag": "<name> L3"}
             }
@@ -243,7 +251,6 @@
         {
             "name": "Setpoint",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_setpoint",
             "unit": "A"
@@ -251,7 +258,6 @@
         {
             "name": "Power",
             "tag": "<name> L1",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_l1_power",
             "unit": "W"
@@ -259,7 +265,6 @@
         {
             "name": "Power",
             "tag": "<name> L2",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_l2_power",
             "unit": "W"
@@ -267,7 +272,6 @@
         {
             "name": "Power",
             "tag": "<name> L3",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_l3_power",
             "unit": "W"
@@ -275,28 +279,24 @@
         {
             "name": "Cos phi",
             "tag": "<name> L1",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_l1_cos_phi"
         },
         {
             "name": "Cos phi",
             "tag": "<name> L2",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_l2_cos_phi"
         },
         {
             "name": "Cos phi",
             "tag": "<name> L3",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_l3_cos_phi"
         },
         {
             "name": "Energy",
             "tag": "<name> L1",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_l1_energy",
             "unit": "kWh"
@@ -304,7 +304,6 @@
         {
             "name": "Energy",
             "tag": "<name> L2",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_l2_energy",
             "unit": "kWh"
@@ -312,7 +311,6 @@
         {
             "name": "Energy",
             "tag": "<name> L3",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_l3_energy",
             "unit": "kWh"
@@ -320,7 +318,6 @@
         {
             "name": "Current",
             "tag": "<name> L1",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_l1_current",
             "unit": "A"
@@ -328,7 +325,6 @@
         {
             "name": "Current",
             "tag": "<name> L2",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_l2_current",
             "unit": "A"
@@ -336,7 +332,6 @@
         {
             "name": "Current",
             "tag": "<name> L3",
-            "type": "DataType::REALTIME",
             "engine": "Engine::MYSQL",
             "table": "<node>_l3_current",
             "unit": "A"

@@ -1,14 +1,14 @@
 {
     "name": "MT631",
-    "category": "Meter",
     "group": "Iskraemeco",
-    "driver": "smartmeter",
+    "category": "Meter",
     "description": "Requires the <b><a href='https://github.com/isc-konstanz/OpenSmartMeter/'>SmartMeter</a></b> driver to be installed.<br><br>Energy Meter MT631",
 
+    "driver": "smartmeter",
     "devices": [
         {
             "description": "MT631 Energy Meter",
-            "address": "serialPort:<serialPort>",
+            "address": "<serialPort>",
             "settings": "mode:SML,baudRate:<baudRate>"
         }
     ],
@@ -156,28 +156,24 @@
         {
             "name": "Power import",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "W"
         },
         {
             "name": "Energy import",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "kWh"
         },
         {
             "name": "Power export",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "W"
         },
         {
             "name": "Energy export",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "kWh"
         }

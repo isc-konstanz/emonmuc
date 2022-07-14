@@ -1,10 +1,10 @@
 {
     "name": "Pin",
-    "category": "Sensor",
     "group": "GPIO (Raspberry Pi)",
-    "driver": "rpi-gpio",
+    "category": "Sensor",
     "description": "Requires the <b>GPIO</b> driver to be installed.<br><br>Configuration for a Raspberry Pi pin as an input.",
 
+    "driver": "rpi-gpio",
     "devices": [
         {
             "description": "Raspberry Pi Input",
@@ -88,7 +88,6 @@
         {
             "name": "State",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60"
         }

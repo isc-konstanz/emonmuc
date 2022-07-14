@@ -98,9 +98,8 @@ install_emonmuc() {
         systemctl start openmuc.service
     fi
     if [ -d "$EMONCMS_DIR" ]; then
-        sudo -u $EMONMUC_USER ln -sf "$EMONMUC_DIR"/www/modules/channel "$EMONCMS_DIR"/Modules/
-        sudo -u $EMONMUC_USER ln -sf "$EMONMUC_DIR"/www/modules/muc "$EMONCMS_DIR"/Modules/
-        sudo -u $EMONMUC_USER ln -sf "$EMONMUC_DIR"/www/themes/seal "$EMONCMS_DIR"/Theme/
+        sudo -u $EMONMUC_USER ln -sf "$EMONMUC_DIR"/www/channel "$EMONCMS_DIR"/Modules/channel
+        sudo -u $EMONMUC_USER ln -sf "$EMONMUC_DIR"/www/core "$EMONCMS_DIR"/Modules/muc
 
         php "$EMONMUC_DIR"/lib/www/upgrade.php
     fi

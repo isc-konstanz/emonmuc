@@ -32,17 +32,6 @@ class HttpChannel extends ControllerChannel {
             return array('success'=>false, 'message'=>"Channel key must only contain a-z A-Z 0-9 - _ . : and / characters");
         }
         
-        if (isset($channel['logging'])) {
-            $logging = (array) $channel['logging'];
-        }
-        else if (isset($channel['nodeid'])) {
-            $logging = array('nodeid' => $channel['nodeid']);
-        }
-        $nodeid = $logging['nodeid'];
-        if (preg_replace('/[^\p{N}\p{L}\-\_\.\:\/]/u', '', $nodeid) != $nodeid) {
-            return array('success'=>false, 'message'=>"Channel node must only contain a-z A-Z 0-9 - _ . : and / characters");
-        }
-        
         if (!empty($channel['description'])) {
             $description = $channel['description'];
         }
@@ -50,27 +39,41 @@ class HttpChannel extends ControllerChannel {
             $description = '';
         }
         
+        if (!empty($channel['logging'])) {
+            $logging = (array) $channel['logging'];
+            $logging_enabled = (isset($logging['loggingInterval']) && $logging['loggingInterval'] > 0) ||
+                               (isset($logging['loggingEvent']) && $logging['loggingEvent']);
+            
+            if (empty($logging['nodeid'])) {
+                return array('success'=>false, 'message'=>"Channel node needs to be configured to post values");
+        }
+        $nodeid = $logging['nodeid'];
+            
+        if (preg_replace('/[^\p{N}\p{L}\-\_\.\:\/]/u', '', $nodeid) != $nodeid) {
+            return array('success'=>false, 'message'=>"Channel node must only contain a-z A-Z 0-9 - _ . : and / characters");
+        }
+        
         $inputid = 0;
-        $input = $this->get_input($this->ctrl['userid'], $logging['nodeid'], $id);
+            $input = $this->get_input($this->ctrl['userid'], $nodeid, $id);
         if (isset($input)) {
             $inputid = $input['id'];
         }
-        else if (isset($logging['loggingInterval'])) {
+            else if ($inputid <= 0 && $logging_enabled) {
             $inputid = $this->input()->create_input($this->ctrl['userid'], $nodeid, $id);
             if ($inputid < 0) {
                 return array('success'=>false, 'message'=>_("Unable to create input for channel: $id"));
             }
         }
         if ($inputid > 0) {
-            $logging['inputid'] = $inputid;
+                $channel['logging']['inputid'] = $inputid;
             if ($description !== '') {
                 $this->input()->set_fields($inputid, '{"description":"'.$description.'"}');
                 if ($this->redis) $this->load_redis_input($inputid);
             }
         }
-        $logging = $this->decode_logging($this->ctrl['userid'], $nodeid, $logging);
+        }
         
-        $configs = $this->encode($id, $description, $logging, $channel);
+        $configs = $this->encode($id, $description, $channel);
         $data = array(
             'device' => $deviceid,
             'configs' => $configs
@@ -134,9 +137,15 @@ class HttpChannel extends ControllerChannel {
             $channels = $this->get_http_list();
         }
         usort($channels, function($c1, $c2) {
-            if($c1['deviceid'] == $c2['deviceid'])
-                return strcmp($c1['id'], $c2['id']);
-                return strcmp($c1['deviceid'], $c2['deviceid']);
+            $idsort = function($id1, $id2) {
+                return strcmp(preg_replace('/[^\p{N}\p{L}]/u', '', $id1), 
+                              preg_replace('/[^\p{N}\p{L}]/u', '', $id2));
+            };
+            if($c1['deviceid'] != $c2['deviceid']) {
+                return $idsort($c1['deviceid'], 
+                               $c2['deviceid']);
+            }
+            return $idsort($c1['id'], $c2['id']);
         });
         return $channels;
     }
@@ -275,26 +284,17 @@ class HttpChannel extends ControllerChannel {
             $description = '';
         }
         
-        if (isset($channel['logging'])) {
-            $logging = (array) $channel['logging'];
-            
-            if (empty($logging['nodeid'])) {
-                $newnode = null;
-            }
-            else {
-                $newnode = $logging['nodeid'];
+        if (!empty($channel['logging']) && !empty($channel['logging']['nodeid'])) {
+            $newnode = $channel['logging']['nodeid'];
                 if (preg_replace('/[^\p{N}\p{L}\-\_\.\:\/]/u', '', $newnode) != $newnode) {
                     return array('success'=>false, 'message'=>"Channel node must only contain a-z A-Z 0-9 - _ . : and / characters");
                 }
             }
-        }
         else {
-            $logging = array('nodeid' => $nodeid);
-            $newnode = null;
+            $newnode = $nodeid;
         }
-        $logging = $this->decode_logging($this->ctrl['userid'], $newnode, $logging);
         
-        $configs = $this->encode($newid, $description, $logging, $channel);
+        $configs = $this->encode($newid, $description, $channel);
         $this->http->put('channels/'.urlencode($id).'/configs', array('configs' => $configs));
         
         if (isset($nodeid)) {

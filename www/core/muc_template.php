@@ -15,56 +15,57 @@ require_once "Modules/device/device_template.php";
 require_once "Modules/muc/muc_model.php";
 
 class MucTemplate extends DeviceTemplate {
-    
+
     private $ctrl;
-    
+
     function __construct(&$parent) {
         parent::__construct($parent);
         $this->ctrl = new Controller($this->mysqli, $this->redis);
     }
-    
+
     protected function load_list() {
         $list = array();
+        $this->load_dir($this->get_root_dir()."/lib/device", $list);
+        $this->load_dir($this->get_lib_dir()."/device", $list);
         
-        $dir = $this->get_dir();
+        return $list;
+    }
+
+    protected function load_dir($dir, &$list) {
         if (is_dir($dir)) {
             $it = new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::FOLLOW_SYMLINKS);
             foreach (new RecursiveIteratorIterator($it) as $file) {
                 if ($file->getExtension() == "json") {
-                    $type = substr(pathinfo($file, PATHINFO_DIRNAME), strlen($dir)).'/'.pathinfo($file, PATHINFO_FILENAME);
+                    $type = substr(pathinfo($file, PATHINFO_DIRNAME), strlen($dir)+1).'/'.pathinfo($file, PATHINFO_FILENAME);
                     
                     $result = $this->get($type);
                     if (is_array($result) && isset($result['success']) && $result['success'] == false) {
-                        return $result;
+                        throw new DeviceException($result['message']);
                     }
                     $list[$type] = $result;
                 }
             }
         }
-        return $list;
     }
-    
+
     public function get($type) {
-        if (preg_replace('/[^\p{N}\p{L}\-\_\/]/u', '', $type) != $type) {
-            return array('success'=>false, 'message'=>"Device type must only contain A-Z a-z 0-9 - _ / characters");
-        }
-        $file = $this->get_dir().$type.".json";
-        if (!file_exists($file)) {
-            return array('success'=>false, 'message'=>"Error reading template $type: $file does not exist");
-        }
-        $content = file_get_contents($file);
+        $content = $this->get_file_content($type);
         
+        if (strpos($content, "<openenergymonitor_dir>") !== false) {
+            global $settings;
+            $content = str_replace("<openenergymonitor_dir>", $settings['openenergymonitor_dir'], $content);
+        }
         if (strpos($content, "<emoncms_dir>") !== false) {
             global $settings;
             $content = str_replace("<emoncms_dir>", $settings['emoncms_dir'], $content);
         }
         if (strpos($content, "<emonmuc_dir>") !== false) {
             global $settings;
-            $content = str_replace("<emonmuc_dir>", $settings['openenergymonitor_dir']."/emonmuc", $content);
+            $content = str_replace("<emonmuc_dir>", $this->get_root_dir(), $content);
         }
-        if (strpos($content, "<openenergymonitor_dir>") !== false) {
+        if (strpos($content, "<emonmuc_lib>") !== false) {
             global $settings;
-            $content = str_replace("<openenergymonitor_dir>", $settings['openenergymonitor_dir'], $content);
+            $content = str_replace("<emonmuc_lib>", $this->get_lib_dir(), $content);
         }
         
         $template = json_decode($content);
@@ -82,7 +83,7 @@ class MucTemplate extends DeviceTemplate {
                     array('name'=>'Dot', 'value'=>'.'),
                     array('name'=>'Hyphen', 'value'=>'-'),
                     array('name'=>'Underscore', 'value'=>'_'),
-                    array('name'=>'Space', 'value'=>' ')
+                    array('name'=>'Slash', 'value'=>'/')
                 ),
                 'default'=>self::SEPARATOR,
                 'mandatory'=>false,
@@ -90,7 +91,13 @@ class MucTemplate extends DeviceTemplate {
         }
         
         global $session;
-        $ctrls = $this->ctrl->get_list($session['userid']);
+        if (isset($session['userid']) && !$session['admin']) {
+            $userid = $session['userid'];
+            $ctrls = $this->ctrl->get_list($userid);
+        }
+        else {
+            $ctrls = $this->ctrl->get_all();
+        }
         if (count($ctrls) > 0) {
             $select = array();
             foreach ($ctrls as $ctrl) {
@@ -110,21 +117,49 @@ class MucTemplate extends DeviceTemplate {
         // Recursively cast associative arrays to objects
         return json_decode(json_encode($template));
     }
-    
-    private function get_dir() {
+
+    private function get_file_content($type) {
+        if (preg_replace('/[^\p{N}\p{L}\-\_\/]/u', '', $type) != $type) {
+            throw new ParseError("Device type must only contain A-Z a-z 0-9 - _ / characters");
+        }
+        $file = $this->get_root_dir()."/lib/device/$type.json";
+        if (!file_exists($file)) {
+            $file = $this->get_lib_dir()."/device/$type.json";
+        }
+        if (!file_exists($file)) {
+            throw new ParseError("Error reading template ".$type.": $file does not exist");
+        }
+        return file_get_contents($file);
+    }
+
+    private function get_root_dir() {
         global $settings;
-        if (isset($settings['muc']) && !empty($settings['muc']['lib_dir'])) {
-            $muc_template_dir = $settings['muc']['lib_dir'];
+        if (isset($settings['muc']) && !empty($settings['muc']['root_dir'])) {
+            $muc_root_dir = $settings['muc']['root_dir'];
         }
         else {
-            $muc_template_dir = $settings['openenergymonitor_dir']."/emonmuc/lib/";
+            $muc_root_dir = $settings['openenergymonitor_dir']."/emonmuc";
         }
-        if (substr($muc_template_dir, -1) !== "/") {
-            $muc_template_dir .= "/";
+        if (substr($muc_root_dir, -1) === "/") {
+            $muc_root_dir = substr($muc_lib_dir, 0, -1);
         }
-        return $muc_template_dir."device/";
+        return $muc_root_dir;
     }
-    
+
+    private function get_lib_dir() {
+        global $settings;
+        if (isset($settings['muc']) && !empty($settings['muc']['lib_dir'])) {
+            $muc_lib_dir = $settings['muc']['lib_dir'];
+        }
+        else {
+            $muc_lib_dir = "/var/opt/emonmuc";
+        }
+        if (substr($muc_lib_dir, -1) === "/") {
+            $muc_lib_dir = substr($muc_lib_dir, 0, -1);
+        }
+        return $muc_lib_dir;
+    }
+
     public function prepare($device) {
         $userid = intval($device['userid']);
         $nodeid = $device['nodeid'];
@@ -147,7 +182,7 @@ class MucTemplate extends DeviceTemplate {
             
             if (isset($template->channels)) {
                 $channels = $template->channels;
-                $this->prepare_inputs($userid, $nodeid, $channels);
+                $this->prepare_channels($userid, $nodeid, $channels);
             }
             else {
                 $channels = [];
@@ -164,21 +199,42 @@ class MucTemplate extends DeviceTemplate {
         }
         return array('success'=>true, 'feeds'=>$feeds, 'inputs'=>$channels);
     }
-    
+
     public function prepare_template($device) {
-        $file = $this->get_dir().$device['type'].".json";
-        if (!file_exists($file)) {
-            throw new ParseError("Error reading template ".$device['type'].": $file does not exist");
-        }
+        $content = $this->get_file_content($device['type']);
         $configs = $this->device->get_configs($device);
-        $content = file_get_contents($file);
         $template = json_decode($content);
         if (json_last_error() != 0) {
             throw new ParseError("Error reading template ".$device['type'].": ".json_last_error_msg());
         }
         return $this->prepare_json($device, $template, $content, $configs);
     }
-    
+
+    protected function prepare_channels($userid, $nodeid, &$channels) {
+        
+        foreach($channels as $c) {
+            if(!isset($c->node)) {
+                $c->node = $nodeid;
+            }
+            
+            if (empty($c->logging) || empty($c->logging->loggingInterval) || $c->logging->loggingInterval <= 0) {
+                // Remove the channel from list to avoid the unnecessary input creation
+                $c->action = 'none';
+            }
+            else {
+                $inputid = $this->input->exists_nodeid_name($userid, $c->node, $c->name);
+                if ($inputid == false) {
+                    $c->action = 'create';
+                    $c->id = -1;
+                }
+                else {
+                    $c->action = 'none';
+                    $c->id = $inputid;
+                }
+            }
+        }
+    }
+
     protected function prepare_json($device, $template, $content, $configs) {
         $result = json_decode($this->prepare_str($device, $template, $content, $configs));
         if (json_last_error() != 0) {
@@ -213,7 +269,7 @@ class MucTemplate extends DeviceTemplate {
         }
         return $content;
     }
-    
+
     public function init($device, $template) {
         $userid = intval($device['userid']);
         
@@ -232,17 +288,20 @@ class MucTemplate extends DeviceTemplate {
             throw new DeviceException('Unspecified controller ID in device configs.');
         }
         $device['configs'] = $configs;
+        $deviceid = $device['nodeid'];
+        $ctrlid = intval($configs['ctrlid']);
         try {
             $result = $this->prepare_template($device);
-            if (empty($result->devices)) {
-                return array('success'=>false, 'message'=>'Bad device template. Devices undefined.');
+            
+            if (!empty($result->devices)) {
+                $devices = $this->decode_devices($deviceid, $result, $configs);
+                $response = $this->create_devices($ctrlid, $devices);
+                if (isset($response['success']) && $response['success'] == false) {
+                    return $response;
+                }
             }
-            $ctrlid = intval($configs['ctrlid']);
-            $deviceid = $device['nodeid'];
-            $devices = $this->decode_devices($deviceid, $result, $configs);
-            $response = $this->create_devices($ctrlid, $devices);
-            if (isset($response['success']) && $response['success'] == false) {
-                return $response;
+            else {
+                $devices = array();
             }
             
             if (isset($template->feeds)) {
@@ -272,11 +331,12 @@ class MucTemplate extends DeviceTemplate {
                 $this->create_input_processes($userid, $feeds, $channels);
             }
         } catch(Exception $e) {
+            $this->log->error($e->getMessage());
             return array('success'=>false, 'message'=>$e->getMessage());
         }
         return array('success'=>true, 'message'=>'Device initialized');
     }
-    
+
     // Create the devices
     private function create_devices($ctrlid, $devices) {
         $ctrl = $this->ctrl->get($ctrlid);
@@ -295,7 +355,7 @@ class MucTemplate extends DeviceTemplate {
         }
         return array('success'=>true, 'message'=>'Devices successfully created');
     }
-    
+
     // Create the channels
     private function create_channels($ctrlid, $devices, &$channels) {
         $ctrl = $this->ctrl->get($ctrlid);
@@ -305,17 +365,26 @@ class MucTemplate extends DeviceTemplate {
             
             if (isset($configs['device'])) {
                 $deviceid = $configs['device'];
-                
-                foreach ($devices as $d) {
-                    if ($d->id == $deviceid) {
-                        $driverid = $d->driver;
+            }
+            else if (!empty($devices)) {
+                $deviceid = $devices[0]->id;
+            }
+            else {
+                throw new DeviceException("Bad device template. No device for channel ".$configs['id']);
+            }
+            if (isset($configs['driver'])) {
+                $driverid = $configs['driver'];
+            }
+            else if (!empty($devices)) {
+                foreach ($devices as $device) {
+                    if ($device->id == $deviceid) {
+                        $driverid = $device->driver;
                         break;
                     }
                 }
             }
-            else {
-                $deviceid = $devices[0]->id;
-                $driverid = $devices[0]->driver;
+            if (empty($driverid)) {
+                throw new DeviceException("Bad device template. No driver for channel ".$configs['id']);
             }
             try {
                 $result = $this->ctrl->channel($ctrl)->create($driverid, $deviceid, json_encode($configs));
@@ -329,7 +398,10 @@ class MucTemplate extends DeviceTemplate {
                 }
             }
             //if (empty($c->node) ||
-            if (empty($c->logging) && empty($c->logging->loggingInterval)) {
+            if (empty($configs['logging']) 
+                || empty($configs['logging']['loggingInterval']) 
+                || intval($configs['logging']['loggingInterval']) <= 0) {
+
                 // Remove the channel from list to avoid the unnecessary input creation
                 $c->action = 'none';
             }
@@ -340,38 +412,7 @@ class MucTemplate extends DeviceTemplate {
         }
         return array('success'=>true, 'message'=>'Channels successfully created');
     }
-    
-    protected function create_feeds($userid, &$feeds) {
-        foreach($feeds as $f) {
-            $datatype = constant($f->type); // DataType::
-            $engine = constant($f->engine); // Engine::
-            if (isset($f->unit)) $unit = $f->unit; else $unit = "";
-            
-            $options = new stdClass();
-            if ($engine == Engine::PHPFIWA || $engine == Engine::PHPFINA || $engine == Engine::PHPTIMESTORE || $engine == Engine::TIMESTORE) {
-                if (property_exists($f, "interval")) {
-                    $options->interval = $f->interval;
-                }
-            }
-            else if ($engine == Engine::MYSQL || $engine == Engine::MYSQLMEMORY) {
-                if (property_exists($f, "table")) {
-                    $options->name = $f->table;
-                }
-                if (property_exists($f, "valueType")) {
-                    $options->type = $f->valueType;
-                }
-                $options->empty = true;
-            }
-            
-            if ($f->action === 'create') {
-                $result = $this->feed->create($userid, $f->tag, $f->name, $datatype, $engine, $options, $unit);
-                if($result['success'] === true) {
-                    $f->id = $result["feedid"];
-                }
-            }
-        }
-    }
-    
+
     public function set_fields($device, $fields) {
         if (count((array) $fields) < 1) {
             return array('success'=>true, 'message'=>"No fields to update passed");
@@ -409,7 +450,7 @@ class MucTemplate extends DeviceTemplate {
         }
         return array('success'=>true, 'message'=>"Device updated");
     }
-    
+
     protected function update_devices($ctrlid, $device, $update, $template) {
         $ctrl = $this->ctrl->get($ctrlid);
         foreach($template->devices as $d) {
@@ -432,13 +473,21 @@ class MucTemplate extends DeviceTemplate {
             }
         }
     }
-    
+
     protected function update_channels($ctrlid, $device, $update, $template) {
         $ctrl = $this->ctrl->get($ctrlid);
+        
+        if (isset($template->feeds)) {
+            $feeds = $template->feeds;
+            $this->prepare_feeds($device['userid'], $device['nodeid'], $feeds);
+        }
+        else {
+            $feeds = [];
+        }
         foreach($template->channels as $c) {
             $configs = isset($device['configs']) ? $device['configs'] : $update['configs'];
             $configs = $this->prepare_json($update, $template, json_encode($c), $configs);
-            $channel = $this->decode_channel($update['nodeid'], $configs, $template, $update['configs']);
+            $channel = $this->decode_channel($update['nodeid'], $configs, $template, $update['configs'], $feeds);
             $channel->id = $channel->name;
             
             $id = $this->prepare_str($device, $template, $c->name, $update['configs']);
@@ -457,23 +506,23 @@ class MucTemplate extends DeviceTemplate {
             }
         }
     }
-    
+
     protected function update_feeds($device, $update, $template) {
         foreach($template->feeds as $f) {
             $feed = $this->prepare_json($device, $template, json_encode($f), $update['configs']);
-            $id = $this->feed->exists_tag_name(intval($device['userid']), isset($feed->tag) ? $feed->tag : $device['nodeid'],
+            $feedid = $this->feed->exists_tag_name(intval($device['userid']), isset($feed->tag) ? $feed->tag : $device['nodeid'],
                 $this->prepare_str($device, $template, $feed->name, $update['configs']));
             
-            if ($id > 0) {
+            if ($feedid > 0) {
                 $feed = $this->prepare_json($update, $template, json_encode($f), $update['configs']);
                 if (!isset($feed->tag)) {
                     $feed->tag = $update['nodeid'];
                 }
-                $this->feed->set_feed_fields($id, json_encode(array('name' => $feed->name, 'tag' => $feed->tag)));
+                $this->feed->set_feed_fields($feedid, json_encode(array('name' => $feed->name, 'tag' => $feed->tag)));
             }
         }
     }
-    
+
     public function scan_start($type, $options) {
         global $session;
         $userid = $session['userid'];
@@ -536,7 +585,7 @@ class MucTemplate extends DeviceTemplate {
             return $e->getResult();
         }
     }
-    
+
     public function scan_progress($type) {
         global $session;
         $userid = $session['userid'];
@@ -579,7 +628,7 @@ class MucTemplate extends DeviceTemplate {
             return $e->getResult();
         }
     }
-    
+
     public function scan_cancel($type) {
         global $session;
         $userid = $session['userid'];
@@ -615,7 +664,7 @@ class MucTemplate extends DeviceTemplate {
             return $e->getResult();
         }
     }
-    
+
     public function delete($device) {
         $configs = $this->device->get_configs($device);
         if (isset($configs['ctrlid'])) {
@@ -633,7 +682,7 @@ class MucTemplate extends DeviceTemplate {
         }
         return array('success'=>true, 'message'=>"No device to delete");
     }
-    
+
     private function decode_devices($id, $template, $parameters) {
         $devices = array();
         foreach ($template->devices as $device) {
@@ -641,7 +690,7 @@ class MucTemplate extends DeviceTemplate {
         }
         return $devices;
     }
-    
+
     private function decode_device($id, $device, $template, $parameters) {
         if (isset($device->name)) {
             $device->id = $device->name;
@@ -657,7 +706,7 @@ class MucTemplate extends DeviceTemplate {
         }
         return $device;
     }
-    
+
     private function decode_channels($deviceid, $channels, $template, $parameters, $feeds) {
         $result = array();
         foreach ($channels as $channel) {
@@ -665,16 +714,23 @@ class MucTemplate extends DeviceTemplate {
         }
         return $result;
     }
-    
+
     private function decode_channel($deviceid, $channel, $template, $parameters, $feeds=null) {
         if(!isset($channel->node)) {
             $channel->node = $deviceid;
         }
         if (empty($channel->logging)) {
-            $logging = array();
+            $logging = array(
+                'nodeid'=>$channel->node
+            );
         }
         else if (isset($channel->logging)) {
             $logging = (array) $channel->logging;
+            $logging['nodeid'] = $channel->node;
+            
+            if (isset($channel->id) && $channel->id > 0) {
+                $logging['inputid'] = $channel->id;
+            }
             if (isset($logging['feed']) && isset($feeds)) {
                 $feed = $logging['feed'];
                 $result = $this->search_feed($feeds, $feed->tag, $feed->name);
@@ -684,7 +740,6 @@ class MucTemplate extends DeviceTemplate {
                 unset($logging['feed']);
             }
         }
-        $logging['nodeid'] = $channel->node;
         $channel->logging = $logging;
         
         if (isset($template->options)) {
@@ -751,7 +806,7 @@ class MucTemplate extends DeviceTemplate {
         }
         return $result;
     }
-    
+
     private function decode_options($type, $template, $parameters) {
         $result = array();
         
@@ -795,7 +850,7 @@ class MucTemplate extends DeviceTemplate {
         }
         return $result;
     }
-    
+
     private function decode_progress($userid, $ctrlid, $type, $template, $result) {
         if (isset($result['success']) && $result['success'] == false) {
             return $result;
@@ -820,5 +875,5 @@ class MucTemplate extends DeviceTemplate {
         
         return $result;
     }
-    
+
 }

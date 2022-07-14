@@ -1,0 +1,7 @@
+{
+    "name"         : "EmonMUC Channel",
+    "version"      : "4.2.1",
+    "location"     : "/var/www/emoncms/Modules",
+    "branches_available": ["stable","seal","master"],
+    "requires": ["muc","device"]
+}

@@ -1,14 +1,14 @@
 {
     "name": "AS1440",
-    "category": "Meter",
     "group": "Elster Solutions GmbH",
-    "driver": "smartmeter",
+    "category": "Meter",
     "description": "Requires the <b><a href='https://github.com/isc-konstanz/OpenSmartMeter/'>SmartMeter</a></b> driver to be installed.<br><br>Energy Meter AS1440",
 
+    "driver": "smartmeter",
     "devices": [
         {
             "description": "AS1440 Energy Meter",
-            "address": "serialPort:<serialPort>,address:<address>",
+            "address": "<serialPort>:<address>",
             "settings": "mode:ABC,baudRate:<baudRate>,baudRateChangeDelay:<baudRateChangeDelay>"
         }
     ],
@@ -223,49 +223,42 @@
         {
             "name": "Power import",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "W"
         },
         {
             "name": "Energy import",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "kWh"
         },
         {
             "name": "Power export",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "W"
         },
         {
             "name": "Energy export",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "kWh"
         },
         {
             "name": "Voltage L1",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "V"
         },
         {
             "name": "Voltage L2",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "V"
         },
         {
             "name": "Voltage L3",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "V"
         }

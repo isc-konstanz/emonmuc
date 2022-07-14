@@ -1,10 +1,10 @@
 {
     "name": "CSV",
-    "category": "General",
     "group": "Example",
-    "driver": "csv",
+    "category": "General",
     "description": "Requires the <b>CSV</b> driver to be installed.<br><br>Configuration for an emonmuc demonstration, creating the device channels, inputs and feeds for a virtual household.",
 
+    "driver": "csv",
     "devices": [
         {
             "description": "Household energy consumption",
@@ -14,14 +14,14 @@
     ],
 
     "scan": {
-        "settings": "path=<emonmuc_dir>/lib/driver/csv/"
+        "settings": "path=<emonmuc_lib>/driver/csv/"
     },
 
     "options": [
         {
             "id": "file",
             "name": "CSV file",
-            "description": "The location of the provided demonstration CSV file.<br><b>Default:</b><ul><li><emonmuc_dir>/lib/driver/csv/home1.csv</li><li><emonmuc_dir>/lib/driver/csv/home2.csv</li></ul>",
+            "description": "The location of the provided demonstration CSV file.<br><b>Examples:</b><ul><li><emonmuc_lib>/driver/csv/home1.csv</li><li><emonmuc_lib>/driver/csv/home2.csv</li></ul>",
             "type": "text",
             "scan": true,
             "syntax": "deviceAddress",
@@ -173,7 +173,6 @@
         {
             "name": "Power",
             "tag": "<name> solar",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
             "unit": "W"
@@ -181,7 +180,6 @@
         {
             "name": "Energy",
             "tag": "<name> solar",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
             "unit": "kWh"
@@ -189,7 +187,6 @@
         {
             "name": "Power import",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
             "unit": "W"
@@ -197,7 +194,6 @@
         {
             "name": "Energy import",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
             "unit": "kWh"
@@ -205,7 +201,6 @@
         {
             "name": "Power export",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
             "unit": "W"
@@ -213,7 +208,6 @@
         {
             "name": "Energy export",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
             "unit": "kWh"
@@ -221,7 +215,6 @@
         {
             "name": "Power",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
             "unit": "W"
@@ -229,7 +222,6 @@
         {
             "name": "Energy",
             "tag": "<name>",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
             "unit": "kWh"
@@ -237,7 +229,6 @@
         {
             "name": "Power",
             "tag": "<name> HP",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
             "unit": "W"
@@ -245,7 +236,6 @@
         {
             "name": "Energy",
             "tag": "<name> HP",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
             "unit": "kWh"
@@ -253,7 +243,6 @@
         {
             "name": "Power",
             "tag": "<name> EV",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
             "unit": "W"
@@ -261,7 +250,6 @@
         {
             "name": "Energy",
             "tag": "<name> EV",
-            "type": "DataType::REALTIME",
             "engine": "Engine::PHPFINA",
             "interval": "60",
             "unit": "kWh"

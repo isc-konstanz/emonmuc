@@ -1,0 +1,7 @@
+{
+    "name"         : "EmonMUC",
+    "version"      : "4.2.1",
+    "location"     : "/opt/emonmuc",
+    "branches_available": ["stable","seal","master"],
+    "requires": ["device"]
+}

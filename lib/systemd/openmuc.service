@@ -8,9 +8,9 @@ Group=pi
 Type=forking
 Restart=always
 RestartSec=60s
-ExecStart=/usr/bin/bash /opt/openmuc/bin/openmuc start
-ExecReload=/usr/bin/bash /opt/openmuc/bin/openmuc reload
-ExecStop=/usr/bin/bash /opt/openmuc/bin/openmuc stop
+ExecStart=/opt/openmuc/bin/openmuc start
+ExecReload=/opt/openmuc/bin/openmuc reload
+ExecStop=/opt/openmuc/bin/openmuc stop
 WorkingDirectory=/opt/openmuc
 
 [Install]
