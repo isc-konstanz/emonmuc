@@ -1,5 +1,5 @@
 {
-    "name": "CBP 015+1 Port",
+    "name": "CBP 015+1 Charging point",
     "group": "chargeBIG",
     "category": "EVSE",
     "description": "Requires the <b>OPC UA</b> driver to be installed.",
@@ -21,8 +21,8 @@
             "mandatory": true
         },
         {
-            "id": "port",
-            "name": "Charging port",
+            "id": "point",
+            "name": "Charging point",
             "description": "Defines at which interval the values will be read.",
             "type": "selection",
             "select": [
