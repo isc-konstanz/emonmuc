@@ -46,31 +46,35 @@ class HttpChannel extends ControllerChannel {
             
             if (empty($logging['nodeid'])) {
                 return array('success'=>false, 'message'=>"Channel node needs to be configured to post values");
+            }
         }
-        $nodeid = $logging['nodeid'];
-            
+        if (!empty($logging['nodeid'])) {
+            $nodeid = $logging['nodeid'];
+        }
+        else {
+            $nodeid = $deviceid;
+        }
         if (preg_replace('/[^\p{N}\p{L}\-\_\.\:\/]/u', '', $nodeid) != $nodeid) {
             return array('success'=>false, 'message'=>"Channel node must only contain a-z A-Z 0-9 - _ . : and / characters");
         }
         
-        $inputid = 0;
-            $input = $this->get_input($this->ctrl['userid'], $nodeid, $id);
+        $inputid = -1;
+        $input = $this->get_input($this->ctrl['userid'], $nodeid, $id);
         if (isset($input)) {
             $inputid = $input['id'];
         }
-            else if ($inputid <= 0 && $logging_enabled) {
+        else if ($inputid <= 0 && $logging_enabled) {
             $inputid = $this->input()->create_input($this->ctrl['userid'], $nodeid, $id);
             if ($inputid < 0) {
                 return array('success'=>false, 'message'=>_("Unable to create input for channel: $id"));
             }
         }
         if ($inputid > 0) {
-                $channel['logging']['inputid'] = $inputid;
+            $channel['logging']['inputid'] = $inputid;
             if ($description !== '') {
                 $this->input()->set_fields($inputid, '{"description":"'.$description.'"}');
                 if ($this->redis) $this->load_redis_input($inputid);
             }
-        }
         }
         
         $configs = $this->encode($id, $description, $channel);

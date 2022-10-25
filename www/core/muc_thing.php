@@ -32,7 +32,7 @@ class MucThing extends DeviceThing {
             }
         }
         if (isset($item['channel'])) {
-            // TODO: implement channel parsing
+            $this->parse_item_channel($thing, $item, $template);
         }
         if (isset($item['input'])) {
             if (empty($template->inputs) && !empty($template->channels)) {
@@ -67,6 +67,46 @@ class MucThing extends DeviceThing {
             
             $mapping = array_merge(array('ctrlid'=>$ctrlid, 'channelid'=>$channelid), $configs, (array) $mapping);
         }
+    }
+
+    protected function parse_item_channel($thing, &$item, $template) {
+        $configs = $this->device->get_configs($thing);
+        if (empty($configs['ctrlid'])) {
+            throw new DeviceException('Unspecified controller ID in thing configs.');
+        }
+        $ctrlid = intval($configs['ctrlid']);
+        $channelid = $item['channel'];
+        unset($item['channel']);
+        
+        $item = array_merge(array('ctrlid'=>$ctrlid, 'channelid'=>$channelid), (array) $item);
+    }
+
+    protected function get_item_value($item) {
+        $value = null;
+        if (isset($item['channelid'])) {
+            if (empty($item['ctrlid']) || empty($item['channelid'])) {
+                return array('success'=>false, 'message'=>"Error while getting item value");
+            }
+            $ctrlid = intval($item['ctrlid']);
+            $ctrl = $this->ctrl->get($ctrlid);
+            $channel = $this->ctrl->channel($ctrl);
+            
+            $value = $channel->get($item['channelid'])['value'];
+        }
+        if (isset($item['inputid'])) {
+            require_once "Modules/input/input_model.php";
+            $input = new Input($this->mysqli, $this->redis, null);
+            
+            $value = $input->get_last_value($item['inputid']);
+        }
+        if (isset($item['feedid'])) {
+            global $settings;
+            require_once "Modules/feed/feed_model.php";
+            $feed = new Feed($this->mysqli, $this->redis, $settings['feed']);
+            
+            $value = $feed->get_value($item['feedid']);
+        }
+        return $value;
     }
 
     protected function set_item($itemid, $mapping) {

@@ -53,19 +53,19 @@ class MucTemplate extends DeviceTemplate {
         
         if (strpos($content, "<openenergymonitor_dir>") !== false) {
             global $settings;
-            $content = str_replace("<openenergymonitor_dir>", $settings['openenergymonitor_dir'], $content);
+            $content = str_replace("<openenergymonitor_dir>", $this->parse_dir($settings['openenergymonitor_dir']), $content);
         }
         if (strpos($content, "<emoncms_dir>") !== false) {
             global $settings;
-            $content = str_replace("<emoncms_dir>", $settings['emoncms_dir'], $content);
+            $content = str_replace("<emoncms_dir>", $this->parse_dir($settings['emoncms_dir']), $content);
         }
         if (strpos($content, "<emonmuc_dir>") !== false) {
             global $settings;
-            $content = str_replace("<emonmuc_dir>", $this->get_root_dir(), $content);
+            $content = str_replace("<emonmuc_dir>", $this->parse_dir($this->get_root_dir()), $content);
         }
         if (strpos($content, "<emonmuc_lib>") !== false) {
             global $settings;
-            $content = str_replace("<emonmuc_lib>", $this->get_lib_dir(), $content);
+            $content = str_replace("<emonmuc_lib>", $this->parse_dir($this->get_lib_dir()), $content);
         }
         
         $template = json_decode($content);
@@ -158,6 +158,11 @@ class MucTemplate extends DeviceTemplate {
             $muc_lib_dir = substr($muc_lib_dir, 0, -1);
         }
         return $muc_lib_dir;
+    }
+
+    private function parse_dir($dir) {
+        # TODO: implement additional directory sanitation
+        return str_replace('\\', '/', $dir);
     }
 
     public function prepare($device) {
