@@ -1,0 +1,369 @@
+{
+    "name": "Fronius Symo",
+    "group": "Sunspec",
+    "category": "Inverter",
+    "description": "Requires the <b>Modbus</b> (TCP) driver to be installed.<br><br>Fronius Datamanager Registers",
+
+    "driver": "modbus",
+    "devices": [
+        {
+            "name": "<node>",
+            "description": "Fronius Modbus TCP connection",
+            "address": "<address>:<port>",
+            "settings": "TCP"
+        }
+    ],
+
+    "options": [
+        {
+            "id": "address",
+            "name": "Server address",
+            "description": "The address to the Modbus TCP/IP server, e.g. 192.168.178.52",
+            "type": "text",
+            "mandatory": true
+        },
+        {
+            "id": "port",
+            "name": "Server port",
+            "description": "The port of the Modbus TCP/IP server, e.g. 502",
+            "type": "text",
+            "default": 502,
+            "mandatory": false
+        },
+        {
+            "id": "refresh",
+            "name": "Refresh interval",
+            "description": "Defines at which interval the values of the meter device will be read.",
+            "type": "selection",
+            "select": [
+                { "name": "1 second", "value": 1000 },
+                { "name": "2 seconds", "value": 2000 },
+                { "name": "3 seconds", "value": 3000 },
+                { "name": "4 seconds", "value": 4000 },
+                { "name": "5 seconds", "value": 5000 },
+                { "name": "10 seconds", "value": 10000 },
+                { "name": "15 seconds", "value": 15000 },
+                { "name": "20 seconds", "value": 20000 },
+                { "name": "25 seconds", "value": 25000 },
+                { "name": "30 seconds", "value": 30000 },
+                { "name": "35 seconds", "value": 35000 },
+                { "name": "40 seconds", "value": 40000 },
+                { "name": "45 seconds", "value": 45000 },
+                { "name": "50 seconds", "value": 50000 },
+                { "name": "55 seconds", "value": 55000 },
+                { "name": "1 minute",  "value": 60000 },
+                { "name": "2 minutes", "value": 120000 },
+                { "name": "3 minutes", "value": 180000 },
+                { "name": "4 minutes", "value": 240000 },
+                { "name": "5 minutes", "value": 300000 },
+                { "name": "10 minutes", "value": 600000 },
+                { "name": "15 minutes", "value": 900000 }
+            ],
+            "default": 5000,
+            "mandatory": false
+        }
+    ],
+
+    "items": [
+        {
+            "id": "input",
+            "type": "Text",
+            "label": "Generated power",
+            "header": true,
+            "format": "%.1f kW",
+            "scale": 0.001,
+            "input": "<node>*input*power"
+        },
+        {
+            "id": "grid",
+            "type": "Text",
+            "label": "Grid power",
+            "format": "%.1f kW",
+            "scale": 0.001,
+            "input": "<node>*ac*power*active"
+        },
+        {
+            "id": "current-l1",
+            "type": "Text",
+            "label": "L1 current",
+            "format": "%.1f A",
+            "input": "<node>*l1*current"
+        },
+        {
+            "id": "current-l2",
+            "type": "Text",
+            "label": "L2 current",
+            "format": "%.1f A",
+            "input": "<node>*l2*current"
+        },
+        {
+            "id": "current-l3",
+            "type": "Text",
+            "label": "L3 current",
+            "format": "%.1f A",
+            "input": "<node>*l3*current"
+        }
+    ],
+
+    "channels": [
+        {
+            "name": "<node>*input*power",
+            "description": "<name> AC generated power",
+            "address": "1:HOLDING_REGISTERS:40095:FLOAT",
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"INVERTER", "valueType":"FLOAT", "unit":"W"},
+            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 60000, "loggingTolerance": 10, "average": true, "engine":"SQL",
+                "feed": {"name": "Power generation", "tag": "<name>"}
+            }
+        },
+        {
+            "name": "<node>*input*energy",
+            "description": "<name> AC generated energy",
+            "address": "1:HOLDING_REGISTERS:40101:FLOAT",
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"INVERTER", "scalingFactor":0.001, "valueType":"FLOAT", "unit":"kWh"},
+            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 60000, "loggingTolerance": 10, "average": true, "engine":"SQL",
+                "feed": {"name": "Energy generation", "tag": "<name>"}
+            }
+        },
+        {
+            "name": "<node>*ac*current",
+            "description": "<name> AC total current",
+            "address": "240:HOLDING_REGISTERS:40071:FLOAT",
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"METER", "valueType":"FLOAT", "unit":"A"},
+            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 60000, "loggingTolerance": 0.1, "average": true, "engine":"SQL",
+                "feed": {"name": "Current", "tag": "<name>"}
+            }
+        },
+        {
+            "name": "<node>*l1*current",
+            "description": "<name> AC Phase 1 current",
+            "address": "240:HOLDING_REGISTERS:40073:FLOAT",
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"METER", "valueType":"FLOAT", "unit":"A"},
+            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 60000, "loggingTolerance": 0.1, "average": true, "engine":"SQL",
+                "feed": {"name": "Current L1", "tag": "<name>"}
+            }
+        },
+        {
+            "name": "<node>*l2*current",
+            "description": "<name> AC Phase 2 current",
+            "address": "240:HOLDING_REGISTERS:40075:FLOAT",
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"METER", "valueType":"FLOAT", "unit":"A"},
+            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 60000, "loggingTolerance": 0.1, "average": true, "engine":"SQL",
+                "feed": {"name": "Current L2", "tag": "<name>"}
+            }
+        },
+        {
+            "name": "<node>*l3*current",
+            "description": "<name> AC Phase 3 current",
+            "address": "240:HOLDING_REGISTERS:40077:FLOAT",
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"METER", "valueType":"FLOAT", "unit":"A"},
+            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 60000, "loggingTolerance": 0.1, "average": true, "engine":"SQL",
+                "feed": {"name": "Current L3", "tag": "<name>"}
+            }
+        },
+        {
+            "name": "<node>*l1*voltage",
+            "description": "<name> AC Phase 1 to neutral voltage",
+            "address": "240:HOLDING_REGISTERS:40081:FLOAT",
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"METER", "valueType":"FLOAT", "unit":"V"},
+            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 60000, "loggingTolerance": 0.1, "average": true, "engine":"SQL",
+                "feed": {"name": "Voltage L1", "tag": "<name>"}
+            }
+        },
+        {
+            "name": "<node>*l2*voltage",
+            "description": "<name> AC Phase 2 to neutral voltage",
+            "address": "240:HOLDING_REGISTERS:40083:FLOAT",
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"METER", "valueType":"FLOAT", "unit":"V"},
+            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 60000, "loggingTolerance": 0.1, "average": true, "engine":"SQL",
+                "feed": {"name": "Voltage L2", "tag": "<name>"}
+            }
+        },
+        {
+            "name": "<node>*l3*voltage",
+            "description": "<name> AC Phase 3 to neutral voltage",
+            "address": "240:HOLDING_REGISTERS:40085:FLOAT",
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"METER", "valueType":"FLOAT", "unit":"V"},
+            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 60000, "loggingTolerance": 0.1, "average": true, "engine":"SQL",
+                "feed": {"name": "Voltage L3", "tag": "<name>"}
+            }
+        },
+        {
+            "name": "<node>*ac*frequency",
+            "description": "<name> AC frequency",
+            "address": "240:HOLDING_REGISTERS:40095:FLOAT",
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"METER", "valueType":"FLOAT", "unit":"Hz"},
+            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 60000, "loggingTolerance": 0.01, "average": true, "engine":"SQL",
+                "feed": {"name": "Frequency", "tag": "<name>"}
+            }
+        },
+        {
+            "name": "<node>*ac*power*active",
+            "description": "<name> AC active power",
+            "address": "240:HOLDING_REGISTERS:40097:FLOAT",
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"METER", "valueType":"FLOAT", "unit":"W"},
+            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 60000, "loggingTolerance": 10, "average": true, "engine":"SQL",
+                "feed": {"name": "Power", "tag": "<name>"}
+            }
+        },
+        {
+            "name": "<node>*ac*power*apparent",
+            "description": "<name> AC apparent power",
+            "address": "240:HOLDING_REGISTERS:40105:FLOAT",
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"METER", "valueType":"FLOAT", "unit":"VA"},
+            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 60000, "loggingTolerance": 10, "average": true, "engine":"SQL",
+                "feed": {"name": "Power apparent", "tag": "<name>"}
+            }
+        },
+        {
+            "name": "<node>*ac*power*reactive",
+            "description": "<name> AC reactive power",
+            "address": "240:HOLDING_REGISTERS:40113:FLOAT",
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"METER", "valueType":"FLOAT", "unit":"VAr"},
+            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 60000, "loggingTolerance": 10, "average": true, "engine":"SQL",
+                "feed": {"name": "Power reactive", "tag": "<name>"}
+            }
+        },
+        {
+            "name": "<node>*ac*power*factor",
+            "description": "<name> AC power factor",
+            "address": "240:HOLDING_REGISTERS:40121:FLOAT",
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"METER", "valueType":"FLOAT", "unit":"%"},
+            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 60000, "loggingTolerance": 0.1, "average": true, "engine":"SQL",
+                "feed": {"name": "Power factor", "tag": "<name>"}
+            }
+        },
+        {
+            "name": "<node>*ac*energy*export",
+            "description": "<name> AC exported energy",
+            "address": "240:HOLDING_REGISTERS:40129:FLOAT",
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"METER", "scalingFactor":0.001, "valueType":"FLOAT", "unit":"kWh"},
+            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 60000, "loggingTolerance": 10, "average": true, "engine":"SQL",
+                "feed": {"name": "Energy export", "tag": "<name>"}
+            }
+        },
+        {
+            "name": "<node>*ac*energy*import",
+            "description": "<name> AC imported energy",
+            "address": "240:HOLDING_REGISTERS:40137:FLOAT",
+            "configs": {"samplingInterval": "<refresh>", "samplingGroup":"METER", "scalingFactor":0.001, "valueType":"FLOAT", "unit":"kWh"},
+            "logging": {"loggingInterval": "<refresh>", "loggingMaxInterval": 60000, "loggingTolerance": 10, "average": true, "engine":"SQL",
+                "feed": {"name": "Energy import", "tag": "<name>"}
+            }
+        }
+    ],
+
+    "feeds": [
+        {
+            "name": "Power generation",
+            "tag": "<name>",
+            "engine": "Engine::MYSQL",
+            "table": "<node>_input_power",
+            "unit": "W"
+        },
+        {
+            "name": "Energy generation",
+            "tag": "<name>",
+            "engine": "Engine::MYSQL",
+            "table": "<node>_input_energy",
+            "unit": "kWh"
+        },
+        {
+            "name": "Current",
+            "tag": "<name>",
+            "engine": "Engine::MYSQL",
+            "table": "<node>_ac_current",
+            "unit": "A"
+        },
+        {
+            "name": "Current L1",
+            "tag": "<name>",
+            "engine": "Engine::MYSQL",
+            "table": "<node>_l1_current",
+            "unit": "A"
+        },
+        {
+            "name": "Current L2",
+            "tag": "<name>",
+            "engine": "Engine::MYSQL",
+            "table": "<node>_l2_current",
+            "unit": "A"
+        },
+        {
+            "name": "Current L3",
+            "tag": "<name>",
+            "engine": "Engine::MYSQL",
+            "table": "<node>_l3_current",
+            "unit": "A"
+        },
+        {
+            "name": "Voltage L1",
+            "tag": "<name>",
+            "engine": "Engine::MYSQL",
+            "table": "<node>_l1_voltage",
+            "unit": "V"
+        },
+        {
+            "name": "Voltage L2",
+            "tag": "<name>",
+            "engine": "Engine::MYSQL",
+            "table": "<node>_l2_voltage",
+            "unit": "V"
+        },
+        {
+            "name": "Voltage L3",
+            "tag": "<name>",
+            "engine": "Engine::MYSQL",
+            "table": "<node>_l3_voltage",
+            "unit": "V"
+        },
+        {
+            "name": "Frequency",
+            "tag": "<name>",
+            "engine": "Engine::MYSQL",
+            "table": "<node>_ac_frequency",
+            "unit": "Hz"
+        },
+        {
+            "name": "Power",
+            "tag": "<name>",
+            "engine": "Engine::MYSQL",
+            "table": "<node>_ac_power_active",
+            "unit": "W"
+        },
+        {
+            "name": "Power apparent",
+            "tag": "<name>",
+            "engine": "Engine::MYSQL",
+            "table": "<node>_ac_power_apparent",
+            "unit": "VA"
+        },
+        {
+            "name": "Power reactive",
+            "tag": "<name>",
+            "engine": "Engine::MYSQL",
+            "table": "<node>_ac_power_reactive",
+            "unit": "VAr"
+        },
+        {
+            "name": "Power factor",
+            "tag": "<name>",
+            "engine": "Engine::MYSQL",
+            "table": "<node>_ac_power_factor",
+            "unit": "%"
+        },
+        {
+            "name": "Energy export",
+            "tag": "<name>",
+            "engine": "Engine::MYSQL",
+            "table": "<node>_ac_energy_export",
+            "unit": "kWh"
+        },
+        {
+            "name": "Energy import",
+            "tag": "<name>",
+            "engine": "Engine::MYSQL",
+            "table": "<node>_ac_energy_import",
+            "unit": "kWh"
+        }
+    ]
+}
