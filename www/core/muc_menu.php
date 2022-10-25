@@ -1,11 +1,11 @@
 <?php
 
 global $session;
-if ($session["admin"]) {
+if ($session["write"] && $session["admin"]) {
     $menu["setup"]["l2"]['muc'] = array(
         "name"=>_("Controllers"),
         "href"=>"muc/view",
-        "order"=>180,
+        "order"=>190,
         "icon"=>"muc"
     );
 }

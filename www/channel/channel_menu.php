@@ -5,7 +5,7 @@ if ($session["write"]) {
     $menu["setup"]["l2"]['channel'] = array(
         "name"=>_("Channels"),
         "href"=>"channel/view",
-        "order"=>6,
+        "order"=>7,
         "icon"=>"channel"
     );
 }
